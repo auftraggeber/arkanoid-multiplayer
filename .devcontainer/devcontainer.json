@@ -1,0 +1,56 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/cpp
+{
+	"name": "C++ - WHZ-Image für modernes C++",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	// Add capabilities that are typically disabled for a container. Most often used to add the ptrace capability required to debug languages like C++, Go, and Rust.
+	"capAdd": [
+		"SYS_PTRACE"
+	],
+	// Set container security options
+	"securityOpt": [
+		"seccomp=unconfined"
+	],
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		//	"ghcr.io/devcontainers-contrib/features/ccache-asdf": "latest" // leider funktioniert dieses Feature nicht mit Apple Silicon (M1, M2)
+	},
+	//"postCreateCommand": "sudo bash scripts/install-dev-tools.sh",
+	//
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+	//
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "gcc -v",
+	//
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"cmake.configureOnOpen": true,
+				"editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+				"editor.formatOnSave": true,
+				"C_Cpp.codeAnalysis.clangTidy.enabled": true,
+				"C_Cpp.codeAnalysis.runAutomatically": true
+			},
+			// Add the IDs of extensions you want installed when the container is created.
+			"extensions": [
+				"llvm-vs-code-extensions.vscode-clangd", // wir verwenden clangd für die IDE-Integration (Auto-Vervollständigung, clang-tidy usw.)
+				"ms-vscode.cmake-tools",
+				"twxs.cmake",
+				"ms-vscode.cpptools-themes",
+				"cschlosser.doxdocgen",
+				"eamodio.gitlens",
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"mutantdino.resourcemonitor"
+				// "streetsidesoftware.code-spell-checker",
+				//"xaver.clang-format"
+			]
+		}
+	}
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

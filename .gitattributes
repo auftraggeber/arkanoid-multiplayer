@@ -1,0 +1,4 @@
+*.sh text=auto eol=lf
+
+# Disable automatic line ending conversion for .sh files
+*.sh -text
