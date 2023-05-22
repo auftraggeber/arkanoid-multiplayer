@@ -79,4 +79,10 @@ project_options(
 #####################
 
 add_executable(main src/main.cpp)
-target_link_libraries(main PRIVATE fmt::fmt Catch2::Catch2 project_options project_warnings)
+target_link_libraries(main PRIVATE ftxui::screen ftxui::dom ftxui::component fmt::fmt project_options project_warnings)
+target_link_system_libraries(
+    main
+    PRIVATE
+    ftxui::screen
+    ftxui::dom
+    ftxui::component)
