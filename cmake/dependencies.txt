@@ -18,6 +18,14 @@ FetchContent_MakeAvailable(fmt)
 
 #####
 
+FetchContent_Declare(Boost
+  GIT_REPOSITORY https://github.com/boostorg/boost.git
+  GIT_TAG boost-1.80.0
+)
+FetchContent_MakeAvailable(Boost)
+
+#####
+
 FetchContent_Declare(asio-cmake
   GIT_REPOSITORY https://github.com/kingsamchen/asio-cmake.git
   GIT_TAG        origin/master
