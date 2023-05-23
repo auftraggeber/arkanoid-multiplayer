@@ -80,7 +80,7 @@ project_options(
 
 
 add_executable(main src/main.cpp)
-target_link_libraries(main PRIVATE ftxui::screen ftxui::dom ftxui::component fmt::fmt project_options project_warnings Boost::system asio)
+target_link_libraries(main PRIVATE ftxui::screen ftxui::dom ftxui::component fmt::fmt project_options project_warnings asio)
 target_link_system_libraries(
     main
     PRIVATE
