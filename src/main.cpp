@@ -1,10 +1,14 @@
 #include <algorithm>
+#include <exception>
 #include <ftxui/dom/canvas.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <iostream>
 
 #include <fmt/format.h>
+#include <string>
 #include <vector>
+
+#include "asio.hpp"
 
 #include "fmt/core.h"
 #include "ftxui/component/component.hpp"
@@ -12,11 +16,19 @@
 #include "ftxui/component/loop.hpp"
 #include "ftxui/component/screen_interactive.hpp"
 
+namespace connection {
+
+int constexpr default_port{ 45678 };
+
+
+}
+
 namespace menu {
 using namespace ftxui;
+
 void show_connecting()
 {
-  auto screen = ScreenInteractive::FitComponent();
+  auto screen = ScreenInteractive::TerminalOutput();
 
   int dots = 1;
 
@@ -31,15 +43,24 @@ void show_connecting()
   screen.Loop(renderer);
 }
 
-void show_waiting_for_connection(int const port) {}
+[[nodiscard]] int calculate_port(std::string const &str)
+{
+
+  try {
+    return std::stoi(str);
+  } catch (std::exception e) {}
+  return connection::default_port;
+}
+
+void show_waiting_for_connection(int const &port = connection::default_port) {}
 
 void show_connection_methods()
 {
 
-  auto screen = ScreenInteractive::FitComponent();
+  auto screen = ScreenInteractive::TerminalOutput();
   bool is_host{ false };
 
-  std::string port_string{ "45678" };
+  std::string port_string{ std::to_string(connection::default_port) };
 
   auto button_host = Button("Als Host auf Verbindung warten", [&] {
     screen.Exit();
@@ -68,6 +89,8 @@ void show_connection_methods()
 
 
   screen.Loop(render);
+
+  int const port = calculate_port(port_string);
 
   if (is_host) {
     show_waiting_for_connection(1);
