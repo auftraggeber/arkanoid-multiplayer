@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstdlib>
 #include <exception>
 #include <ftxui/dom/canvas.hpp>
 #include <ftxui/dom/elements.hpp>
@@ -45,15 +46,15 @@ boost::asio::io_service io_service; /* todo: in Klasse einbauen */
 class Connection
 {
 private:
-  boost::asio::ip::tcp::socket socket{ io_service };
-  std::vector<std::function<void()>> receivers;
+  boost::asio::ip::tcp::socket m_socket{ io_service };
+  std::vector<std::function<void()>> m_receivers;
   /* std::mutex receivers_mutex; */
 
   void connect_to_on_this_thread(std::string const &host, int const &port)
   {
     try {
-      if (socket.is_open()) { return; }
-      socket.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(host), port));
+      if (m_socket.is_open()) { return; }
+      m_socket.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(host), port));
       listen();
     } catch (boost::system::system_error &e) {
       fmt::print("Fehler beim Verbinden.");
@@ -63,12 +64,12 @@ private:
   void wait_for_connection_on_this_thread(int const &port)
   {
     try {
-      if (socket.is_open()) { return; }
+      if (m_socket.is_open()) { return; }
 
       boost::asio::ip::tcp::acceptor acceptor{ io_service,
         boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port) };
 
-      acceptor.accept(socket);
+      acceptor.accept(m_socket);
       io_service.run();
 
       listen();
@@ -80,7 +81,7 @@ private:
   void call_receivers()
   {
     /* std::lock_guard<std::mutex> lg{ receivers_mutex, std::adopt_lock }; */
-    std::for_each(receivers.begin(), receivers.end(), [](std::function<void()> const &r) { r(); });
+    std::for_each(m_receivers.begin(), m_receivers.end(), [](std::function<void()> const &r) { r(); });
   }
 
   void listen()
@@ -124,13 +125,63 @@ public:
   void register_receiver(std::function<void()> const &receiver)
   {
     /* std::lock_guard<std::mutex> lg{ receivers_mutex, std::adopt_lock }; */
-    receivers.push_back(receiver);
+    m_receivers.push_back(receiver);
   }
 
-  [[nodiscard]] bool is_open() const { return socket.is_open(); }
+  [[nodiscard]] bool is_open() const { return m_socket.is_open(); }
 };
 
 }// namespace connection
+
+namespace arkanoid {
+
+struct Position
+{
+public:
+  int x;
+  int y;
+};
+
+class Element
+{
+protected:
+  Position m_position;
+  int const m_width;
+  int const m_height;
+
+public:
+  explicit Element(Position const position, int const width, int const height)
+    : m_position{ position }, m_width(width), m_height(height)
+  {}
+
+  void draw(ftxui::Canvas const &canvas) const {}
+
+  [[nodiscard]] int left() const { return m_position.x; }
+
+  [[nodiscard]] int right() const { return left() + m_width; }
+
+  [[nodiscard]] int top() const { return m_position.y; }
+
+  [[nodiscard]] int bottom() const { return top() + m_height; }
+};
+
+class Ball : public Element
+{
+
+public:
+  explicit Ball(Position const position) : Element(position, 1, 1) {}
+};
+
+class Paddle : public Element
+{
+};
+
+class Brick : public Element
+{
+};
+
+
+}// namespace arkanoid
 
 void show_connection_methods(std::function<void(bool const &, int const &)> callback)
 {
@@ -219,14 +270,24 @@ void show_connecting_state(connection::Connection const &connection)
   screen.Exit();
 }
 
+void game(connection::Connection const &connection)
+{
+
+  using namespace arkanoid;
+  Ball ball{ { 0, 0 } };
+
+  fmt::print("Ball left: {}", ball.left());
+}
+
 int main()
 {
   show_connection_methods([](bool const &as_host, int const &port) {
     connection::Connection connection = connect_to_peer(as_host, port);
 
     show_connecting_state(connection);
+    game(connection);
 
     connection.close();
   });
-  return 0;
+  return EXIT_SUCCESS;
 }
