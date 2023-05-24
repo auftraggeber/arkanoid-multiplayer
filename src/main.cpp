@@ -1,8 +1,10 @@
 #include <algorithm>
+#include <asm-generic/errno.h>
 #include <cstdlib>
 #include <exception>
 #include <ftxui/dom/canvas.hpp>
 #include <ftxui/dom/elements.hpp>
+#include <ftxui/screen/color.hpp>
 #include <iostream>
 
 #include <fmt/format.h>
@@ -135,14 +137,14 @@ public:
 
 namespace arkanoid {
 
-int constexpr canvas_width{ 150 }, canvas_height{ 100 };
-int constexpr playing_field_top{ 5 }, playing_field_bottom{ canvas_height - 5 }, playing_field_left{ 0 },
-  playing_field_right{ canvas_width - 1 };
+int constexpr canvas_width{ 164 }, canvas_height{ 100 };
+int constexpr playing_field_top{ 5 }, playing_field_bottom{ canvas_height - 10 }, playing_field_left{ 1 },
+  playing_field_right{ canvas_width - 2 };
 int constexpr ball_radius{ 1 }, ball_speed{ 1 };
-int constexpr paddle_width{ 14 }, paddle_height{ 2 };
-int constexpr brick_width{ 8 }, brick_height{ 4 };
-int constexpr num_bricks_x{ 12 }, num_bricks_y{ 3 };
-int constexpr brick_distance_x{ brick_width + 2 }, brick_distance_y{ brick_height + 2 };
+int constexpr paddle_width{ 14 }, paddle_height{ 1 };
+int constexpr brick_width{ 14 }, brick_height{ 5 };
+int constexpr num_bricks_y{ 5 };
+int constexpr brick_distance_x{ 2 }, brick_distance_y{ 3 };
 
 struct Position
 {
@@ -159,16 +161,23 @@ protected:
   Position m_position;
   int const m_width;
   int const m_height;
+  ftxui::Color m_color;
 
 public:
-  explicit Element(Position const position, int const width, int const height)
-    : m_position{ position }, m_width(width), m_height(height)
+  explicit Element(Position const position,
+    int const width,
+    int const height,
+    ftxui::Color const color = ftxui::Color::White)
+    : m_position{ position }, m_width{ width }, m_height{ height }, m_color{ color }
   {}
 
   void draw(ftxui::Canvas &canvas) const
   {
     if (!exists()) { return; }
-    canvas.DrawBlockLine(left(), top(), right(), bottom());
+
+    int const start{ top() % 2 == 0 ? top() - 1 : top() }; /* Zeichenfehler beheben */
+
+    for (int y = start; y <= bottom(); y += 2) { canvas.DrawBlockLine(left(), y, right(), y, m_color); }
   }
 
   [[nodiscard]] int left() const { return m_position.x; }
@@ -186,7 +195,7 @@ class Ball : public Element
 {
 
 public:
-  explicit Ball(Position const position) : Element{ position, ball_radius, ball_radius } {}
+  explicit Ball(Position const position) : Element{ position, ball_radius, ball_radius, ftxui::Color::Red } {}
 };
 
 class Paddle : public Element
@@ -197,6 +206,9 @@ public:
 
 class Brick : public Element
 {
+
+public:
+  explicit Brick(Position const position) : Element{ position, brick_width, brick_height } {}
 };
 
 
@@ -289,17 +301,60 @@ void show_connecting_state(connection::Connection const &connection)
   screen.Exit();
 }
 
+void generate_bricks(std::vector<arkanoid::Element> &elements)
+{
+  using namespace arkanoid;
+
+  int const num_bricks_x = (playing_field_right - brick_distance_x) / (brick_width + brick_distance_x);
+
+  for (int i_x{ 0 }; i_x < num_bricks_x; ++i_x) {
+    for (int i_y{ 0 }; i_y < num_bricks_y; ++i_y) {
+
+      int const x{ playing_field_left + ((brick_distance_x + brick_width) * i_x) };
+      int const y{ playing_field_top + ((brick_distance_y + brick_height) * i_y) };
+
+      arkanoid::Brick brick{ { x, y } };
+      elements.push_back(brick);
+    }
+  }
+}
+
 void game(connection::Connection const &connection)
 {
 
   using namespace arkanoid;
+  using namespace ftxui;
 
-  Position paddle_position = { canvas_width / 2, playing_field_bottom - paddle_height };
+  Position const paddle_position = { (canvas_width / 2) - (paddle_width / 2), playing_field_bottom - paddle_height };
 
   Paddle paddle{ paddle_position };
-  Ball ball{ paddle_position.add(0, -paddle_height - 5) };
+  Ball ball{ paddle_position.add(paddle_width / 2, -10) };
 
-  fmt::print("Ball left: {}", ball.left());
+  std::vector<arkanoid::Element> elements;
+
+  elements.push_back(paddle);
+  elements.push_back(ball);
+
+  generate_bricks(elements);
+
+  auto renderer = Renderer([&] {
+    Canvas can = Canvas(canvas_width, canvas_height);
+
+    // score
+    /*can.DrawText(0, 0, "Score: ");*/
+
+    std::for_each(elements.begin(), elements.end(), [&can](arkanoid::Element element) { element.draw(can); });
+
+    // wrap the element with a border
+    return canvas(can) | border;
+  });
+
+  // because we define the canvas size, we can set the screen to FitComponent
+  auto screen = ScreenInteractive::FitComponent();
+
+  Loop loop{ &screen, std::move(renderer) };
+
+  loop.Run();
 }
 
 int main()
@@ -308,9 +363,12 @@ int main()
     connection::Connection connection = connect_to_peer(as_host, port);
 
     show_connecting_state(connection);
-    game(connection);
 
-    connection.close();
+    if (connection.is_open()) {
+      game(connection);
+
+      connection.close();
+    }
   });
   return EXIT_SUCCESS;
 }
