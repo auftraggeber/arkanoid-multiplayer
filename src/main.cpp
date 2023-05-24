@@ -55,7 +55,7 @@ private:
       if (socket.is_open()) { return; }
       socket.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(host), port));
       listen();
-    } catch (boost::system::system_error e) {
+    } catch (boost::system::system_error &e) {
       fmt::print("Fehler beim Verbinden.");
     }
   }
@@ -72,7 +72,7 @@ private:
       io_service.run();
 
       listen();
-    } catch (boost::system::system_error e) {
+    } catch (boost::system::system_error &e) {
       fmt::print("Fehler beim Warten auf Verbindung.");
     }
   }
