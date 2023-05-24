@@ -118,7 +118,7 @@ public:
     } };
   }
 
-  void close() { socket.close(); }
+  void close() { m_socket.close(); }
 
   void send() const {}
 
@@ -135,11 +135,22 @@ public:
 
 namespace arkanoid {
 
+int constexpr canvas_width{ 150 }, canvas_height{ 100 };
+int constexpr playing_field_top{ 5 }, playing_field_bottom{ canvas_height - 5 }, playing_field_left{ 0 },
+  playing_field_right{ canvas_width - 1 };
+int constexpr ball_radius{ 1 }, ball_speed{ 1 };
+int constexpr paddle_width{ 14 }, paddle_height{ 2 };
+int constexpr brick_width{ 8 }, brick_height{ 4 };
+int constexpr num_bricks_x{ 12 }, num_bricks_y{ 3 };
+int constexpr brick_distance_x{ brick_width + 2 }, brick_distance_y{ brick_height + 2 };
+
 struct Position
 {
 public:
   int x;
   int y;
+
+  [[nodiscard]] Position add(int const &x, int const &y) const { return Position{ this->x + x, this->y + y }; }
 };
 
 class Element
@@ -154,7 +165,11 @@ public:
     : m_position{ position }, m_width(width), m_height(height)
   {}
 
-  void draw(ftxui::Canvas const &canvas) const {}
+  void draw(ftxui::Canvas &canvas) const
+  {
+    if (!exists()) { return; }
+    canvas.DrawBlockLine(left(), top(), right(), bottom());
+  }
 
   [[nodiscard]] int left() const { return m_position.x; }
 
@@ -163,17 +178,21 @@ public:
   [[nodiscard]] int top() const { return m_position.y; }
 
   [[nodiscard]] int bottom() const { return top() + m_height; }
+
+  [[nodiscard]] bool exists() const { return true; }
 };
 
 class Ball : public Element
 {
 
 public:
-  explicit Ball(Position const position) : Element(position, 1, 1) {}
+  explicit Ball(Position const position) : Element{ position, ball_radius, ball_radius } {}
 };
 
 class Paddle : public Element
 {
+public:
+  explicit Paddle(Position const position) : Element{ position, paddle_width, paddle_height } {}
 };
 
 class Brick : public Element
@@ -274,7 +293,11 @@ void game(connection::Connection const &connection)
 {
 
   using namespace arkanoid;
-  Ball ball{ { 0, 0 } };
+
+  Position paddle_position = { canvas_width / 2, playing_field_bottom - paddle_height };
+
+  Paddle paddle{ paddle_position };
+  Ball ball{ paddle_position.add(0, -paddle_height - 5) };
 
   fmt::print("Ball left: {}", ball.left());
 }
