@@ -34,7 +34,7 @@ namespace connection {
 
 int constexpr default_port{ 45678 };
 std::string const default_host{ "127.0.0.1" };
-boost::asio::io_service io_service; /* todo: in Klasse einbauen */
+/* todo: in Klasse einbauen */
 
 [[nodiscard]] int calculate_port_from_string(std::string const &str)
 {
@@ -48,9 +48,10 @@ boost::asio::io_service io_service; /* todo: in Klasse einbauen */
 class Connection
 {
 private:
+  boost::asio::io_service io_service;
   boost::asio::ip::tcp::socket m_socket{ io_service };
   std::vector<std::function<void()>> m_receivers;
-  /* std::mutex receivers_mutex; */
+  /* std::mutex receivers_mutex; todo: gibt fehler */
 
   void connect_to_on_this_thread(std::string const &host, int const &port)
   {
@@ -99,6 +100,9 @@ private:
 public:
   explicit Connection() = default;
 
+  Connection(Connection const &) = delete;
+  Connection &operator=(Connection const &) = delete;
+
   std::thread connect_to(
     std::string const &host,
     int const &port,
@@ -130,7 +134,7 @@ public:
     m_receivers.push_back(receiver);
   }
 
-  [[nodiscard]] bool is_open() const { return m_socket.is_open(); }
+  [[nodiscard]] bool is_open() const { return m_socket.is_open(); } /* todo: auch nach abbruch true?? */
 };
 
 }// namespace connection
@@ -254,10 +258,9 @@ void show_connection_methods(std::function<void(bool const &, int const &)> call
   callback(is_host, port);
 }
 
-[[nodiscard]] connection::Connection connect_to_peer(bool const as_host, int const port)
+[[nodiscard]] void connect_to_peer(connection::Connection &connection, bool const as_host, int const port)
 {
   using namespace ftxui;
-  connection::Connection connection;
 
   auto screen = ScreenInteractive::TerminalOutput();
   screen.Clear();
@@ -280,9 +283,6 @@ void show_connection_methods(std::function<void(bool const &, int const &)> call
   } else {
     connection.connect_to(connection::default_host, port).join();
   }
-
-
-  return connection;
 }
 
 void show_connecting_state(connection::Connection const &connection)
@@ -360,7 +360,8 @@ void game(connection::Connection const &connection)
 int main()
 {
   show_connection_methods([](bool const &as_host, int const &port) {
-    connection::Connection connection = connect_to_peer(as_host, port);
+    connection::Connection connection;
+    connect_to_peer(connection, as_host, port);
 
     show_connecting_state(connection);
 
