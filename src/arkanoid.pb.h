@@ -359,27 +359,27 @@ class GameElement PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kPositionFieldNumber = 3,
+    kElementPositionFieldNumber = 3,
     kIdFieldNumber = 1,
     kTypeFieldNumber = 2,
   };
-  // .ElementPosition position = 3;
-  bool has_position() const;
+  // .ElementPosition element_position = 3;
+  bool has_element_position() const;
   private:
-  bool _internal_has_position() const;
+  bool _internal_has_element_position() const;
   public:
-  void clear_position();
-  const ::ElementPosition& position() const;
-  ::ElementPosition* release_position();
-  ::ElementPosition* mutable_position();
-  void set_allocated_position(::ElementPosition* position);
+  void clear_element_position();
+  const ::ElementPosition& element_position() const;
+  ::ElementPosition* release_element_position();
+  ::ElementPosition* mutable_element_position();
+  void set_allocated_element_position(::ElementPosition* element_position);
   private:
-  const ::ElementPosition& _internal_position() const;
-  ::ElementPosition* _internal_mutable_position();
+  const ::ElementPosition& _internal_element_position() const;
+  ::ElementPosition* _internal_mutable_element_position();
   public:
-  void unsafe_arena_set_allocated_position(
-      ::ElementPosition* position);
-  ::ElementPosition* unsafe_arena_release_position();
+  void unsafe_arena_set_allocated_element_position(
+      ::ElementPosition* element_position);
+  ::ElementPosition* unsafe_arena_release_element_position();
 
   // int32 id = 1;
   void clear_id();
@@ -406,7 +406,7 @@ class GameElement PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::ElementPosition* position_;
+  ::ElementPosition* element_position_;
   ::PROTOBUF_NAMESPACE_ID::int32 id_;
   int type_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -653,85 +653,85 @@ inline void GameElement::set_type(::ElementType value) {
   // @@protoc_insertion_point(field_set:GameElement.type)
 }
 
-// .ElementPosition position = 3;
-inline bool GameElement::_internal_has_position() const {
-  return this != internal_default_instance() && position_ != nullptr;
+// .ElementPosition element_position = 3;
+inline bool GameElement::_internal_has_element_position() const {
+  return this != internal_default_instance() && element_position_ != nullptr;
 }
-inline bool GameElement::has_position() const {
-  return _internal_has_position();
+inline bool GameElement::has_element_position() const {
+  return _internal_has_element_position();
 }
-inline void GameElement::clear_position() {
-  if (GetArena() == nullptr && position_ != nullptr) {
-    delete position_;
+inline void GameElement::clear_element_position() {
+  if (GetArena() == nullptr && element_position_ != nullptr) {
+    delete element_position_;
   }
-  position_ = nullptr;
+  element_position_ = nullptr;
 }
-inline const ::ElementPosition& GameElement::_internal_position() const {
-  const ::ElementPosition* p = position_;
+inline const ::ElementPosition& GameElement::_internal_element_position() const {
+  const ::ElementPosition* p = element_position_;
   return p != nullptr ? *p : *reinterpret_cast<const ::ElementPosition*>(
       &::_ElementPosition_default_instance_);
 }
-inline const ::ElementPosition& GameElement::position() const {
-  // @@protoc_insertion_point(field_get:GameElement.position)
-  return _internal_position();
+inline const ::ElementPosition& GameElement::element_position() const {
+  // @@protoc_insertion_point(field_get:GameElement.element_position)
+  return _internal_element_position();
 }
-inline void GameElement::unsafe_arena_set_allocated_position(
-    ::ElementPosition* position) {
+inline void GameElement::unsafe_arena_set_allocated_element_position(
+    ::ElementPosition* element_position) {
   if (GetArena() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(position_);
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(element_position_);
   }
-  position_ = position;
-  if (position) {
+  element_position_ = element_position;
+  if (element_position) {
     
   } else {
     
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:GameElement.position)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:GameElement.element_position)
 }
-inline ::ElementPosition* GameElement::release_position() {
-  auto temp = unsafe_arena_release_position();
+inline ::ElementPosition* GameElement::release_element_position() {
+  auto temp = unsafe_arena_release_element_position();
   if (GetArena() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
   return temp;
 }
-inline ::ElementPosition* GameElement::unsafe_arena_release_position() {
-  // @@protoc_insertion_point(field_release:GameElement.position)
+inline ::ElementPosition* GameElement::unsafe_arena_release_element_position() {
+  // @@protoc_insertion_point(field_release:GameElement.element_position)
   
-  ::ElementPosition* temp = position_;
-  position_ = nullptr;
+  ::ElementPosition* temp = element_position_;
+  element_position_ = nullptr;
   return temp;
 }
-inline ::ElementPosition* GameElement::_internal_mutable_position() {
+inline ::ElementPosition* GameElement::_internal_mutable_element_position() {
   
-  if (position_ == nullptr) {
+  if (element_position_ == nullptr) {
     auto* p = CreateMaybeMessage<::ElementPosition>(GetArena());
-    position_ = p;
+    element_position_ = p;
   }
-  return position_;
+  return element_position_;
 }
-inline ::ElementPosition* GameElement::mutable_position() {
-  // @@protoc_insertion_point(field_mutable:GameElement.position)
-  return _internal_mutable_position();
+inline ::ElementPosition* GameElement::mutable_element_position() {
+  // @@protoc_insertion_point(field_mutable:GameElement.element_position)
+  return _internal_mutable_element_position();
 }
-inline void GameElement::set_allocated_position(::ElementPosition* position) {
+inline void GameElement::set_allocated_element_position(::ElementPosition* element_position) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
   if (message_arena == nullptr) {
-    delete position_;
+    delete element_position_;
   }
-  if (position) {
+  if (element_position) {
     ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(position);
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(element_position);
     if (message_arena != submessage_arena) {
-      position = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, position, submessage_arena);
+      element_position = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, element_position, submessage_arena);
     }
     
   } else {
     
   }
-  position_ = position;
-  // @@protoc_insertion_point(field_set_allocated:GameElement.position)
+  element_position_ = element_position;
+  // @@protoc_insertion_point(field_set_allocated:GameElement.element_position)
 }
 
 // -------------------------------------------------------------------

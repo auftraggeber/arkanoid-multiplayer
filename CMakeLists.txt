@@ -79,7 +79,9 @@ project_options(
 #####################
 
 find_package(Protobuf REQUIRED)
-add_executable(main src/main.cpp)
+protobuf_generate_cpp(protobuf_srcs protobuf_hdrs src/arkanoid.proto)
+add_executable(main src/main.cpp ${protobuf_srcs} ${protobuf_hdrs})
+target_include_directories(main PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 target_link_libraries(main PRIVATE ftxui::screen ftxui::dom ftxui::component fmt::fmt project_options project_warnings Boost::system Boost::asio ${Protobuf_LIBRARIES}) 
 target_link_system_libraries(
     main

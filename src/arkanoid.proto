@@ -14,10 +14,9 @@ message ElementPosition {
 message GameElement {
     int32 id = 1;
     ElementType type = 2;
-    ElementPosition position = 3; 
+    ElementPosition element_position = 3; 
 }
 
 message GameUpdate {
     repeated GameElement element = 1;
 }
- 

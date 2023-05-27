@@ -37,8 +37,8 @@
 				"protoc": {
 					"compile_on_save": true,
 					"options": [
-						"-I=/workspaces/2023-pv2-langner/protobuf",
-						"--cpp_out=/workspaces/2023-pv2-langner/protobuf"
+						"-I=/workspaces/2023-pv2-langner/src",
+						"--cpp_out=/workspaces/2023-pv2-langner/src"
 					]
 				}
 			},
