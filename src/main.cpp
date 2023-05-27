@@ -34,6 +34,7 @@
 #include "ftxui/component/screen_interactive.hpp"
 #include "ftxui/dom/elements.hpp"
 
+#include "arkanoid.pb.h"
 namespace connection {
 
 int constexpr default_port{ 45678 };
@@ -363,7 +364,8 @@ void game(connection::Connection const &connection)
   using namespace arkanoid;
   using namespace ftxui;
 
-  Position const paddle_position = { (canvas_width / 2) - (paddle_width / 2), playing_field_bottom - paddle_height };
+  arkanoid::Position const paddle_position = { (canvas_width / 2) - (paddle_width / 2),
+    playing_field_bottom - paddle_height };
 
   Paddle paddle{ paddle_position };
   Ball ball{ paddle_position.add(paddle_width / 2, -10) };

@@ -78,9 +78,9 @@ project_options(
 
 #####################
 
-
+find_package(Protobuf REQUIRED)
 add_executable(main src/main.cpp)
-target_link_libraries(main PRIVATE ftxui::screen ftxui::dom ftxui::component fmt::fmt project_options project_warnings Boost::system Boost::asio)
+target_link_libraries(main PRIVATE ftxui::screen ftxui::dom ftxui::component fmt::fmt project_options project_warnings Boost::system Boost::asio ${Protobuf_LIBRARIES}) 
 target_link_system_libraries(
     main
     PRIVATE
