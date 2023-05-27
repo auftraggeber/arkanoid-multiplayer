@@ -35,6 +35,7 @@
 #include "ftxui/dom/elements.hpp"
 
 #include "arkanoid.pb.h"
+
 namespace connection {
 
 int constexpr default_port{ 45678 };
@@ -190,6 +191,8 @@ protected:
   int const m_height;
   ftxui::Color m_color;
 
+  friend void fill_game_element(GameElement *const &, arkanoid::Element const &);// todo: außerhalb von namespace ??
+
 public:
   IdGenerator static id_generator;
 
@@ -237,6 +240,30 @@ public:
   explicit Brick(Position const position) : Element{ position, brick_width, brick_height } {}
 };
 
+/*void fill_game_element(GameElement *const &game_element, arkanoid::Element const &element)// todo
+{
+  ElementPosition position;
+
+  position.set_x(element.m_position.x);
+  position.set_y(element.m_position.y);
+
+  game_element->set_id(element.id());
+  game_element->set_type(BALL);
+  game_element->set_allocated_position(&position);
+}*/
+
+/*[[nodiscard]] GameUpdate build_game_update(std::vector<arkanoid::Element> const &elements) todo
+{
+  GameUpdate update;
+
+  std::for_each(elements.begin(), elements.end(), [&update](arkanoid::Element const &element) {
+    GameElement *game_element = update.add_element();
+
+    fill_game_element(game_element, element);
+  });
+
+  return update;
+}*/
 
 }// namespace arkanoid
 
@@ -358,6 +385,16 @@ void draw(ftxui::Canvas &canvas, T1 const &drawable)
   }
 }
 
+template<typename T1, typename T2>// todo: gibt es schon eine implemtierung?
+[[nodiscard]] std::vector<T2> map_values(std::map<T1, T2> const &map)
+{
+  std::vector<T2> vector;
+
+  std::for_each(map.begin(), map.end(), [&vector](std::pair<T1, T2> const &p) { vector.push_back(p.second); });
+
+  return vector;
+}
+
 void game(connection::Connection const &connection)
 {
 
@@ -376,6 +413,8 @@ void game(connection::Connection const &connection)
   insert_element(element_map, ball);
 
   generate_bricks(element_map);
+
+  // GameUpdate update = build_game_update(map_values(element_map)); todo
 
   auto renderer = Renderer([&] {
     Canvas can = Canvas(canvas_width, canvas_height);

@@ -6,18 +6,18 @@ enum ElementType {
     BRICK = 2;
 }
 
-message Position {
+message ElementPosition {
     int32 x = 1;
     int32 y = 2;
 }
 
-message Element {
+message GameElement {
     int32 id = 1;
     ElementType type = 2;
-    Position position = 3; 
+    ElementPosition position = 3; 
 }
 
-message Game {
-    repeated Element element = 1;
+message GameUpdate {
+    repeated GameElement element = 1;
 }
  
