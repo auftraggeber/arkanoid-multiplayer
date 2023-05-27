@@ -48,7 +48,6 @@ namespace connection {
 
 int constexpr default_port{ 45678 };
 std::string const default_host{ "127.0.0.1" };
-/* todo: in Klasse einbauen */
 
 [[nodiscard]] int calculate_port_from_string(std::string const &str)
 {
@@ -64,18 +63,21 @@ class Connection
 private:
   boost::asio::io_service io_service;
   boost::asio::ip::tcp::socket m_socket{ io_service };
-  std::vector<std::function<void(GameUpdate const update)>> m_receivers;
+  std::vector<std::function<void(GameUpdate const &)>> m_receivers;
   bool m_connected{ false };// todo: unschöne Lösung
-  std::mutex receivers_mutex;
+  std::mutex receivers_mutex, m_conntected_mutex;
 
   void connect_to_on_this_thread(std::string const &host, int const &port)
   {
     try {
-      if (is_open()) { return; }
+      if (has_connected()) { return; }
+
+      std::lock_guard<std::mutex>{ m_conntected_mutex, std::adopt_lock };
       m_socket.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(host), port));
-      io_service.run();
       m_connected = true;
-      listen();
+      read_listener();
+      io_service.run();
+
     } catch (boost::system::system_error &e) {
       fmt::print("Fehler beim Verbinden.");
     }
@@ -84,56 +86,44 @@ private:
   void wait_for_connection_on_this_thread(int const &port)
   {
     try {
-      if (is_open()) { return; }
+      if (has_connected()) { return; }
 
       boost::asio::ip::tcp::acceptor acceptor{ io_service,
         boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port) };
 
-      acceptor.accept(m_socket);
-      io_service.run();
-      m_connected = true;
 
-      listen();
+      std::lock_guard<std::mutex>{ m_conntected_mutex, std::adopt_lock };
+      acceptor.accept(m_socket);
+      m_connected = true;
+      read_listener();
+      io_service.run();
     } catch (boost::system::system_error &e) {
       fmt::print("Fehler beim Warten auf Verbindung.");
     }
   }
 
-  void call_receivers(GameUpdate const &update)
+  void call_receivers(GameUpdate const &update)// todo kopie besser?
   {
-    std::lock_guard<std::mutex> lg{ receivers_mutex, std::adopt_lock };
+    std::lock_guard<std::mutex>{ receivers_mutex, std::adopt_lock };
     std::for_each(m_receivers.begin(),
       m_receivers.end(),
-      [&update](std::function<void(GameUpdate const update)> const &r) { r(update); });// todo kopie besser?
+      [update](std::function<void(GameUpdate const &)> const &receiver) { receiver(update); });
   }
 
-  void listen()
+  void read_listener()
   {
     std::thread{
       [this]() {
-        /* ... */
-        // todo
-        while (is_open()) {
-          boost::asio::streambuf buffer;
-          boost::system::error_code error_code;
+        std::array<char, 4096> buffer;
 
-          std::string all;
-          std::string str;
-
-          while (size_t trans = boost::asio::read(m_socket, buffer, error_code)) {
-            if (error_code) { break; }
-            str.resize(trans);
-
-            buffer.sgetn(&str[0], str.size());
-            all += str;
-          }
-
-          GameUpdate update;
-          if (update.ParseFromString(all)) { call_receivers(update); }
-        }
+        boost::asio::async_read(m_socket,
+          boost::asio::buffer(buffer),
+          boost::asio::transfer_all(),
+          [](boost::system::error_code const &ec, std::size_t bytes_transferred) { std::cout << "done reading!"; });
       }
     }.detach();
   }
+
 
 public:
   explicit Connection() = default;
@@ -164,10 +154,9 @@ public:
 
   void close() { m_socket.close(); }
 
-  [[nodiscard]] bool send(GameUpdate game_update)
+  [[nodiscard]] bool send(GameUpdate &game_update)
   {
-    if (!is_open()) { return false; }
-    return true;
+    if (!has_connected()) { return false; }
 
     std::thread([game_update, this]() {// todo: kopie besser?
       auto buffer = boost::asio::buffer(game_update.SerializeAsString());
@@ -178,13 +167,17 @@ public:
     return true;
   }
 
-  void register_receiver(std::function<void(GameUpdate const update)> const &receiver)
+  void register_receiver(std::function<void(GameUpdate const &update)> const &receiver)
   {
-    std::lock_guard<std::mutex> lg{ receivers_mutex, std::adopt_lock };
+    std::lock_guard<std::mutex>{ receivers_mutex, std::adopt_lock };// todo: varname?
     m_receivers.push_back(receiver);
   }
 
-  [[nodiscard]] bool is_open() const { return m_connected && m_socket.is_open(); } /* todo: auch nach abbruch true?? */
+  [[nodiscard]] bool has_connected()
+  {
+    std::lock_guard<std::mutex>{ m_conntected_mutex, std::adopt_lock };
+    return m_connected;
+  }
 };
 
 }// namespace connection
@@ -259,7 +252,7 @@ public:
   [[nodiscard]] ftxui::Color color() const { return m_color; };
 };
 
-IdGenerator Element::id_generator = IdGenerator{ 0 };
+IdGenerator Element::id_generator = IdGenerator{ 0 };// todo: static init in Klasse
 
 class Ball : public Element
 {
@@ -283,7 +276,7 @@ public:
 
 void fill_game_element(GameElement *const &game_element, arkanoid::Element const &element)// todo
 {
-  ElementPosition *position = new ElementPosition{};// todo muss auf heap, da sonst null-pointer, verfahren da hinter?
+  ElementPosition *position = new ElementPosition{};// muss auf heap, da sonst null-pointer, verfahren da hinter?
 
   int const x = element.m_position.x;
   int const y = element.m_position.y;
@@ -296,11 +289,10 @@ void fill_game_element(GameElement *const &game_element, arkanoid::Element const
   game_element->set_allocated_element_position(position);
 }
 
-void fill_game_update(GameUpdate *update,
-  std::vector<arkanoid::Element> const &elements)// todo
+void fill_game_update(GameUpdate *update, std::vector<arkanoid::Element> const &elements)
 {
 
-  std::for_each(elements.begin(), elements.end(), [&update](arkanoid::Element const &element) {// fehler
+  std::for_each(elements.begin(), elements.end(), [&update](arkanoid::Element const &element) {
     GameElement *game_element = update->add_element();
 
     fill_game_element(game_element, element);
@@ -395,7 +387,7 @@ void connect_to_peer(connection::Connection &connection, bool const as_host, int
   }
 }
 
-void show_connecting_state(connection::Connection const &connection)
+void show_connecting_state(connection::Connection &connection)
 {
   using namespace ftxui;
 
@@ -403,7 +395,7 @@ void show_connecting_state(connection::Connection const &connection)
   screen.Clear();
 
   auto renderer = Renderer([&connection]() {
-    return vbox({ text((connection.is_open()) ? "Verbunden" : "Konnte nicht verbinden") }) | border;
+    return vbox({ text((connection.has_connected()) ? "Verbunden" : "Konnte nicht verbinden") }) | border;
   });
 
   Loop{ &screen, std::move(renderer) }.RunOnce();
@@ -446,7 +438,7 @@ void draw(ftxui::Canvas &canvas, T1 const &drawable)
   }
 }
 
-template<typename T1, typename T2>// todo: gibt es schon eine implemtierung?
+template<typename T1, typename T2>// todo: gibt es schon eine implementierung?
 [[nodiscard]] std::vector<T2> map_values(std::map<T1, T2> const &map)
 {
   std::vector<T2> vector;
@@ -465,8 +457,9 @@ int main()
     std::mutex element_mutex;
     std::map<int, arkanoid::Element> element_map;
     connection::Connection connection;
+    auto screen = ScreenInteractive::FitComponent();
 
-    connection.register_receiver([&element_map, &element_mutex](GameUpdate const update) {
+    connection.register_receiver([&element_map, &element_mutex](GameUpdate const &update) {
       std::vector<arkanoid::Element> elements_to_update = arkanoid::parse_game_update(update);
 
       std::lock_guard<std::mutex>{ element_mutex, std::adopt_lock };
@@ -476,6 +469,7 @@ int main()
     });
 
     connect_to_peer(connection, as_host, port);
+    show_connecting_state(connection);
 
     if (as_host) {
       arkanoid::Position const paddle_position = { (canvas_width / 2) - (paddle_width / 2),
@@ -502,14 +496,9 @@ int main()
       }
     }
 
-    show_connecting_state(connection);
-
-    if (connection.is_open()) {
+    if (connection.has_connected()) {
       auto renderer = Renderer([&] {
         Canvas can = Canvas(canvas_width, canvas_height);
-
-        // score
-        /*can.DrawText(0, 0, "Score: ");*/
 
         {
           std::lock_guard<std::mutex>{ element_mutex, std::adopt_lock };
@@ -522,13 +511,12 @@ int main()
         return canvas(can) | border;
       });
 
-      auto screen = ScreenInteractive::FitComponent();
-
       Loop loop{ &screen, std::move(renderer) };
 
       loop.Run();
       connection.close();
     }
   });
+
   return EXIT_SUCCESS;
 }
