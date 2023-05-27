@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <asm-generic/errno.h>
+#include <cstdarg>
 #include <cstdlib>
 #include <exception>
 #include <ftxui/dom/canvas.hpp>
@@ -8,9 +9,12 @@
 #include <iostream>
 
 #include <fmt/format.h>
+#include <map>
 #include <mutex>
 #include <string>
 #include <thread>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include <chrono>
@@ -51,13 +55,16 @@ private:
   boost::asio::io_service io_service;
   boost::asio::ip::tcp::socket m_socket{ io_service };
   std::vector<std::function<void()>> m_receivers;
+  bool m_connected{ false };// todo: unschöne Lösung
   /* std::mutex receivers_mutex; todo: gibt fehler */
 
   void connect_to_on_this_thread(std::string const &host, int const &port)
   {
     try {
-      if (m_socket.is_open()) { return; }
+      if (is_open()) { return; }
       m_socket.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(host), port));
+      io_service.run();
+      m_connected = true;
       listen();
     } catch (boost::system::system_error &e) {
       fmt::print("Fehler beim Verbinden.");
@@ -67,13 +74,14 @@ private:
   void wait_for_connection_on_this_thread(int const &port)
   {
     try {
-      if (m_socket.is_open()) { return; }
+      if (is_open()) { return; }
 
       boost::asio::ip::tcp::acceptor acceptor{ io_service,
         boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port) };
 
       acceptor.accept(m_socket);
       io_service.run();
+      m_connected = true;
 
       listen();
     } catch (boost::system::system_error &e) {
@@ -134,7 +142,7 @@ public:
     m_receivers.push_back(receiver);
   }
 
-  [[nodiscard]] bool is_open() const { return m_socket.is_open(); } /* todo: auch nach abbruch true?? */
+  [[nodiscard]] bool is_open() const { return m_connected && m_socket.is_open(); } /* todo: auch nach abbruch true?? */
 };
 
 }// namespace connection
@@ -150,6 +158,18 @@ int constexpr brick_width{ 14 }, brick_height{ 5 };
 int constexpr num_bricks_y{ 5 };
 int constexpr brick_distance_x{ 2 }, brick_distance_y{ 3 };
 
+class IdGenerator
+{
+private:
+  int m_id;
+
+public:
+  explicit IdGenerator(int const start_with) : m_id{ start_with - 1 } {}
+  [[nodiscard]] int next() { return ++m_id; }
+
+  [[nodiscard]] int current() const { return m_id; }
+};
+
 struct Position
 {
 public:
@@ -161,28 +181,23 @@ public:
 
 class Element
 {
+
 protected:
   Position m_position;
+  int const m_id;// todo: const kann nicht kopiert werden - aufgefallen bei: map[id] = obj
   int const m_width;
   int const m_height;
   ftxui::Color m_color;
 
 public:
+  IdGenerator static id_generator;
+
   explicit Element(Position const position,
     int const width,
     int const height,
     ftxui::Color const color = ftxui::Color::White)
-    : m_position{ position }, m_width{ width }, m_height{ height }, m_color{ color }
+    : m_position{ position }, m_width{ width }, m_height{ height }, m_color{ color }, m_id{ id_generator.next() }
   {}
-
-  void draw(ftxui::Canvas &canvas) const
-  {
-    if (!exists()) { return; }
-
-    int const start{ top() % 2 == 0 ? top() - 1 : top() }; /* Zeichenfehler beheben */
-
-    for (int y = start; y <= bottom(); y += 2) { canvas.DrawBlockLine(left(), y, right(), y, m_color); }
-  }
 
   [[nodiscard]] int left() const { return m_position.x; }
 
@@ -193,7 +208,13 @@ public:
   [[nodiscard]] int bottom() const { return top() + m_height; }
 
   [[nodiscard]] bool exists() const { return true; }
+
+  [[nodiscard]] int id() const { return m_id; }
+
+  [[nodiscard]] ftxui::Color color() const { return m_color; };
 };
+
+IdGenerator Element::id_generator = IdGenerator{ 0 };
 
 class Ball : public Element
 {
@@ -258,7 +279,7 @@ void show_connection_methods(std::function<void(bool const &, int const &)> call
   callback(is_host, port);
 }
 
-[[nodiscard]] void connect_to_peer(connection::Connection &connection, bool const as_host, int const port)
+void connect_to_peer(connection::Connection &connection, bool const as_host, int const port)
 {
   using namespace ftxui;
 
@@ -301,7 +322,12 @@ void show_connecting_state(connection::Connection const &connection)
   screen.Exit();
 }
 
-void generate_bricks(std::vector<arkanoid::Element> &elements)
+void insert_element(std::map<int, arkanoid::Element> &map, arkanoid::Element const &element)
+{
+  map.insert(std::pair<int, arkanoid::Element>{ element.id(), element });
+}
+
+void generate_bricks(std::map<int, arkanoid::Element> &elements)
 {
   using namespace arkanoid;
 
@@ -314,8 +340,20 @@ void generate_bricks(std::vector<arkanoid::Element> &elements)
       int const y{ playing_field_top + ((brick_distance_y + brick_height) * i_y) };
 
       arkanoid::Brick brick{ { x, y } };
-      elements.push_back(brick);
+      insert_element(elements, brick);
     }
+  }
+}
+
+template<typename T1>//
+void draw(ftxui::Canvas &canvas, T1 const &drawable)
+{
+  if (!drawable.exists()) { return; }
+
+  int const start{ drawable.top() % 2 == 0 ? drawable.top() - 1 : drawable.top() }; /* Zeichenfehler beheben */
+
+  for (int y = start; y <= drawable.bottom(); y += 2) {
+    canvas.DrawBlockLine(drawable.left(), y, drawable.right(), y, drawable.color());
   }
 }
 
@@ -330,12 +368,12 @@ void game(connection::Connection const &connection)
   Paddle paddle{ paddle_position };
   Ball ball{ paddle_position.add(paddle_width / 2, -10) };
 
-  std::vector<arkanoid::Element> elements;
+  std::map<int, arkanoid::Element> element_map;
 
-  elements.push_back(paddle);
-  elements.push_back(ball);
+  insert_element(element_map, paddle);
+  insert_element(element_map, ball);
 
-  generate_bricks(elements);
+  generate_bricks(element_map);
 
   auto renderer = Renderer([&] {
     Canvas can = Canvas(canvas_width, canvas_height);
@@ -343,7 +381,9 @@ void game(connection::Connection const &connection)
     // score
     /*can.DrawText(0, 0, "Score: ");*/
 
-    std::for_each(elements.begin(), elements.end(), [&can](arkanoid::Element element) { element.draw(can); });
+    std::for_each(element_map.begin(), element_map.end(), [&can](std::pair<int, arkanoid::Element> const &pair) {
+      draw(can, pair.second);
+    });
 
     // wrap the element with a border
     return canvas(can) | border;
