@@ -33,7 +33,14 @@
 				"editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
 				"editor.formatOnSave": true,
 				"C_Cpp.codeAnalysis.clangTidy.enabled": true,
-				"C_Cpp.codeAnalysis.runAutomatically": true
+				"C_Cpp.codeAnalysis.runAutomatically": true,
+				"protoc": {
+					"compile_on_save": true,
+					"options": [
+						"-I=/workspaces/2023-pv2-langner/protobuf",
+						"--cpp_out=/workspaces/2023-pv2-langner/protobuf"
+					]
+				}
 			},
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
@@ -45,7 +52,8 @@
 				"eamodio.gitlens",
 				"ms-python.python",
 				"ms-python.vscode-pylance",
-				"mutantdino.resourcemonitor"
+				"mutantdino.resourcemonitor",
+				"zxh404.vscode-proto3"
 				// "streetsidesoftware.code-spell-checker",
 				//"xaver.clang-format"
 			]

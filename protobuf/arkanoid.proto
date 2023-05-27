@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+enum ElementType {
+    BALL = 0;
+    PADDLE = 1;
+    BRICK = 2;
+}
+
+message Position {
+    int32 x = 1;
+    int32 y = 2;
+}
+
+message Element {
+    int32 id = 1;
+    ElementType type = 2;
+    Position position = 3; 
+}
+
+message Game {
+    repeated Element element = 1;
+}
+ 
