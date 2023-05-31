@@ -28,6 +28,7 @@
 #include "asio/buffer.hpp"
 #include "asio/completion_condition.hpp"
 #include "asio/execution/execute.hpp"
+#include "asio/impl/read_until.hpp"
 #include "asio/io_service.hpp"
 #include "asio/ip/address.hpp"
 #include "asio/ip/tcp.hpp"
@@ -49,6 +50,7 @@
 namespace connection {
 
 int constexpr default_port{ 45678 };
+std::string const end_of_message{ "\n\r\r" };
 std::string const default_host{ "127.0.0.1" };
 
 [[nodiscard]] int calculate_port_from_string(std::string const &str)
@@ -114,28 +116,18 @@ private:
           asio::streambuf buffer;
           asio::error_code ec;
 
-          std::size_t const bytes_transferred = asio::read(m_socket, buffer, asio::transfer_all(), ec);
+          // std::size_t const bytes_transferred = asio::read(m_socket, buffer, asio::transfer_exactly(2), ec);
 
-          /*asio::async_read(m_socket,
-            buffer,
-            [&buffer, &nothing](asio::error_code const &ec, std::size_t bytes_transferred) {// muss referenz.
-              std::string message{ buffers_begin(buffer.data()), buffers_begin(buffer.data()) + bytes_transferred };
-              fmt::print("Nachricht empfangen: {}\n", message);
-              nothing = false;
-              buffer.consume(bytes_transferred);
-            });*/
+          std::size_t const bytes_transferred =
+            asio::read_until(m_socket, buffer, end_of_message, ec);// todo - läuft nicht
 
-          if (ec) {
-            fmt::print("NETERR\n");
-            break;
-          } else {
-            std::string message{ buffers_begin(buffer.data()), buffers_begin(buffer.data()) + bytes_transferred };
-            fmt::print("Nachricht empfangen: {}\n", message);
-            buffer.consume(bytes_transferred);
-          }
+          std::string message{ buffers_begin(buffer.data()), buffers_begin(buffer.data()) + bytes_transferred };
+          buffer.consume(bytes_transferred);
+
+          if (ec) { break; }
         }
       }
-    }.detach();
+    }.detach();// todo - mit programm beenden
   }
 
 
@@ -174,10 +166,7 @@ public:
       }
     }.join();
 
-    if (has_connected()) {
-      read_listener();
-      m_io_service.run();
-    }
+    if (has_connected()) { m_io_service.run(); }
   }
 
   void close() { m_socket.close(); }
@@ -189,10 +178,8 @@ public:
     if (!has_connected()) { return false; }
 
     std::thread([this, message]() {
-      fmt::print("Baue versenden.\n");
       // todo: buffer close deconstr.?
-      std::size_t const t = m_socket.write_some(asio::buffer(message));
-      fmt::print("Nachricht versand: {} bytes: {}\n", message, t);
+      std::size_t const t = m_socket.write_some(asio::buffer(message + end_of_message));
     }).detach();
 
     return true;
@@ -502,9 +489,9 @@ int main()
     connect_to_peer(connection, as_host, port);
     show_connecting_state(connection);
 
-    std::string message_to_send{ "Hallo Welt. Ich wurde über einen Socket versendet.\n" };
+    std::string message_to_send{ "Hallo Welt. Ich wurde über einen Socket versendet." };
 
-    connection.send_string(message_to_send);
+    if (as_host) { connection.send_string(message_to_send); }
 
     do {
     } while (true);
