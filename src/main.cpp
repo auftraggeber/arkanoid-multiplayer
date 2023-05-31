@@ -52,6 +52,12 @@ namespace connection {
 int constexpr default_port{ 45678 };
 std::string const end_of_message{ "\n\r\r" };
 std::string const default_host{ "127.0.0.1" };
+bool constexpr debug_networking{ true };
+
+void debug(std::string const &message)
+{
+  if (debug_networking) { fmt::print("[DEBUG] [NET] {}", message); }
+}
 
 [[nodiscard]] int calculate_port_from_string(std::string const &str)
 {
@@ -121,10 +127,14 @@ private:
           std::size_t const bytes_transferred =
             asio::read_until(m_socket, buffer, end_of_message, ec);// todo - läuft nicht
 
-          std::string message{ buffers_begin(buffer.data()), buffers_begin(buffer.data()) + bytes_transferred };
+          if (ec) { break; }
+
+
+          std::string message{ buffers_begin(buffer.data()),
+            buffers_begin(buffer.data()) + (bytes_transferred - end_of_message.size()) };
           buffer.consume(bytes_transferred);
 
-          if (ec) { break; }
+          debug(fmt::format("Nachricht empfangen: {}\n", message));
         }
       }
     }.detach();// todo - mit programm beenden
@@ -180,6 +190,7 @@ public:
     std::thread([this, message]() {
       // todo: buffer close deconstr.?
       std::size_t const t = m_socket.write_some(asio::buffer(message + end_of_message));
+      debug(fmt::format("{} Bytes versendet.", t));
     }).detach();
 
     return true;
@@ -493,8 +504,8 @@ int main()
 
     if (as_host) { connection.send_string(message_to_send); }
 
-    do {
-    } while (true);
+    if (connection::debug_networking) {
+      do { } while (true); }
   });
 
   return EXIT_SUCCESS;
