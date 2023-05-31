@@ -1,22 +1,29 @@
 syntax = "proto3";
 
-enum ElementType {
-    BALL = 0;
-    PADDLE = 1;
-    BRICK = 2;
-}
-
-message ElementPosition {
+message NetPosition {
     int32 x = 1;
     int32 y = 2;
 }
 
-message GameElement {
+message NetElement {
     int32 id = 1;
-    ElementType type = 2;
-    ElementPosition element_position = 3; 
+    NetPosition position = 2;
+}
+
+message NetBall {
+    NetElement element = 1;
+}
+
+message NetPaddle {
+    NetElement element = 1;
+}
+
+message NetBrick {
+    NetElement element = 1;
 }
 
 message GameUpdate {
-    repeated GameElement element = 1;
+    repeated NetBall ball = 1;
+    repeated NetPaddle paddle = 2;
+    repeated NetBrick brick = 3;
 }

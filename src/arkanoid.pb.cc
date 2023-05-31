@@ -14,49 +14,35 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
-extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ElementPosition_arkanoid_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_GameElement_arkanoid_2eproto;
-class ElementPositionDefaultTypeInternal {
+extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_NetBall_arkanoid_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_NetBrick_arkanoid_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_NetElement_arkanoid_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_NetPaddle_arkanoid_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_NetPosition_arkanoid_2eproto;
+class NetPositionDefaultTypeInternal {
  public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<ElementPosition> _instance;
-} _ElementPosition_default_instance_;
-class GameElementDefaultTypeInternal {
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<NetPosition> _instance;
+} _NetPosition_default_instance_;
+class NetElementDefaultTypeInternal {
  public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<GameElement> _instance;
-} _GameElement_default_instance_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<NetElement> _instance;
+} _NetElement_default_instance_;
+class NetBallDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<NetBall> _instance;
+} _NetBall_default_instance_;
+class NetPaddleDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<NetPaddle> _instance;
+} _NetPaddle_default_instance_;
+class NetBrickDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<NetBrick> _instance;
+} _NetBrick_default_instance_;
 class GameUpdateDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<GameUpdate> _instance;
 } _GameUpdate_default_instance_;
-static void InitDefaultsscc_info_ElementPosition_arkanoid_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::_ElementPosition_default_instance_;
-    new (ptr) ::ElementPosition();
-    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::ElementPosition::InitAsDefaultInstance();
-}
-
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ElementPosition_arkanoid_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_ElementPosition_arkanoid_2eproto}, {}};
-
-static void InitDefaultsscc_info_GameElement_arkanoid_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::_GameElement_default_instance_;
-    new (ptr) ::GameElement();
-    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::GameElement::InitAsDefaultInstance();
-}
-
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_GameElement_arkanoid_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_GameElement_arkanoid_2eproto}, {
-      &scc_info_ElementPosition_arkanoid_2eproto.base,}};
-
 static void InitDefaultsscc_info_GameUpdate_arkanoid_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -68,147 +54,238 @@ static void InitDefaultsscc_info_GameUpdate_arkanoid_2eproto() {
   ::GameUpdate::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_GameUpdate_arkanoid_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_GameUpdate_arkanoid_2eproto}, {
-      &scc_info_GameElement_arkanoid_2eproto.base,}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_GameUpdate_arkanoid_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 3, 0, InitDefaultsscc_info_GameUpdate_arkanoid_2eproto}, {
+      &scc_info_NetBall_arkanoid_2eproto.base,
+      &scc_info_NetPaddle_arkanoid_2eproto.base,
+      &scc_info_NetBrick_arkanoid_2eproto.base,}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_arkanoid_2eproto[3];
-static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_arkanoid_2eproto[1];
+static void InitDefaultsscc_info_NetBall_arkanoid_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::_NetBall_default_instance_;
+    new (ptr) ::NetBall();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::NetBall::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_NetBall_arkanoid_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_NetBall_arkanoid_2eproto}, {
+      &scc_info_NetElement_arkanoid_2eproto.base,}};
+
+static void InitDefaultsscc_info_NetBrick_arkanoid_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::_NetBrick_default_instance_;
+    new (ptr) ::NetBrick();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::NetBrick::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_NetBrick_arkanoid_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_NetBrick_arkanoid_2eproto}, {
+      &scc_info_NetElement_arkanoid_2eproto.base,}};
+
+static void InitDefaultsscc_info_NetElement_arkanoid_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::_NetElement_default_instance_;
+    new (ptr) ::NetElement();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::NetElement::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_NetElement_arkanoid_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_NetElement_arkanoid_2eproto}, {
+      &scc_info_NetPosition_arkanoid_2eproto.base,}};
+
+static void InitDefaultsscc_info_NetPaddle_arkanoid_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::_NetPaddle_default_instance_;
+    new (ptr) ::NetPaddle();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::NetPaddle::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_NetPaddle_arkanoid_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_NetPaddle_arkanoid_2eproto}, {
+      &scc_info_NetElement_arkanoid_2eproto.base,}};
+
+static void InitDefaultsscc_info_NetPosition_arkanoid_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::_NetPosition_default_instance_;
+    new (ptr) ::NetPosition();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::NetPosition::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_NetPosition_arkanoid_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_NetPosition_arkanoid_2eproto}, {}};
+
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_arkanoid_2eproto[6];
+static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_arkanoid_2eproto = nullptr;
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_arkanoid_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_arkanoid_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::ElementPosition, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::NetPosition, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::ElementPosition, x_),
-  PROTOBUF_FIELD_OFFSET(::ElementPosition, y_),
+  PROTOBUF_FIELD_OFFSET(::NetPosition, x_),
+  PROTOBUF_FIELD_OFFSET(::NetPosition, y_),
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::GameElement, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::NetElement, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::GameElement, id_),
-  PROTOBUF_FIELD_OFFSET(::GameElement, type_),
-  PROTOBUF_FIELD_OFFSET(::GameElement, element_position_),
+  PROTOBUF_FIELD_OFFSET(::NetElement, id_),
+  PROTOBUF_FIELD_OFFSET(::NetElement, position_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::NetBall, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::NetBall, element_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::NetPaddle, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::NetPaddle, element_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::NetBrick, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::NetBrick, element_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::GameUpdate, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::GameUpdate, element_),
+  PROTOBUF_FIELD_OFFSET(::GameUpdate, ball_),
+  PROTOBUF_FIELD_OFFSET(::GameUpdate, paddle_),
+  PROTOBUF_FIELD_OFFSET(::GameUpdate, brick_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::ElementPosition)},
-  { 7, -1, sizeof(::GameElement)},
-  { 15, -1, sizeof(::GameUpdate)},
+  { 0, -1, sizeof(::NetPosition)},
+  { 7, -1, sizeof(::NetElement)},
+  { 14, -1, sizeof(::NetBall)},
+  { 20, -1, sizeof(::NetPaddle)},
+  { 26, -1, sizeof(::NetBrick)},
+  { 32, -1, sizeof(::GameUpdate)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_ElementPosition_default_instance_),
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_GameElement_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_NetPosition_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_NetElement_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_NetBall_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_NetPaddle_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_NetBrick_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_GameUpdate_default_instance_),
 };
 
 const char descriptor_table_protodef_arkanoid_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\016arkanoid.proto\"\'\n\017ElementPosition\022\t\n\001x"
-  "\030\001 \001(\005\022\t\n\001y\030\002 \001(\005\"a\n\013GameElement\022\n\n\002id\030\001"
-  " \001(\005\022\032\n\004type\030\002 \001(\0162\014.ElementType\022*\n\020elem"
-  "ent_position\030\003 \001(\0132\020.ElementPosition\"+\n\n"
-  "GameUpdate\022\035\n\007element\030\001 \003(\0132\014.GameElemen"
-  "t*.\n\013ElementType\022\010\n\004BALL\020\000\022\n\n\006PADDLE\020\001\022\t"
-  "\n\005BRICK\020\002b\006proto3"
+  "\n\016arkanoid.proto\"#\n\013NetPosition\022\t\n\001x\030\001 \001"
+  "(\005\022\t\n\001y\030\002 \001(\005\"8\n\nNetElement\022\n\n\002id\030\001 \001(\005\022"
+  "\036\n\010position\030\002 \001(\0132\014.NetPosition\"\'\n\007NetBa"
+  "ll\022\034\n\007element\030\001 \001(\0132\013.NetElement\")\n\tNetP"
+  "addle\022\034\n\007element\030\001 \001(\0132\013.NetElement\"(\n\010N"
+  "etBrick\022\034\n\007element\030\001 \001(\0132\013.NetElement\"Z\n"
+  "\nGameUpdate\022\026\n\004ball\030\001 \003(\0132\010.NetBall\022\032\n\006p"
+  "addle\030\002 \003(\0132\n.NetPaddle\022\030\n\005brick\030\003 \003(\0132\t"
+  ".NetBrickb\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_arkanoid_2eproto_deps[1] = {
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_arkanoid_2eproto_sccs[3] = {
-  &scc_info_ElementPosition_arkanoid_2eproto.base,
-  &scc_info_GameElement_arkanoid_2eproto.base,
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_arkanoid_2eproto_sccs[6] = {
   &scc_info_GameUpdate_arkanoid_2eproto.base,
+  &scc_info_NetBall_arkanoid_2eproto.base,
+  &scc_info_NetBrick_arkanoid_2eproto.base,
+  &scc_info_NetElement_arkanoid_2eproto.base,
+  &scc_info_NetPaddle_arkanoid_2eproto.base,
+  &scc_info_NetPosition_arkanoid_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_arkanoid_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_arkanoid_2eproto = {
-  false, false, descriptor_table_protodef_arkanoid_2eproto, "arkanoid.proto", 257,
-  &descriptor_table_arkanoid_2eproto_once, descriptor_table_arkanoid_2eproto_sccs, descriptor_table_arkanoid_2eproto_deps, 3, 0,
+  false, false, descriptor_table_protodef_arkanoid_2eproto, "arkanoid.proto", 337,
+  &descriptor_table_arkanoid_2eproto_once, descriptor_table_arkanoid_2eproto_sccs, descriptor_table_arkanoid_2eproto_deps, 6, 0,
   schemas, file_default_instances, TableStruct_arkanoid_2eproto::offsets,
-  file_level_metadata_arkanoid_2eproto, 3, file_level_enum_descriptors_arkanoid_2eproto, file_level_service_descriptors_arkanoid_2eproto,
+  file_level_metadata_arkanoid_2eproto, 6, file_level_enum_descriptors_arkanoid_2eproto, file_level_service_descriptors_arkanoid_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
 static bool dynamic_init_dummy_arkanoid_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_arkanoid_2eproto)), true);
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ElementType_descriptor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_arkanoid_2eproto);
-  return file_level_enum_descriptors_arkanoid_2eproto[0];
-}
-bool ElementType_IsValid(int value) {
-  switch (value) {
-    case 0:
-    case 1:
-    case 2:
-      return true;
-    default:
-      return false;
-  }
-}
-
 
 // ===================================================================
 
-void ElementPosition::InitAsDefaultInstance() {
+void NetPosition::InitAsDefaultInstance() {
 }
-class ElementPosition::_Internal {
+class NetPosition::_Internal {
  public:
 };
 
-ElementPosition::ElementPosition(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+NetPosition::NetPosition(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:ElementPosition)
+  // @@protoc_insertion_point(arena_constructor:NetPosition)
 }
-ElementPosition::ElementPosition(const ElementPosition& from)
+NetPosition::NetPosition(const NetPosition& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::memcpy(&x_, &from.x_,
     static_cast<size_t>(reinterpret_cast<char*>(&y_) -
     reinterpret_cast<char*>(&x_)) + sizeof(y_));
-  // @@protoc_insertion_point(copy_constructor:ElementPosition)
+  // @@protoc_insertion_point(copy_constructor:NetPosition)
 }
 
-void ElementPosition::SharedCtor() {
+void NetPosition::SharedCtor() {
   ::memset(&x_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&y_) -
       reinterpret_cast<char*>(&x_)) + sizeof(y_));
 }
 
-ElementPosition::~ElementPosition() {
-  // @@protoc_insertion_point(destructor:ElementPosition)
+NetPosition::~NetPosition() {
+  // @@protoc_insertion_point(destructor:NetPosition)
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void ElementPosition::SharedDtor() {
+void NetPosition::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
 }
 
-void ElementPosition::ArenaDtor(void* object) {
-  ElementPosition* _this = reinterpret_cast< ElementPosition* >(object);
+void NetPosition::ArenaDtor(void* object) {
+  NetPosition* _this = reinterpret_cast< NetPosition* >(object);
   (void)_this;
 }
-void ElementPosition::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+void NetPosition::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
 }
-void ElementPosition::SetCachedSize(int size) const {
+void NetPosition::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const ElementPosition& ElementPosition::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_ElementPosition_arkanoid_2eproto.base);
+const NetPosition& NetPosition::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_NetPosition_arkanoid_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void ElementPosition::Clear() {
-// @@protoc_insertion_point(message_clear_start:ElementPosition)
+void NetPosition::Clear() {
+// @@protoc_insertion_point(message_clear_start:NetPosition)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -219,7 +296,7 @@ void ElementPosition::Clear() {
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* ElementPosition::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* NetPosition::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
@@ -263,9 +340,9 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* ElementPosition::_InternalSerialize(
+::PROTOBUF_NAMESPACE_ID::uint8* NetPosition::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:ElementPosition)
+  // @@protoc_insertion_point(serialize_to_array_start:NetPosition)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -285,12 +362,12 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:ElementPosition)
+  // @@protoc_insertion_point(serialize_to_array_end:NetPosition)
   return target;
 }
 
-size_t ElementPosition::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:ElementPosition)
+size_t NetPosition::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:NetPosition)
   size_t total_size = 0;
 
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -320,23 +397,23 @@ size_t ElementPosition::ByteSizeLong() const {
   return total_size;
 }
 
-void ElementPosition::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:ElementPosition)
+void NetPosition::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:NetPosition)
   GOOGLE_DCHECK_NE(&from, this);
-  const ElementPosition* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<ElementPosition>(
+  const NetPosition* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<NetPosition>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:ElementPosition)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:NetPosition)
     ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:ElementPosition)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:NetPosition)
     MergeFrom(*source);
   }
 }
 
-void ElementPosition::MergeFrom(const ElementPosition& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:ElementPosition)
+void NetPosition::MergeFrom(const NetPosition& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:NetPosition)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -350,125 +427,121 @@ void ElementPosition::MergeFrom(const ElementPosition& from) {
   }
 }
 
-void ElementPosition::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:ElementPosition)
+void NetPosition::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:NetPosition)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void ElementPosition::CopyFrom(const ElementPosition& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:ElementPosition)
+void NetPosition::CopyFrom(const NetPosition& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:NetPosition)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool ElementPosition::IsInitialized() const {
+bool NetPosition::IsInitialized() const {
   return true;
 }
 
-void ElementPosition::InternalSwap(ElementPosition* other) {
+void NetPosition::InternalSwap(NetPosition* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(ElementPosition, y_)
-      + sizeof(ElementPosition::y_)
-      - PROTOBUF_FIELD_OFFSET(ElementPosition, x_)>(
+      PROTOBUF_FIELD_OFFSET(NetPosition, y_)
+      + sizeof(NetPosition::y_)
+      - PROTOBUF_FIELD_OFFSET(NetPosition, x_)>(
           reinterpret_cast<char*>(&x_),
           reinterpret_cast<char*>(&other->x_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata ElementPosition::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata NetPosition::GetMetadata() const {
   return GetMetadataStatic();
 }
 
 
 // ===================================================================
 
-void GameElement::InitAsDefaultInstance() {
-  ::_GameElement_default_instance_._instance.get_mutable()->element_position_ = const_cast< ::ElementPosition*>(
-      ::ElementPosition::internal_default_instance());
+void NetElement::InitAsDefaultInstance() {
+  ::_NetElement_default_instance_._instance.get_mutable()->position_ = const_cast< ::NetPosition*>(
+      ::NetPosition::internal_default_instance());
 }
-class GameElement::_Internal {
+class NetElement::_Internal {
  public:
-  static const ::ElementPosition& element_position(const GameElement* msg);
+  static const ::NetPosition& position(const NetElement* msg);
 };
 
-const ::ElementPosition&
-GameElement::_Internal::element_position(const GameElement* msg) {
-  return *msg->element_position_;
+const ::NetPosition&
+NetElement::_Internal::position(const NetElement* msg) {
+  return *msg->position_;
 }
-GameElement::GameElement(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+NetElement::NetElement(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:GameElement)
+  // @@protoc_insertion_point(arena_constructor:NetElement)
 }
-GameElement::GameElement(const GameElement& from)
+NetElement::NetElement(const NetElement& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  if (from._internal_has_element_position()) {
-    element_position_ = new ::ElementPosition(*from.element_position_);
+  if (from._internal_has_position()) {
+    position_ = new ::NetPosition(*from.position_);
   } else {
-    element_position_ = nullptr;
+    position_ = nullptr;
   }
-  ::memcpy(&id_, &from.id_,
-    static_cast<size_t>(reinterpret_cast<char*>(&type_) -
-    reinterpret_cast<char*>(&id_)) + sizeof(type_));
-  // @@protoc_insertion_point(copy_constructor:GameElement)
+  id_ = from.id_;
+  // @@protoc_insertion_point(copy_constructor:NetElement)
 }
 
-void GameElement::SharedCtor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_GameElement_arkanoid_2eproto.base);
-  ::memset(&element_position_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&type_) -
-      reinterpret_cast<char*>(&element_position_)) + sizeof(type_));
+void NetElement::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_NetElement_arkanoid_2eproto.base);
+  ::memset(&position_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&id_) -
+      reinterpret_cast<char*>(&position_)) + sizeof(id_));
 }
 
-GameElement::~GameElement() {
-  // @@protoc_insertion_point(destructor:GameElement)
+NetElement::~NetElement() {
+  // @@protoc_insertion_point(destructor:NetElement)
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void GameElement::SharedDtor() {
+void NetElement::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
-  if (this != internal_default_instance()) delete element_position_;
+  if (this != internal_default_instance()) delete position_;
 }
 
-void GameElement::ArenaDtor(void* object) {
-  GameElement* _this = reinterpret_cast< GameElement* >(object);
+void NetElement::ArenaDtor(void* object) {
+  NetElement* _this = reinterpret_cast< NetElement* >(object);
   (void)_this;
 }
-void GameElement::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+void NetElement::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
 }
-void GameElement::SetCachedSize(int size) const {
+void NetElement::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const GameElement& GameElement::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_GameElement_arkanoid_2eproto.base);
+const NetElement& NetElement::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_NetElement_arkanoid_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void GameElement::Clear() {
-// @@protoc_insertion_point(message_clear_start:GameElement)
+void NetElement::Clear() {
+// @@protoc_insertion_point(message_clear_start:NetElement)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  if (GetArena() == nullptr && element_position_ != nullptr) {
-    delete element_position_;
+  if (GetArena() == nullptr && position_ != nullptr) {
+    delete position_;
   }
-  element_position_ = nullptr;
-  ::memset(&id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&type_) -
-      reinterpret_cast<char*>(&id_)) + sizeof(type_));
+  position_ = nullptr;
+  id_ = 0;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* GameElement::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* NetElement::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
@@ -483,18 +556,10 @@ const char* GameElement::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .ElementType type = 2;
+      // .NetPosition position = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-          _internal_set_type(static_cast<::ElementType>(val));
-        } else goto handle_unusual;
-        continue;
-      // .ElementPosition element_position = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
-          ptr = ctx->ParseMessage(_internal_mutable_element_position(), ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          ptr = ctx->ParseMessage(_internal_mutable_position(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -520,9 +585,9 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* GameElement::_InternalSerialize(
+::PROTOBUF_NAMESPACE_ID::uint8* NetElement::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:GameElement)
+  // @@protoc_insertion_point(serialize_to_array_start:NetElement)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -532,42 +597,35 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_id(), target);
   }
 
-  // .ElementType type = 2;
-  if (this->type() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
-      2, this->_internal_type(), target);
-  }
-
-  // .ElementPosition element_position = 3;
-  if (this->has_element_position()) {
+  // .NetPosition position = 2;
+  if (this->has_position()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        3, _Internal::element_position(this), target, stream);
+        2, _Internal::position(this), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:GameElement)
+  // @@protoc_insertion_point(serialize_to_array_end:NetElement)
   return target;
 }
 
-size_t GameElement::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:GameElement)
+size_t NetElement::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:NetElement)
   size_t total_size = 0;
 
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // .ElementPosition element_position = 3;
-  if (this->has_element_position()) {
+  // .NetPosition position = 2;
+  if (this->has_position()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-        *element_position_);
+        *position_);
   }
 
   // int32 id = 1;
@@ -575,12 +633,6 @@ size_t GameElement::ByteSizeLong() const {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
         this->_internal_id());
-  }
-
-  // .ElementType type = 2;
-  if (this->type() != 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_type());
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -592,69 +644,711 @@ size_t GameElement::ByteSizeLong() const {
   return total_size;
 }
 
-void GameElement::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:GameElement)
+void NetElement::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:NetElement)
   GOOGLE_DCHECK_NE(&from, this);
-  const GameElement* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<GameElement>(
+  const NetElement* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<NetElement>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:GameElement)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:NetElement)
     ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:GameElement)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:NetElement)
     MergeFrom(*source);
   }
 }
 
-void GameElement::MergeFrom(const GameElement& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:GameElement)
+void NetElement::MergeFrom(const NetElement& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:NetElement)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.has_element_position()) {
-    _internal_mutable_element_position()->::ElementPosition::MergeFrom(from._internal_element_position());
+  if (from.has_position()) {
+    _internal_mutable_position()->::NetPosition::MergeFrom(from._internal_position());
   }
   if (from.id() != 0) {
     _internal_set_id(from._internal_id());
   }
-  if (from.type() != 0) {
-    _internal_set_type(from._internal_type());
-  }
 }
 
-void GameElement::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:GameElement)
+void NetElement::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:NetElement)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void GameElement::CopyFrom(const GameElement& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:GameElement)
+void NetElement::CopyFrom(const NetElement& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:NetElement)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool GameElement::IsInitialized() const {
+bool NetElement::IsInitialized() const {
   return true;
 }
 
-void GameElement::InternalSwap(GameElement* other) {
+void NetElement::InternalSwap(NetElement* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(GameElement, type_)
-      + sizeof(GameElement::type_)
-      - PROTOBUF_FIELD_OFFSET(GameElement, element_position_)>(
-          reinterpret_cast<char*>(&element_position_),
-          reinterpret_cast<char*>(&other->element_position_));
+      PROTOBUF_FIELD_OFFSET(NetElement, id_)
+      + sizeof(NetElement::id_)
+      - PROTOBUF_FIELD_OFFSET(NetElement, position_)>(
+          reinterpret_cast<char*>(&position_),
+          reinterpret_cast<char*>(&other->position_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata GameElement::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata NetElement::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void NetBall::InitAsDefaultInstance() {
+  ::_NetBall_default_instance_._instance.get_mutable()->element_ = const_cast< ::NetElement*>(
+      ::NetElement::internal_default_instance());
+}
+class NetBall::_Internal {
+ public:
+  static const ::NetElement& element(const NetBall* msg);
+};
+
+const ::NetElement&
+NetBall::_Internal::element(const NetBall* msg) {
+  return *msg->element_;
+}
+NetBall::NetBall(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:NetBall)
+}
+NetBall::NetBall(const NetBall& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  if (from._internal_has_element()) {
+    element_ = new ::NetElement(*from.element_);
+  } else {
+    element_ = nullptr;
+  }
+  // @@protoc_insertion_point(copy_constructor:NetBall)
+}
+
+void NetBall::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_NetBall_arkanoid_2eproto.base);
+  element_ = nullptr;
+}
+
+NetBall::~NetBall() {
+  // @@protoc_insertion_point(destructor:NetBall)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void NetBall::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  if (this != internal_default_instance()) delete element_;
+}
+
+void NetBall::ArenaDtor(void* object) {
+  NetBall* _this = reinterpret_cast< NetBall* >(object);
+  (void)_this;
+}
+void NetBall::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void NetBall::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const NetBall& NetBall::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_NetBall_arkanoid_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void NetBall::Clear() {
+// @@protoc_insertion_point(message_clear_start:NetBall)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  if (GetArena() == nullptr && element_ != nullptr) {
+    delete element_;
+  }
+  element_ = nullptr;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* NetBall::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // .NetElement element = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr = ctx->ParseMessage(_internal_mutable_element(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* NetBall::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:NetBall)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .NetElement element = 1;
+  if (this->has_element()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        1, _Internal::element(this), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:NetBall)
+  return target;
+}
+
+size_t NetBall::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:NetBall)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // .NetElement element = 1;
+  if (this->has_element()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *element_);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void NetBall::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:NetBall)
+  GOOGLE_DCHECK_NE(&from, this);
+  const NetBall* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<NetBall>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:NetBall)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:NetBall)
+    MergeFrom(*source);
+  }
+}
+
+void NetBall::MergeFrom(const NetBall& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:NetBall)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.has_element()) {
+    _internal_mutable_element()->::NetElement::MergeFrom(from._internal_element());
+  }
+}
+
+void NetBall::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:NetBall)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void NetBall::CopyFrom(const NetBall& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:NetBall)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool NetBall::IsInitialized() const {
+  return true;
+}
+
+void NetBall::InternalSwap(NetBall* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  swap(element_, other->element_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata NetBall::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void NetPaddle::InitAsDefaultInstance() {
+  ::_NetPaddle_default_instance_._instance.get_mutable()->element_ = const_cast< ::NetElement*>(
+      ::NetElement::internal_default_instance());
+}
+class NetPaddle::_Internal {
+ public:
+  static const ::NetElement& element(const NetPaddle* msg);
+};
+
+const ::NetElement&
+NetPaddle::_Internal::element(const NetPaddle* msg) {
+  return *msg->element_;
+}
+NetPaddle::NetPaddle(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:NetPaddle)
+}
+NetPaddle::NetPaddle(const NetPaddle& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  if (from._internal_has_element()) {
+    element_ = new ::NetElement(*from.element_);
+  } else {
+    element_ = nullptr;
+  }
+  // @@protoc_insertion_point(copy_constructor:NetPaddle)
+}
+
+void NetPaddle::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_NetPaddle_arkanoid_2eproto.base);
+  element_ = nullptr;
+}
+
+NetPaddle::~NetPaddle() {
+  // @@protoc_insertion_point(destructor:NetPaddle)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void NetPaddle::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  if (this != internal_default_instance()) delete element_;
+}
+
+void NetPaddle::ArenaDtor(void* object) {
+  NetPaddle* _this = reinterpret_cast< NetPaddle* >(object);
+  (void)_this;
+}
+void NetPaddle::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void NetPaddle::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const NetPaddle& NetPaddle::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_NetPaddle_arkanoid_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void NetPaddle::Clear() {
+// @@protoc_insertion_point(message_clear_start:NetPaddle)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  if (GetArena() == nullptr && element_ != nullptr) {
+    delete element_;
+  }
+  element_ = nullptr;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* NetPaddle::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // .NetElement element = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr = ctx->ParseMessage(_internal_mutable_element(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* NetPaddle::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:NetPaddle)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .NetElement element = 1;
+  if (this->has_element()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        1, _Internal::element(this), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:NetPaddle)
+  return target;
+}
+
+size_t NetPaddle::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:NetPaddle)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // .NetElement element = 1;
+  if (this->has_element()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *element_);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void NetPaddle::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:NetPaddle)
+  GOOGLE_DCHECK_NE(&from, this);
+  const NetPaddle* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<NetPaddle>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:NetPaddle)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:NetPaddle)
+    MergeFrom(*source);
+  }
+}
+
+void NetPaddle::MergeFrom(const NetPaddle& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:NetPaddle)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.has_element()) {
+    _internal_mutable_element()->::NetElement::MergeFrom(from._internal_element());
+  }
+}
+
+void NetPaddle::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:NetPaddle)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void NetPaddle::CopyFrom(const NetPaddle& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:NetPaddle)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool NetPaddle::IsInitialized() const {
+  return true;
+}
+
+void NetPaddle::InternalSwap(NetPaddle* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  swap(element_, other->element_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata NetPaddle::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void NetBrick::InitAsDefaultInstance() {
+  ::_NetBrick_default_instance_._instance.get_mutable()->element_ = const_cast< ::NetElement*>(
+      ::NetElement::internal_default_instance());
+}
+class NetBrick::_Internal {
+ public:
+  static const ::NetElement& element(const NetBrick* msg);
+};
+
+const ::NetElement&
+NetBrick::_Internal::element(const NetBrick* msg) {
+  return *msg->element_;
+}
+NetBrick::NetBrick(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:NetBrick)
+}
+NetBrick::NetBrick(const NetBrick& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  if (from._internal_has_element()) {
+    element_ = new ::NetElement(*from.element_);
+  } else {
+    element_ = nullptr;
+  }
+  // @@protoc_insertion_point(copy_constructor:NetBrick)
+}
+
+void NetBrick::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_NetBrick_arkanoid_2eproto.base);
+  element_ = nullptr;
+}
+
+NetBrick::~NetBrick() {
+  // @@protoc_insertion_point(destructor:NetBrick)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void NetBrick::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  if (this != internal_default_instance()) delete element_;
+}
+
+void NetBrick::ArenaDtor(void* object) {
+  NetBrick* _this = reinterpret_cast< NetBrick* >(object);
+  (void)_this;
+}
+void NetBrick::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void NetBrick::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const NetBrick& NetBrick::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_NetBrick_arkanoid_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void NetBrick::Clear() {
+// @@protoc_insertion_point(message_clear_start:NetBrick)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  if (GetArena() == nullptr && element_ != nullptr) {
+    delete element_;
+  }
+  element_ = nullptr;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* NetBrick::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // .NetElement element = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr = ctx->ParseMessage(_internal_mutable_element(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* NetBrick::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:NetBrick)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .NetElement element = 1;
+  if (this->has_element()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        1, _Internal::element(this), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:NetBrick)
+  return target;
+}
+
+size_t NetBrick::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:NetBrick)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // .NetElement element = 1;
+  if (this->has_element()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *element_);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void NetBrick::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:NetBrick)
+  GOOGLE_DCHECK_NE(&from, this);
+  const NetBrick* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<NetBrick>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:NetBrick)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:NetBrick)
+    MergeFrom(*source);
+  }
+}
+
+void NetBrick::MergeFrom(const NetBrick& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:NetBrick)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.has_element()) {
+    _internal_mutable_element()->::NetElement::MergeFrom(from._internal_element());
+  }
+}
+
+void NetBrick::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:NetBrick)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void NetBrick::CopyFrom(const NetBrick& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:NetBrick)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool NetBrick::IsInitialized() const {
+  return true;
+}
+
+void NetBrick::InternalSwap(NetBrick* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  swap(element_, other->element_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata NetBrick::GetMetadata() const {
   return GetMetadataStatic();
 }
 
@@ -669,14 +1363,18 @@ class GameUpdate::_Internal {
 
 GameUpdate::GameUpdate(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena),
-  element_(arena) {
+  ball_(arena),
+  paddle_(arena),
+  brick_(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
   // @@protoc_insertion_point(arena_constructor:GameUpdate)
 }
 GameUpdate::GameUpdate(const GameUpdate& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
-      element_(from.element_) {
+      ball_(from.ball_),
+      paddle_(from.paddle_),
+      brick_(from.brick_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   // @@protoc_insertion_point(copy_constructor:GameUpdate)
 }
@@ -716,7 +1414,9 @@ void GameUpdate::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  element_.Clear();
+  ball_.Clear();
+  paddle_.Clear();
+  brick_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -728,16 +1428,40 @@ const char* GameUpdate::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // repeated .GameElement element = 1;
+      // repeated .NetBall ball = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
           ptr -= 1;
           do {
             ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_element(), ptr);
+            ptr = ctx->ParseMessage(_internal_add_ball(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // repeated .NetPaddle paddle = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_paddle(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // repeated .NetBrick brick = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_brick(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<26>(ptr));
         } else goto handle_unusual;
         continue;
       default: {
@@ -768,12 +1492,28 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated .GameElement element = 1;
+  // repeated .NetBall ball = 1;
   for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->_internal_element_size()); i < n; i++) {
+      n = static_cast<unsigned int>(this->_internal_ball_size()); i < n; i++) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(1, this->_internal_element(i), target, stream);
+      InternalWriteMessage(1, this->_internal_ball(i), target, stream);
+  }
+
+  // repeated .NetPaddle paddle = 2;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_paddle_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(2, this->_internal_paddle(i), target, stream);
+  }
+
+  // repeated .NetBrick brick = 3;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_brick_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(3, this->_internal_brick(i), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -792,9 +1532,23 @@ size_t GameUpdate::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated .GameElement element = 1;
-  total_size += 1UL * this->_internal_element_size();
-  for (const auto& msg : this->element_) {
+  // repeated .NetBall ball = 1;
+  total_size += 1UL * this->_internal_ball_size();
+  for (const auto& msg : this->ball_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // repeated .NetPaddle paddle = 2;
+  total_size += 1UL * this->_internal_paddle_size();
+  for (const auto& msg : this->paddle_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // repeated .NetBrick brick = 3;
+  total_size += 1UL * this->_internal_brick_size();
+  for (const auto& msg : this->brick_) {
     total_size +=
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
@@ -830,7 +1584,9 @@ void GameUpdate::MergeFrom(const GameUpdate& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  element_.MergeFrom(from.element_);
+  ball_.MergeFrom(from.ball_);
+  paddle_.MergeFrom(from.paddle_);
+  brick_.MergeFrom(from.brick_);
 }
 
 void GameUpdate::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
@@ -854,7 +1610,9 @@ bool GameUpdate::IsInitialized() const {
 void GameUpdate::InternalSwap(GameUpdate* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
-  element_.InternalSwap(&other->element_);
+  ball_.InternalSwap(&other->ball_);
+  paddle_.InternalSwap(&other->paddle_);
+  brick_.InternalSwap(&other->brick_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata GameUpdate::GetMetadata() const {
@@ -864,11 +1622,20 @@ void GameUpdate::InternalSwap(GameUpdate* other) {
 
 // @@protoc_insertion_point(namespace_scope)
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::ElementPosition* Arena::CreateMaybeMessage< ::ElementPosition >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::ElementPosition >(arena);
+template<> PROTOBUF_NOINLINE ::NetPosition* Arena::CreateMaybeMessage< ::NetPosition >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::NetPosition >(arena);
 }
-template<> PROTOBUF_NOINLINE ::GameElement* Arena::CreateMaybeMessage< ::GameElement >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::GameElement >(arena);
+template<> PROTOBUF_NOINLINE ::NetElement* Arena::CreateMaybeMessage< ::NetElement >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::NetElement >(arena);
+}
+template<> PROTOBUF_NOINLINE ::NetBall* Arena::CreateMaybeMessage< ::NetBall >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::NetBall >(arena);
+}
+template<> PROTOBUF_NOINLINE ::NetPaddle* Arena::CreateMaybeMessage< ::NetPaddle >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::NetPaddle >(arena);
+}
+template<> PROTOBUF_NOINLINE ::NetBrick* Arena::CreateMaybeMessage< ::NetBrick >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::NetBrick >(arena);
 }
 template<> PROTOBUF_NOINLINE ::GameUpdate* Arena::CreateMaybeMessage< ::GameUpdate >(Arena* arena) {
   return Arena::CreateMessageInternal< ::GameUpdate >(arena);

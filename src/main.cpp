@@ -224,6 +224,7 @@ int constexpr brick_width{ 14 }, brick_height{ 5 };
 int constexpr num_bricks_y{ 5 };
 int constexpr brick_distance_x{ 2 }, brick_distance_y{ 3 };
 
+
 class IdGenerator
 {
 private:
@@ -255,8 +256,8 @@ protected:
   int const m_height;
   ftxui::Color m_color;
 
-  friend void fill_game_element(GameElement *const &, arkanoid::Element const &);// todo: außerhalb von namespace ??
-  friend std::vector<arkanoid::Element> parse_game_update(GameUpdate const &);
+  template<typename T1> friend NetElement *build_net_element(T1 const &element);// todo: außerhalb von namespace ??
+  friend void modify_element_by_net_element(Element &, NetElement const &);
 
 public:
   IdGenerator static id_generator;
@@ -305,48 +306,80 @@ public:
   explicit Brick(Position const position) : Element{ position, brick_width, brick_height } {}
 };
 
-void fill_game_element(GameElement *const &game_element, arkanoid::Element const &element)// todo
+struct ElementRepository// todo -- aktuelle lsg gegen obj. slicing, problem keine schöne for_each.
 {
-  ElementPosition *position = new ElementPosition{};// muss auf heap, da sonst null-pointer, verfahren da hinter?
+public:
+  std::vector<Ball> balls;
+  std::vector<Paddle> paddles;
+  std::vector<Brick> bricks;
+};
 
-  int const x = element.m_position.x;
-  int const y = element.m_position.y;
+template<typename T1>//
+NetElement *build_net_element(T1 const &element)
+{
+  NetElement *net_element = new NetElement;// auf den heap
+  net_element->set_id(element.m_id);
 
-  position->set_x(x);
-  position->set_y(y);
+  NetPosition *position = new NetPosition;
+  position->set_x(element.m_position.x);
+  position->set_y(element.m_position.y);
 
-  game_element->set_id(element.id());
-  game_element->set_type(BALL);
-  game_element->set_allocated_element_position(position);
+  net_element->set_allocated_position(position);
+
+  return net_element;
 }
 
-void fill_game_update(GameUpdate *update, std::vector<arkanoid::Element> const &elements)
+void fill_game_update(GameUpdate *update, ElementRepository const repository)
 {
+  std::for_each(repository.balls.begin(), repository.balls.end(), [&update](auto const &ball) {
+    NetBall *n_ball = update->add_ball();
+    n_ball->set_allocated_element(build_net_element(ball));
+  });
 
-  std::for_each(elements.begin(), elements.end(), [&update](arkanoid::Element const &element) {
-    GameElement *game_element = update->add_element();
+  std::for_each(repository.paddles.begin(), repository.paddles.end(), [&update](auto const &paddle) {
+    NetPaddle *n_paddle = update->add_paddle();
+    n_paddle->set_allocated_element(build_net_element(paddle));
+  });
 
-    fill_game_element(game_element, element);
+  std::for_each(repository.bricks.begin(), repository.bricks.end(), [&update](auto const &brick) {
+    NetBrick *n_brick = update->add_brick();
+    n_brick->set_allocated_element(build_net_element(brick));
   });
 }
 
-[[nodiscard]] std::vector<arkanoid::Element> parse_game_update(GameUpdate const &update)
+void modify_element_by_net_element(Element &target, NetElement const &net_element) { target.m_id = net_element.id(); }
+
+[[nodiscard]] Position parse_net_position(NetPosition const &net_position)
 {
-  std::vector<arkanoid::Element> elements;
+  return { net_position.x(), net_position.y() };
+}
 
-  for (int i = 0; i < update.element_size(); ++i) {
-    auto const element = update.element(i);
-    Position position{ element.element_position().x(), element.element_position().y() };
+[[nodiscard]] ElementRepository *parse_game_update(GameUpdate const &update)
+{
+  ElementRepository *repository;
 
-    switch (element.type()) {
-    case BALL:
-      Ball ball{ position };
-      ball.m_id = element.id();
-      elements.push_back(ball);
-    }
+  for (int i = 0; i < update.ball_size(); ++i) {
+    NetBall const net_ball = update.ball(i);
+    Ball ball{ parse_net_position(net_ball.element().position()) };
+    modify_element_by_net_element(ball, net_ball.element());
+    repository.balls.push_back(ball);
   }
 
-  return elements;
+  for (int i = 0; i < update.paddle_size(); ++i) {
+    NetPaddle const net_paddle = update.paddle(i);
+    Paddle paddle{ parse_net_position(net_paddle.element().position()) };
+    modify_element_by_net_element(paddle, net_paddle.element());
+    repository.paddles.push_back(paddle);
+  }
+
+  for (int i = 0; i < update.brick_size(); ++i) {
+    NetBrick const net_brick = update.brick(i);
+    Brick brick{ parse_net_position(net_brick.element().position()) };
+    modify_element_by_net_element(brick, net_brick.element());
+    repository.bricks.push_back(brick);
+  }
+
+  return repository;
 }
 
 }// namespace arkanoid
