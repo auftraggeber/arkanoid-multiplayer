@@ -23,23 +23,20 @@
 
 #include <chrono>
 
-#include "boost/asio.hpp"
+#include "asio.hpp"
 
-#include "boost/asio/buffer.hpp"
-#include "boost/asio/completion_condition.hpp"
-#include "boost/asio/execution/execute.hpp"
-#include "boost/asio/io_service.hpp"
-#include "boost/asio/ip/address.hpp"
-#include "boost/asio/ip/tcp.hpp"
-#include "boost/asio/ip/udp.hpp"
-#include "boost/asio/read.hpp"
-#include "boost/asio/read_until.hpp"
-#include "boost/asio/registered_buffer.hpp"
-#include "boost/asio/streambuf.hpp"
-#include "boost/asio/write.hpp"
-#include "boost/core/addressof.hpp"
-#include "boost/system/detail/error_code.hpp"
-#include "boost/system/system_error.hpp"
+#include "asio/buffer.hpp"
+#include "asio/completion_condition.hpp"
+#include "asio/execution/execute.hpp"
+#include "asio/io_service.hpp"
+#include "asio/ip/address.hpp"
+#include "asio/ip/tcp.hpp"
+#include "asio/ip/udp.hpp"
+#include "asio/read.hpp"
+#include "asio/read_until.hpp"
+#include "asio/registered_buffer.hpp"
+#include "asio/streambuf.hpp"
+#include "asio/write.hpp"
 #include "fmt/core.h"
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/event.hpp"
@@ -66,8 +63,8 @@ std::string const default_host{ "127.0.0.1" };
 class Connection
 {
 private:
-  boost::asio::io_service m_io_service;
-  boost::asio::ip::tcp::socket m_socket{ m_io_service };
+  asio::io_service m_io_service;
+  asio::ip::tcp::socket m_socket{ m_io_service };
   std::vector<std::function<void(GameUpdate const &)>> m_receivers;
   bool m_connected{ false };// todo: unschöne Lösung
   std::mutex receivers_mutex, m_conntected_mutex;
@@ -78,9 +75,9 @@ private:
       if (has_connected()) { return; }
 
       std::lock_guard<std::mutex>{ m_conntected_mutex, std::adopt_lock };
-      m_socket.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(host), port));
+      m_socket.connect(asio::ip::tcp::endpoint(asio::ip::address::from_string(host), port));
       m_connected = true;
-    } catch (boost::system::system_error &e) {
+    } catch (asio::system_error &e) {
       fmt::print("Fehler beim Verbinden.");
     }
   }
@@ -90,14 +87,13 @@ private:
     try {
       if (has_connected()) { return; }
 
-      boost::asio::ip::tcp::acceptor acceptor{ m_io_service,
-        boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port) };
+      asio::ip::tcp::acceptor acceptor{ m_io_service, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port) };
 
 
       std::lock_guard<std::mutex>{ m_conntected_mutex, std::adopt_lock };
       acceptor.accept(m_socket);
       m_connected = true;
-    } catch (boost::system::system_error &e) {
+    } catch (asio::system_error &e) {
       fmt::print("Fehler beim Warten auf Verbindung.");
     }
   }
@@ -115,14 +111,14 @@ private:
     std::thread{
       [this]() {
         while (true) {
-          boost::asio::streambuf buffer;
-          boost::system::error_code ec;
+          asio::streambuf buffer;
+          asio::error_code ec;
 
-          std::size_t const bytes_transferred = boost::asio::read(m_socket, buffer, boost::asio::transfer_all(), ec);
+          std::size_t const bytes_transferred = asio::read(m_socket, buffer, asio::transfer_all(), ec);
 
-          /*boost::asio::async_read(m_socket,
+          /*asio::async_read(m_socket,
             buffer,
-            [&buffer, &nothing](boost::system::error_code const &ec, std::size_t bytes_transferred) {// muss referenz.
+            [&buffer, &nothing](asio::error_code const &ec, std::size_t bytes_transferred) {// muss referenz.
               std::string message{ buffers_begin(buffer.data()), buffers_begin(buffer.data()) + bytes_transferred };
               fmt::print("Nachricht empfangen: {}\n", message);
               nothing = false;
@@ -195,7 +191,7 @@ public:
     std::thread([this, message]() {
       fmt::print("Baue versenden.\n");
       // todo: buffer close deconstr.?
-      std::size_t const t = m_socket.write_some(boost::asio::buffer(message));
+      std::size_t const t = m_socket.write_some(asio::buffer(message));
       fmt::print("Nachricht versand: {} bytes: {}\n", message, t);
     }).detach();
 
