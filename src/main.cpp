@@ -52,7 +52,7 @@ namespace connection {
 int constexpr default_port{ 45678 };
 std::string const end_of_message{ "\n\r\r" };
 std::string const default_host{ "127.0.0.1" };
-bool constexpr debug_networking{ true };
+bool constexpr debug_networking{ false };
 
 void debug(std::string const &message)
 {
@@ -121,6 +121,7 @@ private:
         while (true) {
           asio::streambuf buffer;
           asio::error_code ec;
+          GameUpdate update;
 
           // std::size_t const bytes_transferred = asio::read(m_socket, buffer, asio::transfer_exactly(2), ec);
 
@@ -129,10 +130,11 @@ private:
 
           if (ec) { break; }
 
-
           std::string message{ buffers_begin(buffer.data()),
             buffers_begin(buffer.data()) + (bytes_transferred - end_of_message.size()) };
           buffer.consume(bytes_transferred);
+
+          if (update.ParseFromString(message)) { call_receivers(update); }
 
           debug(fmt::format("Nachricht empfangen: {}\n", message));
         }
@@ -500,13 +502,54 @@ int main()
     connect_to_peer(connection, as_host, port);
     show_connecting_state(connection);
 
-    std::string message_to_send{ "Hallo Welt. Ich wurde über einen Socket versendet." };
+    if (as_host) {
+      arkanoid::Position const paddle_position = { (canvas_width / 2) - (paddle_width / 2),
+        playing_field_bottom - paddle_height };
 
-    if (as_host) { connection.send_string(message_to_send); }
+      Paddle paddle{ paddle_position };
+      Ball ball{ paddle_position.add(paddle_width / 2, -10) };
 
-    if (connection::debug_networking) {
-      do { } while (true); }
+      insert_element(element_map, paddle);
+      insert_element(element_map, ball);
+
+      generate_bricks(element_map);
+
+      {
+        std::lock_guard<std::mutex>{ element_mutex, std::adopt_lock };
+        GameUpdate update;
+        arkanoid::fill_game_update(&update, map_values(element_map));
+
+
+        if (!connection.send(update)) {
+          connection.close();
+          return EXIT_FAILURE;
+        }// todo
+      }
+    }
+
+    if (connection.has_connected()) {
+      auto renderer = Renderer([&] {
+        Canvas can = Canvas(canvas_width, canvas_height);
+
+        {
+          std::lock_guard<std::mutex>{ element_mutex, std::adopt_lock };
+          std::for_each(element_map.begin(), element_map.end(), [&can](std::pair<int, arkanoid::Element> const &pair) {
+            draw(can, pair.second);
+          });
+        }
+
+
+        return canvas(can) | border;
+      });
+
+      Loop loop{ &screen, std::move(renderer) };
+
+      loop.Run();
+      connection.close();
+    }
   });
+
+  google::protobuf::ShutdownProtobufLibrary();
 
   return EXIT_SUCCESS;
 }
