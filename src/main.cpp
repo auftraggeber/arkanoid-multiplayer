@@ -2,6 +2,7 @@
 #include <asm-generic/errno.h>
 #include <cstdarg>
 #include <cstddef>
+#include <cstdio>
 #include <cstdlib>
 #include <exception>
 #include <ftxui/dom/canvas.hpp>
@@ -11,6 +12,7 @@
 #include <iostream>
 
 #include <fmt/format.h>
+#include <istream>
 #include <map>
 #include <mutex>
 #include <string>
@@ -24,14 +26,17 @@
 #include "boost/asio.hpp"
 
 #include "boost/asio/buffer.hpp"
+#include "boost/asio/completion_condition.hpp"
 #include "boost/asio/execution/execute.hpp"
 #include "boost/asio/io_service.hpp"
 #include "boost/asio/ip/address.hpp"
 #include "boost/asio/ip/tcp.hpp"
 #include "boost/asio/ip/udp.hpp"
 #include "boost/asio/read.hpp"
+#include "boost/asio/read_until.hpp"
 #include "boost/asio/registered_buffer.hpp"
 #include "boost/asio/streambuf.hpp"
+#include "boost/asio/write.hpp"
 #include "boost/core/addressof.hpp"
 #include "boost/system/detail/error_code.hpp"
 #include "boost/system/system_error.hpp"
@@ -61,8 +66,8 @@ std::string const default_host{ "127.0.0.1" };
 class Connection
 {
 private:
-  boost::asio::io_service io_service;
-  boost::asio::ip::tcp::socket m_socket{ io_service };
+  boost::asio::io_service m_io_service;
+  boost::asio::ip::tcp::socket m_socket{ m_io_service };
   std::vector<std::function<void(GameUpdate const &)>> m_receivers;
   bool m_connected{ false };// todo: unschöne Lösung
   std::mutex receivers_mutex, m_conntected_mutex;
@@ -75,9 +80,6 @@ private:
       std::lock_guard<std::mutex>{ m_conntected_mutex, std::adopt_lock };
       m_socket.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(host), port));
       m_connected = true;
-      read_listener();
-      io_service.run();
-
     } catch (boost::system::system_error &e) {
       fmt::print("Fehler beim Verbinden.");
     }
@@ -88,15 +90,13 @@ private:
     try {
       if (has_connected()) { return; }
 
-      boost::asio::ip::tcp::acceptor acceptor{ io_service,
+      boost::asio::ip::tcp::acceptor acceptor{ m_io_service,
         boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port) };
 
 
       std::lock_guard<std::mutex>{ m_conntected_mutex, std::adopt_lock };
       acceptor.accept(m_socket);
       m_connected = true;
-      read_listener();
-      io_service.run();
     } catch (boost::system::system_error &e) {
       fmt::print("Fehler beim Warten auf Verbindung.");
     }
@@ -110,16 +110,34 @@ private:
       [update](std::function<void(GameUpdate const &)> const &receiver) { receiver(update); });
   }
 
-  void read_listener()
+  void read_listener()// todo: feedback - keine nachricht kommt an
   {
     std::thread{
       [this]() {
-        std::array<char, 4096> buffer;
+        while (true) {
+          boost::asio::streambuf buffer;
+          boost::system::error_code ec;
 
-        boost::asio::async_read(m_socket,
-          boost::asio::buffer(buffer),
-          boost::asio::transfer_all(),
-          [](boost::system::error_code const &ec, std::size_t bytes_transferred) { std::cout << "done reading!"; });
+          std::size_t const bytes_transferred = boost::asio::read(m_socket, buffer, boost::asio::transfer_all(), ec);
+
+          /*boost::asio::async_read(m_socket,
+            buffer,
+            [&buffer, &nothing](boost::system::error_code const &ec, std::size_t bytes_transferred) {// muss referenz.
+              std::string message{ buffers_begin(buffer.data()), buffers_begin(buffer.data()) + bytes_transferred };
+              fmt::print("Nachricht empfangen: {}\n", message);
+              nothing = false;
+              buffer.consume(bytes_transferred);
+            });*/
+
+          if (ec) {
+            fmt::print("NETERR\n");
+            break;
+          } else {
+            std::string message{ buffers_begin(buffer.data()), buffers_begin(buffer.data()) + bytes_transferred };
+            fmt::print("Nachricht empfangen: {}\n", message);
+            buffer.consume(bytes_transferred);
+          }
+        }
       }
     }.detach();
   }
@@ -131,38 +149,55 @@ public:
   Connection(Connection const &) = delete;
   Connection &operator=(Connection const &) = delete;
 
-  std::thread connect_to(
+  void connect_to(
     std::string const &host,
     int const &port,
     std::function<void()> const &on_finish = []() {})
   {
-    return std::thread{ [host, port, this, on_finish]() {
-      connect_to_on_this_thread(host, port);
-      on_finish();
-    } };
+    std::thread{
+      [host, port, this, on_finish]() {
+        connect_to_on_this_thread(host, port);
+        on_finish();
+      }
+    }.join();
+
+    if (has_connected()) {
+      read_listener();
+      m_io_service.run();
+    }
   }
 
-  std::thread wait_for_connection(
+  void wait_for_connection(
     int const &port,
     std::function<void()> const &on_finish = []() {})
   {
-    return std::thread{ [port, this, on_finish]() {
-      wait_for_connection_on_this_thread(port);
-      on_finish();
-    } };
+    std::thread{
+      [port, this, on_finish]() {
+        wait_for_connection_on_this_thread(port);
+        on_finish();
+      }
+    }.join();
+
+    if (has_connected()) {
+      read_listener();
+      m_io_service.run();
+    }
   }
 
   void close() { m_socket.close(); }
 
-  [[nodiscard]] bool send(GameUpdate &game_update)
+  [[nodiscard]] bool send(GameUpdate &game_update) { return send_string(game_update.SerializeAsString()); }
+
+  [[nodiscard]] bool send_string(std::string const &message)
   {
     if (!has_connected()) { return false; }
 
-    std::thread([game_update, this]() {// todo: kopie besser?
-      auto buffer = boost::asio::buffer(game_update.SerializeAsString());
-      m_socket.send(buffer);
-    })
-      .detach();
+    std::thread([this, message]() {
+      fmt::print("Baue versenden.\n");
+      // todo: buffer close deconstr.?
+      std::size_t const t = m_socket.write_some(boost::asio::buffer(message));
+      fmt::print("Nachricht versand: {} bytes: {}\n", message, t);
+    }).detach();
 
     return true;
   }
@@ -381,9 +416,9 @@ void connect_to_peer(connection::Connection &connection, bool const as_host, int
 
 
   if (as_host) {
-    connection.wait_for_connection(port).join();
+    connection.wait_for_connection(port);
   } else {
-    connection.connect_to(connection::default_host, port).join();
+    connection.connect_to(connection::default_host, port);
   }
 }
 
@@ -471,51 +506,12 @@ int main()
     connect_to_peer(connection, as_host, port);
     show_connecting_state(connection);
 
-    if (as_host) {
-      arkanoid::Position const paddle_position = { (canvas_width / 2) - (paddle_width / 2),
-        playing_field_bottom - paddle_height };
+    std::string message_to_send{ "Hallo Welt. Ich wurde über einen Socket versendet.\n" };
 
-      Paddle paddle{ paddle_position };
-      Ball ball{ paddle_position.add(paddle_width / 2, -10) };
+    connection.send_string(message_to_send);
 
-      insert_element(element_map, paddle);
-      insert_element(element_map, ball);
-
-      generate_bricks(element_map);
-
-      {
-        std::lock_guard<std::mutex>{ element_mutex, std::adopt_lock };
-        GameUpdate update;
-        arkanoid::fill_game_update(&update, map_values(element_map));
-
-
-        if (!connection.send(update)) {
-          connection.close();
-          return EXIT_FAILURE;
-        }// todo
-      }
-    }
-
-    if (connection.has_connected()) {
-      auto renderer = Renderer([&] {
-        Canvas can = Canvas(canvas_width, canvas_height);
-
-        {
-          std::lock_guard<std::mutex>{ element_mutex, std::adopt_lock };
-          std::for_each(element_map.begin(), element_map.end(), [&can](std::pair<int, arkanoid::Element> const &pair) {
-            draw(can, pair.second);
-          });
-        }
-
-
-        return canvas(can) | border;
-      });
-
-      Loop loop{ &screen, std::move(renderer) };
-
-      loop.Run();
-      connection.close();
-    }
+    do {
+    } while (true);
   });
 
   return EXIT_SUCCESS;
