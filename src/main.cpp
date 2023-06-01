@@ -247,6 +247,8 @@ public:
 
 class Element
 {
+public:
+  virtual std::string get_type() const = 0;
 
 protected:
   Position m_position;
@@ -255,7 +257,7 @@ protected:
   int const m_height;
   ftxui::Color m_color;
 
-  friend void fill_game_element(GameElement *const &, arkanoid::Element *const &);// todo: außerhalb von namespace ??
+  friend void fill_game_element(GameElement *const &, arkanoid::Element const *);// todo: außerhalb von namespace ??
   friend std::vector<std::unique_ptr<arkanoid::Element>> parse_game_update(GameUpdate const &);
 
 public:
@@ -290,12 +292,14 @@ class Ball : public Element
 
 public:
   explicit Ball(Position const position) : Element{ position, ball_radius, ball_radius, ftxui::Color::Red } {}
+  std::string get_type() const override { return "ball"; }
 };
 
 class Paddle : public Element
 {
 public:
   explicit Paddle(Position const position) : Element{ position, paddle_width, paddle_height } {}
+  std::string get_type() const override { return "paddle"; }
 };
 
 class Brick : public Element
@@ -303,11 +307,12 @@ class Brick : public Element
 
 public:
   explicit Brick(Position const position) : Element{ position, brick_width, brick_height } {}
+  std::string get_type() const override { return "brick"; }
 };
 
-void fill_game_element(GameElement *const &game_element, arkanoid::Element *const &element)// todo
+void fill_game_element(GameElement *const &game_element, arkanoid::Element const *element)// todo
 {
-  ElementPosition *position = new ElementPosition{};// muss auf heap, da sonst null-pointer, verfahren da hinter?
+  ElementPosition *position = new ElementPosition;// muss auf heap, da sonst null-pointer, verfahren da hinter?
 
   int const x = element->m_position.x;
   int const y = element->m_position.y;
@@ -316,7 +321,7 @@ void fill_game_element(GameElement *const &game_element, arkanoid::Element *cons
   position->set_y(y);
 
   game_element->set_id(element->id());
-  game_element->set_type(BALL);
+  game_element->set_type(BRICK);
   game_element->set_allocated_element_position(position);
 }
 
@@ -339,10 +344,20 @@ void fill_game_update(GameUpdate *update, std::vector<arkanoid::Element *> const
     Position position{ element.element_position().x(), element.element_position().y() };
 
     switch (element.type()) {
-    case BALL:
+    case BALL: {
       std::unique_ptr<Element> ball = std::make_unique<Ball>(position);
       ball->m_id = element.id();
       elements.push_back(std::move(ball));
+      break;
+    }
+
+    case PADDLE:
+    case BRICK: {
+      std::unique_ptr<Element> brick = std::make_unique<Brick>(position);
+      brick->m_id = element.id();
+      elements.push_back(std::move(brick));
+      break;
+    }
     }
   }
 
