@@ -255,8 +255,8 @@ protected:
   int const m_height;
   ftxui::Color m_color;
 
-  friend void fill_game_element(GameElement *const &, arkanoid::Element const &);// todo: außerhalb von namespace ??
-  friend std::vector<arkanoid::Element> parse_game_update(GameUpdate const &);
+  friend void fill_game_element(GameElement *const &, arkanoid::Element *const &);// todo: außerhalb von namespace ??
+  friend std::vector<std::unique_ptr<arkanoid::Element>> parse_game_update(GameUpdate const &);
 
 public:
   IdGenerator static id_generator;
@@ -305,34 +305,34 @@ public:
   explicit Brick(Position const position) : Element{ position, brick_width, brick_height } {}
 };
 
-void fill_game_element(GameElement *const &game_element, arkanoid::Element const &element)// todo
+void fill_game_element(GameElement *const &game_element, arkanoid::Element *const &element)// todo
 {
   ElementPosition *position = new ElementPosition{};// muss auf heap, da sonst null-pointer, verfahren da hinter?
 
-  int const x = element.m_position.x;
-  int const y = element.m_position.y;
+  int const x = element->m_position.x;
+  int const y = element->m_position.y;
 
   position->set_x(x);
   position->set_y(y);
 
-  game_element->set_id(element.id());
+  game_element->set_id(element->id());
   game_element->set_type(BALL);
   game_element->set_allocated_element_position(position);
 }
 
-void fill_game_update(GameUpdate *update, std::vector<arkanoid::Element> const &elements)
+void fill_game_update(GameUpdate *update, std::vector<arkanoid::Element *> const &elements)
 {
 
-  std::for_each(elements.begin(), elements.end(), [&update](arkanoid::Element const &element) {
+  std::for_each(elements.begin(), elements.end(), [&update](auto const &element) {
     GameElement *game_element = update->add_element();
 
     fill_game_element(game_element, element);
   });
 }
 
-[[nodiscard]] std::vector<arkanoid::Element> parse_game_update(GameUpdate const &update)
+[[nodiscard]] std::vector<std::unique_ptr<arkanoid::Element>> parse_game_update(GameUpdate const &update)
 {
-  std::vector<arkanoid::Element> elements;
+  std::vector<std::unique_ptr<arkanoid::Element>> elements;
 
   for (int i = 0; i < update.element_size(); ++i) {
     auto const element = update.element(i);
@@ -340,9 +340,9 @@ void fill_game_update(GameUpdate *update, std::vector<arkanoid::Element> const &
 
     switch (element.type()) {
     case BALL:
-      Ball ball{ position };
-      ball.m_id = element.id();
-      elements.push_back(ball);
+      std::unique_ptr<Element> ball = std::make_unique<Ball>(position);
+      ball->m_id = element.id();
+      elements.push_back(std::move(ball));
     }
   }
 
@@ -434,12 +434,12 @@ void show_connecting_state(connection::Connection &connection)
   screen.Exit();
 }
 
-void insert_element(std::map<int, arkanoid::Element> &map, arkanoid::Element const &element)
+void insert_element(std::map<int, std::unique_ptr<arkanoid::Element>> &map, std::unique_ptr<arkanoid::Element> &element)
 {
-  map.insert(std::pair<int, arkanoid::Element>{ element.id(), element });
+  map.insert(std::pair<int, std::unique_ptr<arkanoid::Element>>{ element->id(), std::move(element) });
 }
 
-void generate_bricks(std::map<int, arkanoid::Element> &elements)
+void generate_bricks(std::map<int, std::unique_ptr<arkanoid::Element>> &elements)
 {
   using namespace arkanoid;
 
@@ -451,7 +451,7 @@ void generate_bricks(std::map<int, arkanoid::Element> &elements)
       int const x{ playing_field_left + ((brick_distance_x + brick_width) * i_x) };
       int const y{ playing_field_top + ((brick_distance_y + brick_height) * i_y) };
 
-      arkanoid::Brick brick{ { x, y } };
+      std::unique_ptr<arkanoid::Element> brick = std::make_unique<arkanoid::Brick>(arkanoid::Position{ x, y });
       insert_element(elements, brick);
     }
   }
@@ -469,7 +469,7 @@ void draw(ftxui::Canvas &canvas, T1 const &drawable)
   }
 }
 
-template<typename T1, typename T2>// todo: gibt es schon eine implementierung?
+/*template<typename T1, typename T2>// todo: gibt es schon eine implementierung?
 [[nodiscard]] std::vector<T2> map_values(std::map<T1, T2> const &map)
 {
   std::vector<T2> vector;
@@ -477,7 +477,20 @@ template<typename T1, typename T2>// todo: gibt es schon eine implementierung?
   std::for_each(map.begin(), map.end(), [&vector](std::pair<T1, T2> const &p) { vector.push_back(p.second); });
 
   return vector;
+}*/
+
+std::vector<arkanoid::Element *> map_values(std::map<int, std::unique_ptr<arkanoid::Element>> const &map)
+{
+  std::vector<arkanoid::Element *> vector;
+
+  std::for_each(map.begin(), map.end(), [&vector](std::pair<const int, std::unique_ptr<arkanoid::Element>> const &p) {
+    vector.push_back(p.second.get());
+  });
+
+  return vector;
 }
+
+#include <memory>
 
 int main()
 {
@@ -486,17 +499,17 @@ int main()
 
   show_connection_methods([](bool const &as_host, int const &port) {
     std::mutex element_mutex;
-    std::map<int, arkanoid::Element> element_map;
+    std::map<int, std::unique_ptr<arkanoid::Element>> element_map;
     connection::Connection connection;
     auto screen = ScreenInteractive::FitComponent();
 
     connection.register_receiver([&element_map, &element_mutex](GameUpdate const &update) {
-      std::vector<arkanoid::Element> elements_to_update = arkanoid::parse_game_update(update);
+      std::vector<std::unique_ptr<arkanoid::Element>> elements_to_update = arkanoid::parse_game_update(update);
 
       std::lock_guard<std::mutex>{ element_mutex, std::adopt_lock };
-      std::for_each(elements_to_update.begin(),
-        elements_to_update.end(),
-        [&element_map](arkanoid::Element const &element) { insert_element(element_map, element); });
+      std::for_each(elements_to_update.begin(), elements_to_update.end(), [&element_map](auto &element) {
+        insert_element(element_map, element);
+      });
     });
 
     connect_to_peer(connection, as_host, port);
@@ -506,8 +519,8 @@ int main()
       arkanoid::Position const paddle_position = { (canvas_width / 2) - (paddle_width / 2),
         playing_field_bottom - paddle_height };
 
-      Paddle paddle{ paddle_position };
-      Ball ball{ paddle_position.add(paddle_width / 2, -10) };
+      std::unique_ptr<arkanoid::Element> paddle = std::make_unique<Paddle>(paddle_position);
+      std::unique_ptr<arkanoid::Element> ball = std::make_unique<Ball>(paddle_position.add(paddle_width / 2, -10));
 
       insert_element(element_map, paddle);
       insert_element(element_map, ball);
@@ -533,9 +546,8 @@ int main()
 
         {
           std::lock_guard<std::mutex>{ element_mutex, std::adopt_lock };
-          std::for_each(element_map.begin(), element_map.end(), [&can](std::pair<int, arkanoid::Element> const &pair) {
-            draw(can, pair.second);
-          });
+          std::for_each(
+            element_map.begin(), element_map.end(), [&can](auto const &pair) { draw(can, *(pair.second)); });
         }
 
 
