@@ -18,6 +18,7 @@
 #include <mutex>
 #include <optional>
 #include <queue>
+#include <random>
 #include <string>
 #include <thread>
 #include <unordered_map>
@@ -40,6 +41,7 @@
 #include "asio/read_until.hpp"
 #include "asio/registered_buffer.hpp"
 #include "asio/streambuf.hpp"
+#include "asio/system_error.hpp"
 #include "asio/write.hpp"
 #include "fmt/core.h"
 #include "ftxui/component/component.hpp"
@@ -146,17 +148,27 @@ private:
           asio::error_code ec;
           GameUpdate update;
 
-          std::size_t const bytes_transferred = asio::read_until(m_socket, buffer, end_of_message, ec);
+          try {
+            std::size_t const bytes_transferred = asio::read_until(m_socket, buffer, end_of_message, ec);
 
-          if (ec) { break; }
+            if (ec) { break; }
 
-          std::string message{ buffers_begin(buffer.data()),
-            buffers_begin(buffer.data()) + (bytes_transferred - end_of_message.size()) };
-          buffer.consume(bytes_transferred);
+            std::string message{ buffers_begin(buffer.data()),
+              buffers_begin(buffer.data()) + (bytes_transferred - end_of_message.size()) };
+            buffer.consume(bytes_transferred);
 
-          if (update.ParseFromString(message)) { call_receivers(update); }
+            if (update.ParseFromString(message)) { call_receivers(update); }
 
-          debug(fmt::format("Nachricht empfangen: {}\n", message));
+            debug(fmt::format("Nachricht empfangen: {}\n", message));
+          } catch (asio::system_error const &e) {
+
+            {
+              std::lock_guard<std::mutex> lock{ m_conntected_mutex };
+              m_connected = false;
+            }
+
+            break;
+          }
         }
       }
     }.detach();
@@ -198,7 +210,10 @@ public:
       }
     }.join();
 
-    if (has_connected()) { m_io_service.run(); }
+    if (has_connected()) {
+      read_listener();
+      m_io_service.run();
+    }
   }
 
   void close() { m_socket.close(); }
@@ -230,8 +245,10 @@ public:
         std::lock_guard<std::mutex> lock{ m_send_mutex };
         m_sending = true;
       }
-      std::size_t const t = m_socket.write_some(asio::buffer(message + end_of_message));
-      debug(fmt::format("{} Bytes versendet.", t));
+      try {
+        std::size_t const t = m_socket.write_some(asio::buffer(message + end_of_message));
+        debug(fmt::format("{} Bytes versendet.", t));
+      } catch (asio::system_error const &e) {}
 
       {
         std::lock_guard<std::mutex> lock{ m_send_mutex };
@@ -264,7 +281,7 @@ int constexpr playing_field_top{ 5 }, playing_field_bottom{ canvas_height - 10 }
 int constexpr ball_radius{ 1 }, ball_speed{ 1 };
 int constexpr paddle_width{ 14 }, paddle_height{ 1 };
 int constexpr brick_width{ 14 }, brick_height{ 5 };
-int constexpr num_bricks_y{ 5 };
+int constexpr num_bricks_y{ 8 };
 int constexpr brick_distance_x{ 2 }, brick_distance_y{ 3 };
 
 class IdGenerator
@@ -307,6 +324,7 @@ protected:
 
   friend void fill_game_element(GameElement *const &, arkanoid::Element const *);// todo: außerhalb von namespace ??
   friend void parse_game_update(std::map<int, std::unique_ptr<Element>> &, GameUpdate const &);
+  friend void parse_game_element(Element *, GameElement const &);
 
 public:
   IdGenerator static id_generator;
@@ -396,6 +414,12 @@ void fill_game_update(GameUpdate *update, std::vector<arkanoid::Element *> const
   });
 }
 
+void parse_game_element(Element *element, GameElement const &net_element)
+{
+  element->m_position = { net_element.element_position().x(), net_element.element_position().y() };
+  element->invert_position();
+}
+
 void parse_game_update(std::map<int, std::unique_ptr<Element>> &map, GameUpdate const &update)
 {
   for (int i = 0; i < update.element_size(); ++i) {
@@ -404,9 +428,9 @@ void parse_game_update(std::map<int, std::unique_ptr<Element>> &map, GameUpdate 
 
     bool new_id{ !map.contains(net_element.id()) };
 
-    std::unique_ptr<Element> arkanoid_element_ptr = nullptr;
-
     if (new_id) {
+      std::unique_ptr<Element> arkanoid_element_ptr = nullptr;
+
       switch (net_element.type()) {
       case BALL: {
         arkanoid_element_ptr = std::make_unique<Ball>(position);
@@ -422,19 +446,12 @@ void parse_game_update(std::map<int, std::unique_ptr<Element>> &map, GameUpdate 
         break;
       }
       }
-    } else {
-      // todo
-    }
 
-    if (arkanoid_element_ptr == nullptr) { continue; }
-    arkanoid_element_ptr->m_id = net_element.id();
-    arkanoid_element_ptr->m_position = position;
-    arkanoid_element_ptr->invert_position();
-
-    if (new_id) {
+      arkanoid_element_ptr->m_id = net_element.id();
+      parse_game_element(arkanoid_element_ptr.get(), net_element);
       insert_element(map, arkanoid_element_ptr);
     } else {
-      map.erase(map.find(net_element.id()));
+      parse_game_element(map.find(net_element.id())->second.get(), net_element);
     }
   }
 }
@@ -570,12 +587,29 @@ int find_id_of_controller(std::map<int, std::unique_ptr<arkanoid::Element>> cons
   return id;
 }
 
+/*
+void test_paddle_movement(arkanoid::Paddle *paddle)
+{
+  std::random_device r;
+  std::default_random_engine e1(r());
+  std::uniform_int_distribution<int> uniform_dist(1, 100);
+
+  float const multiplier = uniform_dist(e1) / 100.0f;
+
+  int const range = arkanoid::playing_field_right - arkanoid::paddle_width;
+  int const x = multiplier * x;
+
+  paddle->update_x(x);
+}
+*/
+
+
 int main()
 {
   using namespace ftxui;
   using namespace arkanoid;
 
-  show_connection_methods([](bool const &as_host, int const &port) {
+  show_connection_methods([](bool const as_host, int const &port) {
     std::mutex element_mutex;
     std::map<int, std::unique_ptr<arkanoid::Element>> element_map;
     connection::Connection connection;
@@ -677,7 +711,7 @@ int main()
           updated_elements.push_back(element_map.find(controlling_paddle_id)->second.get());
         }
 
-        if (frame % 15 == 14 && !updated_elements.empty()) {
+        if (frame % 5 == 4 && !updated_elements.empty()) {
           GameUpdate update;
           fill_game_update(&update, updated_elements);
           connection.send(update);
