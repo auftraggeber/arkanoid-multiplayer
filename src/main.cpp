@@ -14,7 +14,10 @@
 #include <fmt/format.h>
 #include <istream>
 #include <map>
+#include <memory>
 #include <mutex>
+#include <optional>
+#include <queue>
 #include <string>
 #include <thread>
 #include <unordered_map>
@@ -74,7 +77,7 @@ private:
   asio::io_service m_io_service;
   asio::ip::tcp::socket m_socket{ m_io_service };
   std::vector<std::function<void(GameUpdate const &)>> m_receivers;
-  bool m_connected{ false };// todo: unschöne Lösung
+  bool m_connected{ false };
   std::mutex receivers_mutex, m_conntected_mutex;
 
   void connect_to_on_this_thread(std::string const &host, int const &port)
@@ -82,7 +85,7 @@ private:
     try {
       if (has_connected()) { return; }
 
-      std::lock_guard<std::mutex>{ m_conntected_mutex, std::adopt_lock };
+      std::lock_guard<std::mutex> lock{ m_conntected_mutex };
       m_socket.connect(asio::ip::tcp::endpoint(asio::ip::address::from_string(host), port));
       m_connected = true;
     } catch (asio::system_error &e) {
@@ -98,7 +101,7 @@ private:
       asio::ip::tcp::acceptor acceptor{ m_io_service, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port) };
 
 
-      std::lock_guard<std::mutex>{ m_conntected_mutex, std::adopt_lock };
+      std::lock_guard<std::mutex> lock{ m_conntected_mutex };
       acceptor.accept(m_socket);
       m_connected = true;
     } catch (asio::system_error &e) {
@@ -106,15 +109,15 @@ private:
     }
   }
 
-  void call_receivers(GameUpdate const &update)// todo kopie besser?
+  void call_receivers(GameUpdate const &update)
   {
-    std::lock_guard<std::mutex>{ receivers_mutex, std::adopt_lock };
+    std::lock_guard<std::mutex> lock{ receivers_mutex };
     std::for_each(m_receivers.begin(),
       m_receivers.end(),
       [update](std::function<void(GameUpdate const &)> const &receiver) { receiver(update); });
   }
 
-  void read_listener()// todo: feedback - keine nachricht kommt an
+  void read_listener()
   {
     std::thread{
       [this]() {
@@ -123,10 +126,7 @@ private:
           asio::error_code ec;
           GameUpdate update;
 
-          // std::size_t const bytes_transferred = asio::read(m_socket, buffer, asio::transfer_exactly(2), ec);
-
-          std::size_t const bytes_transferred =
-            asio::read_until(m_socket, buffer, end_of_message, ec);// todo - läuft nicht
+          std::size_t const bytes_transferred = asio::read_until(m_socket, buffer, end_of_message, ec);
 
           if (ec) { break; }
 
@@ -139,7 +139,7 @@ private:
           debug(fmt::format("Nachricht empfangen: {}\n", message));
         }
       }
-    }.detach();// todo - mit programm beenden
+    }.detach();
   }
 
 
@@ -190,7 +190,6 @@ public:
     if (!has_connected()) { return false; }
 
     std::thread([this, message]() {
-      // todo: buffer close deconstr.?
       std::size_t const t = m_socket.write_some(asio::buffer(message + end_of_message));
       debug(fmt::format("{} Bytes versendet.", t));
     }).detach();
@@ -200,13 +199,13 @@ public:
 
   void register_receiver(std::function<void(GameUpdate const &update)> const &receiver)
   {
-    std::lock_guard<std::mutex>{ receivers_mutex, std::adopt_lock };// todo: varname?
+    std::lock_guard<std::mutex> lock{ receivers_mutex };
     m_receivers.push_back(receiver);
   }
 
   [[nodiscard]] bool has_connected()
   {
-    std::lock_guard<std::mutex>{ m_conntected_mutex, std::adopt_lock };
+    std::lock_guard<std::mutex> lock{ m_conntected_mutex };
     return m_connected;
   }
 };
@@ -215,7 +214,7 @@ public:
 
 namespace arkanoid {
 
-int constexpr canvas_width{ 164 }, canvas_height{ 100 };
+int constexpr canvas_width{ 164 }, canvas_height{ 180 };
 int constexpr playing_field_top{ 5 }, playing_field_bottom{ canvas_height - 10 }, playing_field_left{ 1 },
   playing_field_right{ canvas_width - 2 };
 int constexpr ball_radius{ 1 }, ball_speed{ 1 };
@@ -242,17 +241,22 @@ public:
   int x;
   int y;
 
-  [[nodiscard]] Position add(int const &x, int const &y) const { return Position{ this->x + x, this->y + y }; }
+  [[nodiscard]] Position add(int const x, int const y) const { return Position{ this->x + x, this->y + y }; }
+  [[nodiscard]] Position add(Position const &pos) const { return add(pos.x, pos.y); }
+
+
+  [[nodiscard]] Position sub(int const x, int const y) const { return Position{ this->x - x, this->y - y }; }
+  [[nodiscard]] Position sub(Position const &pos) const { return sub(pos.x, pos.y); }
 };
 
 class Element
 {
 public:
-  virtual std::string get_type() const = 0;
+  virtual ElementType get_type() const = 0;
 
 protected:
   Position m_position;
-  int m_id;// todo: const kann nicht kopiert werden - aufgefallen bei: map[id] = obj
+  int m_id;
   int const m_width;
   int const m_height;
   ftxui::Color m_color;
@@ -270,6 +274,11 @@ public:
     : m_position{ position }, m_width{ width }, m_height{ height }, m_color{ color }, m_id{ id_generator.next() }
   {}
 
+  void invert_position()
+  {
+    m_position = Position{ playing_field_right, playing_field_bottom }.sub(m_position).sub(m_width, m_height);
+  }
+
   [[nodiscard]] int left() const { return m_position.x; }
 
   [[nodiscard]] int right() const { return left() + m_width; }
@@ -285,21 +294,29 @@ public:
   [[nodiscard]] ftxui::Color color() const { return m_color; };
 };
 
-IdGenerator Element::id_generator = IdGenerator{ 0 };// todo: static init in Klasse
+IdGenerator Element::id_generator = IdGenerator{ 0 };
 
 class Ball : public Element
 {
 
 public:
   explicit Ball(Position const position) : Element{ position, ball_radius, ball_radius, ftxui::Color::Red } {}
-  std::string get_type() const override { return "ball"; }
+  ElementType get_type() const override { return BALL; }
 };
 
 class Paddle : public Element
 {
 public:
   explicit Paddle(Position const position) : Element{ position, paddle_width, paddle_height } {}
-  std::string get_type() const override { return "paddle"; }
+  ElementType get_type() const override { return PADDLE; }
+
+  [[nodiscard]] bool update_x(int const new_x)
+  {
+    if (m_position.x == new_x) { return false; }
+    m_position.x = new_x;
+
+    return true;
+  }
 };
 
 class Brick : public Element
@@ -307,12 +324,12 @@ class Brick : public Element
 
 public:
   explicit Brick(Position const position) : Element{ position, brick_width, brick_height } {}
-  std::string get_type() const override { return "brick"; }
+  ElementType get_type() const override { return BRICK; }
 };
 
-void fill_game_element(GameElement *const &game_element, arkanoid::Element const *element)// todo
+void fill_game_element(GameElement *const &game_element, arkanoid::Element const *element)
 {
-  ElementPosition *position = new ElementPosition;// muss auf heap, da sonst null-pointer, verfahren da hinter?
+  ElementPosition *position = new ElementPosition;
 
   int const x = element->m_position.x;
   int const y = element->m_position.y;
@@ -321,7 +338,7 @@ void fill_game_element(GameElement *const &game_element, arkanoid::Element const
   position->set_y(y);
 
   game_element->set_id(element->id());
-  game_element->set_type(BRICK);
+  game_element->set_type(element->get_type());
   game_element->set_allocated_element_position(position);
 }
 
@@ -343,22 +360,29 @@ void fill_game_update(GameUpdate *update, std::vector<arkanoid::Element *> const
     auto const element = update.element(i);
     Position position{ element.element_position().x(), element.element_position().y() };
 
+    std::unique_ptr<Element> arkanoid_element_ptr = nullptr;
+
     switch (element.type()) {
     case BALL: {
-      std::unique_ptr<Element> ball = std::make_unique<Ball>(position);
-      ball->m_id = element.id();
-      elements.push_back(std::move(ball));
+      arkanoid_element_ptr = std::make_unique<Ball>(position);
       break;
     }
 
-    case PADDLE:
+    case PADDLE: {
+      arkanoid_element_ptr = std::make_unique<Paddle>(position);
+      break;
+    }
     case BRICK: {
-      std::unique_ptr<Element> brick = std::make_unique<Brick>(position);
-      brick->m_id = element.id();
-      elements.push_back(std::move(brick));
+      arkanoid_element_ptr = std::make_unique<Brick>(position);
       break;
     }
     }
+
+    if (arkanoid_element_ptr == nullptr) { continue; }
+    arkanoid_element_ptr->m_id = element.id();
+    arkanoid_element_ptr->invert_position();
+
+    elements.push_back(std::move(arkanoid_element_ptr));
   }
 
   return elements;
@@ -460,11 +484,14 @@ void generate_bricks(std::map<int, std::unique_ptr<arkanoid::Element>> &elements
 
   int const num_bricks_x = (playing_field_right - brick_distance_x) / (brick_width + brick_distance_x);
 
+  int const total_brick_height = (num_bricks_y * (brick_height + brick_distance_y)) + brick_distance_y;
+  int const top = (playing_field_bottom / 2) - (total_brick_height / 2);
+
   for (int i_x{ 0 }; i_x < num_bricks_x; ++i_x) {
     for (int i_y{ 0 }; i_y < num_bricks_y; ++i_y) {
 
       int const x{ playing_field_left + ((brick_distance_x + brick_width) * i_x) };
-      int const y{ playing_field_top + ((brick_distance_y + brick_height) * i_y) };
+      int const y{ top + ((brick_distance_y + brick_height) * i_y) };
 
       std::unique_ptr<arkanoid::Element> brick = std::make_unique<arkanoid::Brick>(arkanoid::Position{ x, y });
       insert_element(elements, brick);
@@ -477,35 +504,35 @@ void draw(ftxui::Canvas &canvas, T1 const &drawable)
 {
   if (!drawable.exists()) { return; }
 
-  int const start{ drawable.top() % 2 == 0 ? drawable.top() - 1 : drawable.top() }; /* Zeichenfehler beheben */
-
-  for (int y = start; y <= drawable.bottom(); y += 2) {
+  for (int y = drawable.top(); y <= drawable.bottom(); y += 2) {
     canvas.DrawBlockLine(drawable.left(), y, drawable.right(), y, drawable.color());
   }
 }
 
-/*template<typename T1, typename T2>// todo: gibt es schon eine implementierung?
-[[nodiscard]] std::vector<T2> map_values(std::map<T1, T2> const &map)
+template<typename T1, typename T2>//
+std::vector<T2 *> map_values(std::map<T1, std::unique_ptr<T2>> const &map)
 {
-  std::vector<T2> vector;
+  std::vector<T2 *> vector;
 
-  std::for_each(map.begin(), map.end(), [&vector](std::pair<T1, T2> const &p) { vector.push_back(p.second); });
-
-  return vector;
-}*/
-
-std::vector<arkanoid::Element *> map_values(std::map<int, std::unique_ptr<arkanoid::Element>> const &map)
-{
-  std::vector<arkanoid::Element *> vector;
-
-  std::for_each(map.begin(), map.end(), [&vector](std::pair<const int, std::unique_ptr<arkanoid::Element>> const &p) {
-    vector.push_back(p.second.get());
-  });
+  std::for_each(map.begin(), map.end(), [&vector](auto const &pair) { vector.push_back(pair.second.get()); });
 
   return vector;
 }
 
-#include <memory>
+int find_id_of_controller(std::map<int, std::unique_ptr<arkanoid::Element>> const &element_map, int const paddle_y)
+{
+  int id = -1;
+
+  std::for_each(element_map.begin(), element_map.end(), [&id, paddle_y](auto const &pair) {
+    auto &element_ptr = pair.second;
+
+    if (element_ptr->get_type() == PADDLE) {
+      if (element_ptr->top() == paddle_y) { id = element_ptr->id(); }
+    }
+  });
+
+  return id;
+}
 
 int main()
 {
@@ -517,11 +544,12 @@ int main()
     std::map<int, std::unique_ptr<arkanoid::Element>> element_map;
     connection::Connection connection;
     auto screen = ScreenInteractive::FitComponent();
+    int const paddle_y{ playing_field_bottom - paddle_height };
 
     connection.register_receiver([&element_map, &element_mutex](GameUpdate const &update) {
       std::vector<std::unique_ptr<arkanoid::Element>> elements_to_update = arkanoid::parse_game_update(update);
 
-      std::lock_guard<std::mutex>{ element_mutex, std::adopt_lock };
+      std::lock_guard<std::mutex> lock{ element_mutex };
       std::for_each(elements_to_update.begin(), elements_to_update.end(), [&element_map](auto &element) {
         insert_element(element_map, element);
       });
@@ -531,19 +559,20 @@ int main()
     show_connecting_state(connection);
 
     if (as_host) {
-      arkanoid::Position const paddle_position = { (canvas_width / 2) - (paddle_width / 2),
-        playing_field_bottom - paddle_height };
+      arkanoid::Position const paddle_position = { (canvas_width / 2) - (paddle_width / 2), paddle_y };
 
       std::unique_ptr<arkanoid::Element> paddle = std::make_unique<Paddle>(paddle_position);
+      std::unique_ptr<arkanoid::Element> paddle_enemy = std::make_unique<Paddle>(paddle_position.sub(0, paddle_y));
       std::unique_ptr<arkanoid::Element> ball = std::make_unique<Ball>(paddle_position.add(paddle_width / 2, -10));
 
       insert_element(element_map, paddle);
+      insert_element(element_map, paddle_enemy);
       insert_element(element_map, ball);
 
       generate_bricks(element_map);
 
       {
-        std::lock_guard<std::mutex>{ element_mutex, std::adopt_lock };
+        std::lock_guard<std::mutex> lock{ element_mutex };
         GameUpdate update;
         arkanoid::fill_game_update(&update, map_values(element_map));
 
@@ -551,27 +580,71 @@ int main()
         if (!connection.send(update)) {
           connection.close();
           return EXIT_FAILURE;
-        }// todo
+        }
       }
     }
 
     if (connection.has_connected()) {
+      int controlling_paddle_id{ -1 };
+      int mouse_x{};
+
       auto renderer = Renderer([&] {
         Canvas can = Canvas(canvas_width, canvas_height);
 
         {
-          std::lock_guard<std::mutex>{ element_mutex, std::adopt_lock };
+          std::lock_guard<std::mutex> lock{ element_mutex };
           std::for_each(
             element_map.begin(), element_map.end(), [&can](auto const &pair) { draw(can, *(pair.second)); });
         }
 
-
         return canvas(can) | border;
+      });
+
+      renderer |= CatchEvent([&](Event event) {
+        if (event == Event::Escape) {
+          screen.Exit();
+        } else if (event.is_mouse()) {
+          mouse_x = (event.mouse().x - 1) * 2;// recommended translation of captured x
+        }
+        return true;
       });
 
       Loop loop{ &screen, std::move(renderer) };
 
-      loop.Run();
+      auto game_update_loop = [&element_map, &element_mutex, &controlling_paddle_id, &connection, paddle_y, &mouse_x]() { // todo - mouse_x als kopie buggt
+        std::vector<arkanoid::Element *> updated_elements;
+        GameUpdate update;
+        {
+          std::lock_guard<std::mutex> lock{ element_mutex };
+          if (controlling_paddle_id < 0) { controlling_paddle_id = find_id_of_controller(element_map, paddle_y); }
+
+          if (controlling_paddle_id >= 0) {
+            arkanoid::Element *paddle_element = element_map.find(controlling_paddle_id)->second.get();
+            arkanoid::Paddle *paddle_ptr = static_cast<Paddle *>(paddle_element);
+            if (paddle_ptr->update_x(mouse_x)) { updated_elements.push_back(paddle_ptr); }
+          }
+
+          if (!updated_elements.empty()) {
+            arkanoid::fill_game_update(&update, updated_elements);
+            connection.send(update);// todo: aus mutex raus nehmen?
+          }
+        }
+      };
+
+      constexpr auto frame_time_budget{ std::chrono::seconds(1) / 30 };
+
+      while (!loop.HasQuitted()) {
+        const auto frame_start_time{ std::chrono::steady_clock::now() };
+
+        game_update_loop();
+        loop.RunOnce();
+
+        const auto frame_end_time{ std::chrono::steady_clock::now() };
+        const auto unused_frame_time{ frame_time_budget - (frame_end_time - frame_start_time) };
+
+        if (unused_frame_time > std::chrono::seconds(0)) { std::this_thread::sleep_for(unused_frame_time); }
+      }
+
       connection.close();
     }
   });
