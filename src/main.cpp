@@ -50,6 +50,25 @@
 
 #include "arkanoid.pb.h"
 
+
+template<typename T1, typename T2>//
+void insert_element(std::map<T1, T2> &map, T2 &element)
+{
+  if (map.contains(element->id())) { map.erase(map.find(element->id())); }
+
+  map.insert(std::pair<T1, T2>{ element->id(), std::move(element) });
+}
+
+template<typename T1, typename T2>//
+std::vector<T2 *> map_values(std::map<T1, std::unique_ptr<T2>> const &map)
+{
+  std::vector<T2 *> vector;
+
+  std::for_each(map.begin(), map.end(), [&vector](auto const &pair) { vector.push_back(pair.second.get()); });
+
+  return vector;
+}
+
 namespace connection {
 
 int constexpr default_port{ 45678 };
@@ -77,8 +96,9 @@ private:
   asio::io_service m_io_service;
   asio::ip::tcp::socket m_socket{ m_io_service };
   std::vector<std::function<void(GameUpdate const &)>> m_receivers;
-  bool m_connected{ false };
-  std::mutex receivers_mutex, m_conntected_mutex;
+  bool m_connected{ false }, m_sending{ false };
+  std::queue<GameUpdate> m_next_game_updates;
+  std::mutex receivers_mutex, m_conntected_mutex, m_send_mutex;
 
   void connect_to_on_this_thread(std::string const &host, int const &port)
   {
@@ -183,18 +203,42 @@ public:
 
   void close() { m_socket.close(); }
 
-  [[nodiscard]] bool send(GameUpdate &game_update) { return send_string(game_update.SerializeAsString()); }
-
-  [[nodiscard]] bool send_string(std::string const &message)
+  void send(GameUpdate &game_update, bool const add_to_queue_if_currently_in_use = false)
   {
-    if (!has_connected()) { return false; }
 
-    std::thread([this, message]() {
+    auto recursive{ [this]() {
+      if (m_next_game_updates.empty()) { return; }
+      GameUpdate update = m_next_game_updates.front();
+      GameUpdate update_copy = update;// todo - einfacher ?
+      m_next_game_updates.pop();
+      send(update_copy);
+    } };
+
+    {
+      std::lock_guard<std::mutex> lock{ m_send_mutex };
+      if (m_sending) {
+        if (add_to_queue_if_currently_in_use) { m_next_game_updates.push(game_update); }
+
+        return;
+      }
+    }
+
+    auto message = game_update.SerializeAsString();
+
+    std::thread([this, message, recursive]() {
+      {
+        std::lock_guard<std::mutex> lock{ m_send_mutex };
+        m_sending = true;
+      }
       std::size_t const t = m_socket.write_some(asio::buffer(message + end_of_message));
       debug(fmt::format("{} Bytes versendet.", t));
-    }).detach();
 
-    return true;
+      {
+        std::lock_guard<std::mutex> lock{ m_send_mutex };
+        m_sending = false;
+      }
+      recursive();
+    }).detach();
   }
 
   void register_receiver(std::function<void(GameUpdate const &update)> const &receiver)
@@ -262,7 +306,7 @@ protected:
   ftxui::Color m_color;
 
   friend void fill_game_element(GameElement *const &, arkanoid::Element const *);// todo: außerhalb von namespace ??
-  friend std::vector<std::unique_ptr<arkanoid::Element>> parse_game_update(GameUpdate const &);
+  friend void parse_game_update(std::map<int, std::unique_ptr<Element>> &, GameUpdate const &);
 
 public:
   IdGenerator static id_generator;
@@ -352,40 +396,47 @@ void fill_game_update(GameUpdate *update, std::vector<arkanoid::Element *> const
   });
 }
 
-[[nodiscard]] std::vector<std::unique_ptr<arkanoid::Element>> parse_game_update(GameUpdate const &update)
+void parse_game_update(std::map<int, std::unique_ptr<Element>> &map, GameUpdate const &update)
 {
-  std::vector<std::unique_ptr<arkanoid::Element>> elements;
-
   for (int i = 0; i < update.element_size(); ++i) {
-    auto const element = update.element(i);
-    Position position{ element.element_position().x(), element.element_position().y() };
+    auto const net_element = update.element(i);
+    Position position{ net_element.element_position().x(), net_element.element_position().y() };
+
+    bool new_id{ !map.contains(net_element.id()) };
 
     std::unique_ptr<Element> arkanoid_element_ptr = nullptr;
 
-    switch (element.type()) {
-    case BALL: {
-      arkanoid_element_ptr = std::make_unique<Ball>(position);
-      break;
-    }
+    if (new_id) {
+      switch (net_element.type()) {
+      case BALL: {
+        arkanoid_element_ptr = std::make_unique<Ball>(position);
+        break;
+      }
 
-    case PADDLE: {
-      arkanoid_element_ptr = std::make_unique<Paddle>(position);
-      break;
-    }
-    case BRICK: {
-      arkanoid_element_ptr = std::make_unique<Brick>(position);
-      break;
-    }
+      case PADDLE: {
+        arkanoid_element_ptr = std::make_unique<Paddle>(position);
+        break;
+      }
+      case BRICK: {
+        arkanoid_element_ptr = std::make_unique<Brick>(position);
+        break;
+      }
+      }
+    } else {
+      // todo
     }
 
     if (arkanoid_element_ptr == nullptr) { continue; }
-    arkanoid_element_ptr->m_id = element.id();
+    arkanoid_element_ptr->m_id = net_element.id();
+    arkanoid_element_ptr->m_position = position;
     arkanoid_element_ptr->invert_position();
 
-    elements.push_back(std::move(arkanoid_element_ptr));
+    if (new_id) {
+      insert_element(map, arkanoid_element_ptr);
+    } else {
+      map.erase(map.find(net_element.id()));
+    }
   }
-
-  return elements;
 }
 
 }// namespace arkanoid
@@ -473,11 +524,6 @@ void show_connecting_state(connection::Connection &connection)
   screen.Exit();
 }
 
-void insert_element(std::map<int, std::unique_ptr<arkanoid::Element>> &map, std::unique_ptr<arkanoid::Element> &element)
-{
-  map.insert(std::pair<int, std::unique_ptr<arkanoid::Element>>{ element->id(), std::move(element) });
-}
-
 void generate_bricks(std::map<int, std::unique_ptr<arkanoid::Element>> &elements)
 {
   using namespace arkanoid;
@@ -509,16 +555,6 @@ void draw(ftxui::Canvas &canvas, T1 const &drawable)
   }
 }
 
-template<typename T1, typename T2>//
-std::vector<T2 *> map_values(std::map<T1, std::unique_ptr<T2>> const &map)
-{
-  std::vector<T2 *> vector;
-
-  std::for_each(map.begin(), map.end(), [&vector](auto const &pair) { vector.push_back(pair.second.get()); });
-
-  return vector;
-}
-
 int find_id_of_controller(std::map<int, std::unique_ptr<arkanoid::Element>> const &element_map, int const paddle_y)
 {
   int id = -1;
@@ -547,12 +583,8 @@ int main()
     int const paddle_y{ playing_field_bottom - paddle_height };
 
     connection.register_receiver([&element_map, &element_mutex](GameUpdate const &update) {
-      std::vector<std::unique_ptr<arkanoid::Element>> elements_to_update = arkanoid::parse_game_update(update);
-
       std::lock_guard<std::mutex> lock{ element_mutex };
-      std::for_each(elements_to_update.begin(), elements_to_update.end(), [&element_map](auto &element) {
-        insert_element(element_map, element);
-      });
+      arkanoid::parse_game_update(element_map, update);
     });
 
     connect_to_peer(connection, as_host, port);
@@ -576,17 +608,14 @@ int main()
         GameUpdate update;
         arkanoid::fill_game_update(&update, map_values(element_map));
 
-
-        if (!connection.send(update)) {
-          connection.close();
-          return EXIT_FAILURE;
-        }
+        connection.send(update, true);
       }
     }
 
     if (connection.has_connected()) {
       int controlling_paddle_id{ -1 };
       int mouse_x{};
+      std::vector<arkanoid::Element *> updated_elements;
 
       auto renderer = Renderer([&] {
         Canvas can = Canvas(canvas_width, canvas_height);
@@ -611,9 +640,11 @@ int main()
 
       Loop loop{ &screen, std::move(renderer) };
 
-      auto game_update_loop = [&element_map, &element_mutex, &controlling_paddle_id, &connection, paddle_y, &mouse_x]() { // todo - mouse_x als kopie buggt
-        std::vector<arkanoid::Element *> updated_elements;
-        GameUpdate update;
+      auto game_update_loop = [&element_map,
+                                &element_mutex,
+                                &controlling_paddle_id,
+                                paddle_y,
+                                &mouse_x]() {// todo - mouse_x als kopie buggt
         {
           std::lock_guard<std::mutex> lock{ element_mutex };
           if (controlling_paddle_id < 0) { controlling_paddle_id = find_id_of_controller(element_map, paddle_y); }
@@ -621,18 +652,18 @@ int main()
           if (controlling_paddle_id >= 0) {
             arkanoid::Element *paddle_element = element_map.find(controlling_paddle_id)->second.get();
             arkanoid::Paddle *paddle_ptr = static_cast<Paddle *>(paddle_element);
-            if (paddle_ptr->update_x(mouse_x)) { updated_elements.push_back(paddle_ptr); }
-          }
 
-          if (!updated_elements.empty()) {
-            arkanoid::fill_game_update(&update, updated_elements);
-            connection.send(update);// todo: aus mutex raus nehmen?
+            int const new_paddle_x =
+              (mouse_x > playing_field_right - paddle_width) ? playing_field_right - paddle_width : mouse_x;
+
+            if (paddle_ptr->update_x(new_paddle_x)) {}
           }
         }
       };
 
       constexpr auto frame_time_budget{ std::chrono::seconds(1) / 30 };
 
+      int frame{ 0 };
       while (!loop.HasQuitted()) {
         const auto frame_start_time{ std::chrono::steady_clock::now() };
 
@@ -642,6 +673,18 @@ int main()
         const auto frame_end_time{ std::chrono::steady_clock::now() };
         const auto unused_frame_time{ frame_time_budget - (frame_end_time - frame_start_time) };
 
+        if (controlling_paddle_id >= 0) {
+          updated_elements.push_back(element_map.find(controlling_paddle_id)->second.get());
+        }
+
+        if (frame % 15 == 14 && !updated_elements.empty()) {
+          GameUpdate update;
+          fill_game_update(&update, updated_elements);
+          connection.send(update);
+        }
+
+        ++frame;
+        if (frame >= 30) { frame = 0; }
         if (unused_frame_time > std::chrono::seconds(0)) { std::this_thread::sleep_for(unused_frame_time); }
       }
 
