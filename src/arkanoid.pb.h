@@ -214,22 +214,22 @@ class ElementPosition PROTOBUF_FINAL :
     kXFieldNumber = 1,
     kYFieldNumber = 2,
   };
-  // int32 x = 1;
+  // float x = 1;
   void clear_x();
-  ::PROTOBUF_NAMESPACE_ID::int32 x() const;
-  void set_x(::PROTOBUF_NAMESPACE_ID::int32 value);
+  float x() const;
+  void set_x(float value);
   private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_x() const;
-  void _internal_set_x(::PROTOBUF_NAMESPACE_ID::int32 value);
+  float _internal_x() const;
+  void _internal_set_x(float value);
   public:
 
-  // int32 y = 2;
+  // float y = 2;
   void clear_y();
-  ::PROTOBUF_NAMESPACE_ID::int32 y() const;
-  void set_y(::PROTOBUF_NAMESPACE_ID::int32 value);
+  float y() const;
+  void set_y(float value);
   private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_y() const;
-  void _internal_set_y(::PROTOBUF_NAMESPACE_ID::int32 value);
+  float _internal_y() const;
+  void _internal_set_y(float value);
   public:
 
   // @@protoc_insertion_point(class_scope:ElementPosition)
@@ -239,8 +239,8 @@ class ElementPosition PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::int32 x_;
-  ::PROTOBUF_NAMESPACE_ID::int32 y_;
+  float x_;
+  float y_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_arkanoid_2eproto;
 };
@@ -569,42 +569,42 @@ class GameUpdate PROTOBUF_FINAL :
 #endif  // __GNUC__
 // ElementPosition
 
-// int32 x = 1;
+// float x = 1;
 inline void ElementPosition::clear_x() {
   x_ = 0;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 ElementPosition::_internal_x() const {
+inline float ElementPosition::_internal_x() const {
   return x_;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 ElementPosition::x() const {
+inline float ElementPosition::x() const {
   // @@protoc_insertion_point(field_get:ElementPosition.x)
   return _internal_x();
 }
-inline void ElementPosition::_internal_set_x(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void ElementPosition::_internal_set_x(float value) {
   
   x_ = value;
 }
-inline void ElementPosition::set_x(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void ElementPosition::set_x(float value) {
   _internal_set_x(value);
   // @@protoc_insertion_point(field_set:ElementPosition.x)
 }
 
-// int32 y = 2;
+// float y = 2;
 inline void ElementPosition::clear_y() {
   y_ = 0;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 ElementPosition::_internal_y() const {
+inline float ElementPosition::_internal_y() const {
   return y_;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 ElementPosition::y() const {
+inline float ElementPosition::y() const {
   // @@protoc_insertion_point(field_get:ElementPosition.y)
   return _internal_y();
 }
-inline void ElementPosition::_internal_set_y(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void ElementPosition::_internal_set_y(float value) {
   
   y_ = value;
 }
-inline void ElementPosition::set_y(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void ElementPosition::set_y(float value) {
   _internal_set_y(value);
   // @@protoc_insertion_point(field_set:ElementPosition.y)
 }

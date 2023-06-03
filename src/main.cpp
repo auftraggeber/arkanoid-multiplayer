@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <asm-generic/errno.h>
+#include <cmath>
 #include <cstdarg>
 #include <cstddef>
 #include <cstdio>
@@ -100,7 +101,7 @@ private:
   std::vector<std::function<void(GameUpdate const &)>> m_receivers;
   bool m_connected{ false }, m_sending{ false };
   std::queue<GameUpdate> m_next_game_updates;
-  std::mutex receivers_mutex, m_conntected_mutex, m_send_mutex;
+  std::mutex m_receivers_mutex, m_conntected_mutex, m_send_mutex;
 
   void connect_to_on_this_thread(std::string const &host, int const &port)
   {
@@ -133,7 +134,7 @@ private:
 
   void call_receivers(GameUpdate const &update)
   {
-    std::lock_guard<std::mutex> lock{ receivers_mutex };
+    std::lock_guard<std::mutex> lock{ m_receivers_mutex };
     std::for_each(m_receivers.begin(),
       m_receivers.end(),
       [update](std::function<void(GameUpdate const &)> const &receiver) { receiver(update); });
@@ -258,9 +259,9 @@ public:
     }).detach();
   }
 
-  void register_receiver(std::function<void(GameUpdate const &update)> const &receiver)
+  void register_receiver(std::function<void(GameUpdate const &)> const &receiver)
   {
-    std::lock_guard<std::mutex> lock{ receivers_mutex };
+    std::lock_guard<std::mutex> lock{ m_receivers_mutex };
     m_receivers.push_back(receiver);
   }
 
@@ -296,27 +297,51 @@ public:
   [[nodiscard]] int current() const { return m_id; }
 };
 
-struct Position
+struct Vector
 {
 public:
-  int x;
-  int y;
+  float x, y;
 
-  [[nodiscard]] Position add(int const x, int const y) const { return Position{ this->x + x, this->y + y }; }
-  [[nodiscard]] Position add(Position const &pos) const { return add(pos.x, pos.y); }
+  Vector(int const x, int const y) : x(x), y(y) {}
+  Vector(float const x, float const y) : x{ x }, y{ y } {}// todo explicit
+
+  [[nodiscard]] Vector invert() const { return { -x, -y }; }
+
+  [[nodiscard]] Vector add(float const x, float const y) const { return { this->x + x, this->y + y }; }
+  [[nodiscard]] Vector add(Vector const &vec) const { return add(vec.x, vec.y); }
 
 
-  [[nodiscard]] Position sub(int const x, int const y) const { return Position{ this->x - x, this->y - y }; }
-  [[nodiscard]] Position sub(Position const &pos) const { return sub(pos.x, pos.y); }
+  [[nodiscard]] Vector sub(float const x, float const y) const { return { this->x - x, this->y - y }; }
+  [[nodiscard]] Vector sub(Vector const &vec) const { return sub(vec.x, vec.y); }
+
+  [[nodistcard]] Vector set_abs(float const abs) const
+  {
+    Vector const norm = normalize();
+
+    return { norm.x * abs, norm.y * abs };
+  }
+
+  [[nodiscard]] Vector normalize() const
+  {
+    float const a = abs();
+
+    return { x / a, y / a };
+  }
+
+  [[nodiscard]] float abs() const { return std::sqrt((x * x) + (y * y)); }
+
+  [[nodiscard]] int x_i() const { return std::round(x); }
+  [[nodiscard]] int y_i() const { return std::round(y); }
 };
 
 class Element
 {
 public:
-  virtual ElementType get_type() const = 0;
+  [[nodiscard]] virtual ElementType get_type() const = 0;
+  virtual void update() = 0;
 
 protected:
-  Position m_position;
+  Vector m_position;
   int m_id;
   int const m_width;
   int const m_height;
@@ -329,7 +354,7 @@ protected:
 public:
   IdGenerator static id_generator;
 
-  explicit Element(Position const position,
+  explicit Element(Vector const position,
     int const width,
     int const height,
     ftxui::Color const color = ftxui::Color::White)
@@ -338,14 +363,14 @@ public:
 
   void invert_position()
   {
-    m_position = Position{ playing_field_right, playing_field_bottom }.sub(m_position).sub(m_width, m_height);
+    m_position = Vector{ playing_field_right, playing_field_bottom }.sub(m_position).sub(m_width, m_height);
   }
 
-  [[nodiscard]] int left() const { return m_position.x; }
+  [[nodiscard]] int left() const { return m_position.x_i(); }
 
   [[nodiscard]] int right() const { return left() + m_width; }
 
-  [[nodiscard]] int top() const { return m_position.y; }
+  [[nodiscard]] int top() const { return m_position.y_i(); }
 
   [[nodiscard]] int bottom() const { return top() + m_height; }
 
@@ -361,16 +386,30 @@ IdGenerator Element::id_generator = IdGenerator{ 0 };
 class Ball : public Element
 {
 
+private:
+  Vector m_velocity{ 0.0f, 0.00025f };
+
+  friend void parse_game_element(Element *, GameElement const &);
+
 public:
-  explicit Ball(Position const position) : Element{ position, ball_radius, ball_radius, ftxui::Color::Red } {}
-  ElementType get_type() const override { return BALL; }
+  explicit Ball(Vector const position) : Element{ position, ball_radius, ball_radius, ftxui::Color::Red } {}
+
+  [[nodiscard]] ElementType get_type() const override { return BALL; }
+
+  void update() override
+  {
+    if (m_position.x <= playing_field_left || m_position.x >= playing_field_right) { m_velocity.x = -m_velocity.x; }
+    if (m_position.y >= playing_field_bottom || m_position.y <= playing_field_top) { m_velocity.y = -m_velocity.y; }
+
+    m_position = m_position.add(m_velocity);
+  }
 };
 
 class Paddle : public Element
 {
 public:
-  explicit Paddle(Position const position) : Element{ position, paddle_width, paddle_height } {}
-  ElementType get_type() const override { return PADDLE; }
+  explicit Paddle(Vector const position) : Element{ position, paddle_width, paddle_height } {}
+  [[nodiscard]] ElementType get_type() const override { return PADDLE; }
 
   [[nodiscard]] bool update_x(int const new_x)
   {
@@ -379,14 +418,18 @@ public:
 
     return true;
   }
+
+  void update() override {}
 };
 
 class Brick : public Element
 {
 
 public:
-  explicit Brick(Position const position) : Element{ position, brick_width, brick_height } {}
-  ElementType get_type() const override { return BRICK; }
+  explicit Brick(Vector const position) : Element{ position, brick_width, brick_height } {}
+  [[nodiscard]] ElementType get_type() const override { return BRICK; }
+
+  void update() override {}
 };
 
 void fill_game_element(GameElement *const &game_element, arkanoid::Element const *element)
@@ -418,13 +461,18 @@ void parse_game_element(Element *element, GameElement const &net_element)
 {
   element->m_position = { net_element.element_position().x(), net_element.element_position().y() };
   element->invert_position();
+
+  if (element->get_type() == BALL) {
+    Ball *ball = static_cast<Ball *>(element);
+    ball->m_velocity = ball->m_velocity.invert();
+  }
 }
 
 void parse_game_update(std::map<int, std::unique_ptr<Element>> &map, GameUpdate const &update)
 {
   for (int i = 0; i < update.element_size(); ++i) {
     auto const net_element = update.element(i);
-    Position position{ net_element.element_position().x(), net_element.element_position().y() };
+    Vector position{ net_element.element_position().x(), net_element.element_position().y() };
 
     bool new_id{ !map.contains(net_element.id()) };
 
@@ -556,7 +604,7 @@ void generate_bricks(std::map<int, std::unique_ptr<arkanoid::Element>> &elements
       int const x{ playing_field_left + ((brick_distance_x + brick_width) * i_x) };
       int const y{ top + ((brick_distance_y + brick_height) * i_y) };
 
-      std::unique_ptr<arkanoid::Element> brick = std::make_unique<arkanoid::Brick>(arkanoid::Position{ x, y });
+      std::unique_ptr<arkanoid::Element> brick = std::make_unique<arkanoid::Brick>(arkanoid::Vector{ x, y });
       insert_element(elements, brick);
     }
   }
@@ -602,7 +650,17 @@ void test_paddle_movement(arkanoid::Paddle *paddle)
   paddle->update_x(x);
 }
 */
+void create_and_send_new_game_update(std::vector<arkanoid::Element *> const send_elements,
+  connection::Connection &connection)
+{
+  std::thread([send_elements, &connection]() {// todo: sicherheit?
+    GameUpdate update;
+    arkanoid::fill_game_update(&update, send_elements);
 
+    connection.send(update);
+  })
+    .detach();
+}
 
 int main()
 {
@@ -625,7 +683,7 @@ int main()
     show_connecting_state(connection);
 
     if (as_host) {
-      arkanoid::Position const paddle_position = { (canvas_width / 2) - (paddle_width / 2), paddle_y };
+      arkanoid::Vector const paddle_position = { (canvas_width / 2) - (paddle_width / 2), paddle_y };
 
       std::unique_ptr<arkanoid::Element> paddle = std::make_unique<Paddle>(paddle_position);
       std::unique_ptr<arkanoid::Element> paddle_enemy = std::make_unique<Paddle>(paddle_position.sub(0, paddle_y));
@@ -684,48 +742,48 @@ int main()
                                 &element_mutex,
                                 &controlling_paddle_id,
                                 paddle_y,
+                                &updated_elements,
                                 &mouse_x]() {// todo - mouse_x als kopie buggt
         {
-          std::lock_guard<std::mutex> lock{ element_mutex };
-          if (controlling_paddle_id < 0) { controlling_paddle_id = find_id_of_controller(element_map, paddle_y); }
+          {
+            std::lock_guard<std::mutex> lock{ element_mutex };
+            if (controlling_paddle_id < 0) { controlling_paddle_id = find_id_of_controller(element_map, paddle_y); }
 
-          if (controlling_paddle_id >= 0) {
-            arkanoid::Element *paddle_element = element_map.find(controlling_paddle_id)->second.get();
-            arkanoid::Paddle *paddle_ptr = static_cast<Paddle *>(paddle_element);
+            if (controlling_paddle_id >= 0) {
+              arkanoid::Element *paddle_element = element_map.find(controlling_paddle_id)->second.get();
+              arkanoid::Paddle *paddle_ptr = static_cast<Paddle *>(paddle_element);
 
-            int const new_paddle_x =
-              (mouse_x > playing_field_right - paddle_width) ? playing_field_right - paddle_width : mouse_x;
+              int const new_paddle_x =
+                (mouse_x > playing_field_right - paddle_width) ? playing_field_right - paddle_width : mouse_x;
 
-            if (paddle_ptr->update_x(new_paddle_x)) {}
+              if (paddle_ptr->update_x(new_paddle_x)) { updated_elements.push_back(paddle_element); }
+            }
+          }
+
+          {
+            std::lock_guard<std::mutex> lock{ element_mutex };
+            std::for_each(element_map.begin(), element_map.end(), [](auto const &pair) { pair.second->update(); });
           }
         }
       };
 
-      constexpr auto frame_time_budget{ std::chrono::seconds(1) / 30 };
+      constexpr auto frame_time_budget{ std::chrono::seconds(1) / 40 };
 
-      int frame{ 0 };
       while (!loop.HasQuitted()) {
         const auto frame_start_time{ std::chrono::steady_clock::now() };
 
-        game_update_loop();
         screen.RequestAnimationFrame();// wichtig, da sonst keine aktualisierung, wenn aus fokus
         loop.RunOnce();
 
+        game_update_loop();
+
+        if (!updated_elements.empty()) {
+          create_and_send_new_game_update(updated_elements, connection);
+          updated_elements.clear();
+        }
+
         const auto frame_end_time{ std::chrono::steady_clock::now() };
         const auto unused_frame_time{ frame_time_budget - (frame_end_time - frame_start_time) };
-
-        if (controlling_paddle_id >= 0) {
-          updated_elements.push_back(element_map.find(controlling_paddle_id)->second.get());
-        }
-
-        if (frame % 5 == 4 && !updated_elements.empty()) {
-          GameUpdate update;
-          fill_game_update(&update, updated_elements);
-          connection.send(update);
-        }
-
-        ++frame;
-        if (frame >= 30) { frame = 0; }
         if (unused_frame_time > std::chrono::seconds(0)) { std::this_thread::sleep_for(unused_frame_time); }
       }
 
