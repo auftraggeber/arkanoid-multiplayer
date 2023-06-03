@@ -660,6 +660,12 @@ int main()
             element_map.begin(), element_map.end(), [&can](auto const &pair) { draw(can, *(pair.second)); });
         }
 
+        long const timestamp =
+          std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch())
+            .count();
+
+        can.DrawText(0, 0, std::to_string(timestamp));
+
         return canvas(can) | border;
       });
 
@@ -702,6 +708,7 @@ int main()
         const auto frame_start_time{ std::chrono::steady_clock::now() };
 
         game_update_loop();
+        screen.RequestAnimationFrame();// wichtig, da sonst keine aktualisierung, wenn aus fokus
         loop.RunOnce();
 
         const auto frame_end_time{ std::chrono::steady_clock::now() };
