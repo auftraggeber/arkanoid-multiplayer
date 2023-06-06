@@ -48,6 +48,7 @@
 #include "box2d-incl/box2d/b2_broad_phase.h"
 #include "box2d-incl/box2d/b2_math.h"
 #include "box2d-incl/box2d/b2_polygon_shape.h"
+#include "box2d-incl/box2d/b2_settings.h"
 #include "box2d-incl/box2d/b2_world.h"
 #include "fmt/core.h"
 #include "ftxui/component/component.hpp"
@@ -290,7 +291,6 @@ int constexpr paddle_width{ 14 }, paddle_height{ 1 };
 int constexpr brick_width{ 14 }, brick_height{ 5 };
 int constexpr num_bricks_y{ 8 };
 int constexpr brick_distance_x{ 2 }, brick_distance_y{ 3 };
-b2World arkanoid_world{ { 0, 0 } };
 
 class IdGenerator
 {
@@ -356,7 +356,7 @@ protected:
   ftxui::Color m_color;
 
   friend void fill_game_element(GameElement *const &, arkanoid::Element const *);// todo: außerhalb von namespace ??
-  friend void parse_game_update(std::map<int, std::unique_ptr<Element>> &, GameUpdate const &);
+  friend void parse_game_update(std::map<int, std::unique_ptr<Element>> &, GameUpdate const &, b2World *);
   friend void parse_game_element(Element *, GameElement const &);
 
 public:
@@ -397,12 +397,13 @@ private:
   friend void parse_game_element(Element *, GameElement const &);
 
 public:
-  explicit Ball(Vector const position) : Element{ ftxui::Color::Red }
+  explicit Ball(Vector const position, b2World *arkanoid_world) : Element{ ftxui::Color::Red }
   {
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
     bodyDef.position.Set(position.x, position.y);
-    m_body_ptr = arkanoid_world.CreateBody(&bodyDef);
+    // bodyDef.userData = b2BodyUserData{}; // todo: verlinkung auf dieses objekt.
+    m_body_ptr = arkanoid_world->CreateBody(&bodyDef);
 
     b2PolygonShape dynamicBox;
     dynamicBox.SetAsBox(width(), height());
@@ -440,12 +441,12 @@ private:
   b2Body *m_body_ptr = nullptr;
 
 public:
-  explicit Paddle(Vector const position) : Element{}
+  explicit Paddle(Vector const position, b2World *arkanoid_world) : Element{}
   {
     b2BodyDef groundBodyDef;
     groundBodyDef.position.Set(position.x + (width() / 2.0f), position.y + (height() / 2.0f));
 
-    m_body_ptr = arkanoid_world.CreateBody(&groundBodyDef);
+    m_body_ptr = arkanoid_world->CreateBody(&groundBodyDef);
 
     b2PolygonShape groundBox;
     groundBox.SetAsBox(width(), height());
@@ -486,12 +487,13 @@ private:
   b2Body *m_body_ptr = nullptr;
 
 public:
-  explicit Brick(Vector const position) : Element{}
+  explicit Brick(Vector const position, b2World *arkanoid_world)
+    : Element{}// todo: b2world muss als pointer, da sonst make_unique nicht funktioniert
   {
     b2BodyDef groundBodyDef;
     groundBodyDef.position.Set(position.x + (width() / 2.0f), position.y + (height() / 2.0f));
 
-    m_body_ptr = arkanoid_world.CreateBody(&groundBodyDef);
+    m_body_ptr = arkanoid_world->CreateBody(&groundBodyDef);
 
     b2PolygonShape groundBox;
     groundBox.SetAsBox(width(), height());
@@ -554,7 +556,7 @@ void parse_game_element(Element *element, GameElement const &net_element)
   }
 }
 
-void parse_game_update(std::map<int, std::unique_ptr<Element>> &map, GameUpdate const &update)
+void parse_game_update(std::map<int, std::unique_ptr<Element>> &map, GameUpdate const &update, b2World *world)
 {
   for (int i = 0; i < update.element_size(); ++i) {
     auto const net_element = update.element(i);
@@ -567,16 +569,16 @@ void parse_game_update(std::map<int, std::unique_ptr<Element>> &map, GameUpdate 
 
       switch (net_element.type()) {
       case BALL: {
-        arkanoid_element_ptr = std::make_unique<Ball>(position);
+        arkanoid_element_ptr = std::make_unique<Ball>(position, world);
         break;
       }
 
       case PADDLE: {
-        arkanoid_element_ptr = std::make_unique<Paddle>(position);
+        arkanoid_element_ptr = std::make_unique<Paddle>(position, world);
         break;
       }
       case BRICK: {
-        arkanoid_element_ptr = std::make_unique<Brick>(position);
+        arkanoid_element_ptr = std::make_unique<Brick>(position, world);
         break;
       }
       }
@@ -675,7 +677,7 @@ void show_connecting_state(connection::Connection &connection)
   screen.Exit();
 }
 
-void generate_bricks(std::map<int, std::unique_ptr<arkanoid::Element>> &elements)
+void generate_bricks(std::map<int, std::unique_ptr<arkanoid::Element>> &elements, b2World *world)
 {
   using namespace arkanoid;
 
@@ -690,7 +692,7 @@ void generate_bricks(std::map<int, std::unique_ptr<arkanoid::Element>> &elements
       int const x{ playing_field_left + ((brick_distance_x + brick_width) * i_x) };
       int const y{ top + ((brick_distance_y + brick_height) * i_y) };
 
-      std::unique_ptr<arkanoid::Element> brick = std::make_unique<arkanoid::Brick>(arkanoid::Vector{ x, y });
+      std::unique_ptr<arkanoid::Element> brick = std::make_unique<arkanoid::Brick>(arkanoid::Vector{ x, y }, world);
       insert_element(elements, brick);
     }
   }
@@ -780,10 +782,11 @@ int main()
     connection::Connection connection;
     auto screen = ScreenInteractive::FitComponent();
     int const paddle_y{ playing_field_bottom - paddle_height };
+    b2World arkanoid_world{ { 0, 0 } };
 
-    connection.register_receiver([&element_map, &element_mutex](GameUpdate const &update) {
+    connection.register_receiver([&element_map, &element_mutex, &arkanoid_world](GameUpdate const &update) {
       std::lock_guard<std::mutex> lock{ element_mutex };
-      arkanoid::parse_game_update(element_map, update);
+      arkanoid::parse_game_update(element_map, update, &arkanoid_world);
     });
 
     connect_to_peer(connection, as_host, port);
@@ -792,15 +795,17 @@ int main()
     if (as_host) {
       arkanoid::Vector const paddle_position = { (canvas_width / 2) - (paddle_width / 2), paddle_y };
 
-      std::unique_ptr<arkanoid::Element> paddle = std::make_unique<Paddle>(paddle_position);
-      std::unique_ptr<arkanoid::Element> paddle_enemy = std::make_unique<Paddle>(paddle_position.sub(0, paddle_y));
-      std::unique_ptr<arkanoid::Element> ball = std::make_unique<Ball>(paddle_position.add(paddle_width / 2, -10));
+      std::unique_ptr<arkanoid::Element> paddle = std::make_unique<Paddle>(paddle_position, &arkanoid_world);
+      std::unique_ptr<arkanoid::Element> paddle_enemy =
+        std::make_unique<Paddle>(paddle_position.sub(0, paddle_y), &arkanoid_world);
+      std::unique_ptr<arkanoid::Element> ball =
+        std::make_unique<Ball>(paddle_position.add(paddle_width / 2, -10), &arkanoid_world);
 
       insert_element(element_map, paddle);
       insert_element(element_map, paddle_enemy);
       insert_element(element_map, ball);
 
-      generate_bricks(element_map);
+      generate_bricks(element_map, &arkanoid_world);
 
       {
         std::lock_guard<std::mutex> lock{ element_mutex };
@@ -859,7 +864,8 @@ int main()
                                 as_host,
                                 &updated_elements,
                                 &mouse_x,
-                                frame_rate]() {// todo - mouse_x als kopie buggt
+                                frame_rate,
+                                &arkanoid_world]() {// todo - mouse_x als kopie buggt
         {
           {
             std::lock_guard<std::mutex> lock{ element_mutex };
@@ -878,7 +884,7 @@ int main()
 
           {
             std::lock_guard<std::mutex> lock{ element_mutex };
-            arkanoid::arkanoid_world.Step(1.0f / frame_rate, 8, 3);
+            arkanoid_world.Step(1.0f / frame_rate, 8, 3);
           }
         }
       };
