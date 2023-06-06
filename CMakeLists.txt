@@ -78,11 +78,17 @@ project_options(
 
 include_directories(asio/include)
 
+file(GLOB SOURCES
+    src/*.cpp
+    src/box2d-incl/*.cpp
+    src/box2d-incl/box2d/*.h
+)
+
 #####################
 
 find_package(Protobuf REQUIRED)
 protobuf_generate_cpp(protobuf_srcs protobuf_hdrs src/arkanoid.proto)
-add_executable(main src/main.cpp ${protobuf_srcs} ${protobuf_hdrs})
+add_executable(main ${protobuf_srcs} ${protobuf_hdrs} ${SOURCES})
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 target_link_libraries(main PRIVATE ftxui::screen ftxui::dom ftxui::component fmt::fmt project_options project_warnings ${Protobuf_LIBRARIES}) 
 target_link_system_libraries(
