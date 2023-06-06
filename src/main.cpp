@@ -44,6 +44,11 @@
 #include "asio/streambuf.hpp"
 #include "asio/system_error.hpp"
 #include "asio/write.hpp"
+#include "box2d-incl/box2d/b2_body.h"
+#include "box2d-incl/box2d/b2_broad_phase.h"
+#include "box2d-incl/box2d/b2_math.h"
+#include "box2d-incl/box2d/b2_polygon_shape.h"
+#include "box2d-incl/box2d/b2_world.h"
 #include "fmt/core.h"
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/event.hpp"
@@ -53,6 +58,7 @@
 
 #include "arkanoid.pb.h"
 
+#include "box2d-incl/box2d/box2d.h"
 
 template<typename T1, typename T2>//
 void insert_element(std::map<T1, T2> &map, T2 &element)
@@ -284,6 +290,7 @@ int constexpr paddle_width{ 14 }, paddle_height{ 1 };
 int constexpr brick_width{ 14 }, brick_height{ 5 };
 int constexpr num_bricks_y{ 8 };
 int constexpr brick_distance_x{ 2 }, brick_distance_y{ 3 };
+b2World arkanoid_world{ { 0, 0 } };
 
 class IdGenerator
 {
@@ -339,12 +346,13 @@ class Element
 public:
   [[nodiscard]] virtual ElementType get_type() const = 0;
   virtual void update() = 0;
+  virtual void set_position(Vector const position) = 0;
+  virtual Vector center_position() const = 0;
+  virtual int width() const = 0;
+  virtual int height() const = 0;
 
 protected:
-  Vector m_position;
   int m_id;
-  int const m_width;
-  int const m_height;
   ftxui::Color m_color;
 
   friend void fill_game_element(GameElement *const &, arkanoid::Element const *);// todo: außerhalb von namespace ??
@@ -354,25 +362,21 @@ protected:
 public:
   IdGenerator static id_generator;
 
-  explicit Element(Vector const position,
-    int const width,
-    int const height,
-    ftxui::Color const color = ftxui::Color::White)
-    : m_position{ position }, m_width{ width }, m_height{ height }, m_color{ color }, m_id{ id_generator.next() }
-  {}
+  explicit Element(ftxui::Color const color = ftxui::Color::White) : m_color{ color }, m_id{ id_generator.next() } {}
 
   void invert_position()
   {
-    m_position = Vector{ playing_field_right, playing_field_bottom }.sub(m_position).sub(m_width, m_height);
+    Vector const position = center_position();
+    set_position({ playing_field_right - position.x, playing_field_bottom - position.y });
   }
 
-  [[nodiscard]] int left() const { return m_position.x_i(); }
+  [[nodiscard]] int left() const { return std::round(center_position().x - (width() / 2.0f)); }
 
-  [[nodiscard]] int right() const { return left() + m_width; }
+  [[nodiscard]] int right() const { return left() + width(); }
 
-  [[nodiscard]] int top() const { return m_position.y_i(); }
+  [[nodiscard]] int top() const { return std::round(center_position().y - (height() / 2.0f)); }
 
-  [[nodiscard]] int bottom() const { return top() + m_height; }
+  [[nodiscard]] int bottom() const { return top() + height(); }
 
   [[nodiscard]] bool exists() const { return true; }
 
@@ -387,57 +391,139 @@ class Ball : public Element
 {
 
 private:
+  b2Body *m_body_ptr = nullptr;
   Vector m_velocity{ 0.0f, 0.00025f };
 
   friend void parse_game_element(Element *, GameElement const &);
 
 public:
-  explicit Ball(Vector const position) : Element{ position, ball_radius, ball_radius, ftxui::Color::Red } {}
+  explicit Ball(Vector const position) : Element{ ftxui::Color::Red }
+  {
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_dynamicBody;
+    bodyDef.position.Set(position.x, position.y);
+    m_body_ptr = arkanoid_world.CreateBody(&bodyDef);
+
+    b2PolygonShape dynamicBox;
+    dynamicBox.SetAsBox(width(), height());
+
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &dynamicBox;
+    fixtureDef.density = 1.0f;
+    fixtureDef.friction = 0.3f;
+
+    m_body_ptr->CreateFixture(&fixtureDef);
+  }
 
   [[nodiscard]] ElementType get_type() const override { return BALL; }
 
-  void update() override
-  {
-    if (m_position.x <= playing_field_left || m_position.x >= playing_field_right) { m_velocity.x = -m_velocity.x; }
-    if (m_position.y >= playing_field_bottom || m_position.y <= playing_field_top) { m_velocity.y = -m_velocity.y; }
+  void update() override {}
 
-    m_position = m_position.add(m_velocity);
+  void set_position(Vector const position) override
+  {
+    m_body_ptr->SetTransform({ position.x, position.y }, m_body_ptr->GetAngle());
   }
+
+  [[nodiscard]] Vector center_position() const override
+  {
+    auto pos = m_body_ptr->GetPosition();
+    return { pos.x, pos.y };
+  }
+
+  [[nodiscard]] int width() const override { return ball_radius; }
+  [[nodiscard]] int height() const override { return ball_radius; }
 };
 
 class Paddle : public Element
 {
+private:
+  b2Body *m_body_ptr = nullptr;
+
 public:
-  explicit Paddle(Vector const position) : Element{ position, paddle_width, paddle_height } {}
+  explicit Paddle(Vector const position) : Element{}
+  {
+    b2BodyDef groundBodyDef;
+    groundBodyDef.position.Set(position.x + (width() / 2.0f), position.y + (height() / 2.0f));
+
+    m_body_ptr = arkanoid_world.CreateBody(&groundBodyDef);
+
+    b2PolygonShape groundBox;
+    groundBox.SetAsBox(width(), height());
+
+    m_body_ptr->CreateFixture(&groundBox, 0.0f);
+  }
   [[nodiscard]] ElementType get_type() const override { return PADDLE; }
 
-  [[nodiscard]] bool update_x(int const new_x)
+  [[nodiscard]] bool update_left(int const new_x)
   {
-    if (m_position.x == new_x) { return false; }
-    m_position.x = new_x;
-
+    Vector pos = center_position();
+    pos.x = new_x + (width() / 2);
+    set_position(pos);
     return true;
   }
 
   void update() override {}
+
+  void set_position(Vector const position) override
+  {
+    m_body_ptr->SetTransform({ position.x, position.y }, m_body_ptr->GetAngle());
+  }
+
+  [[nodiscard]] Vector center_position() const override
+  {
+    auto pos = m_body_ptr->GetPosition();
+    return { pos.x, pos.y };
+  }
+
+  [[nodiscard]] int width() const override { return paddle_width; }
+  [[nodiscard]] int height() const override { return paddle_height; }
 };
 
 class Brick : public Element
 {
 
+private:
+  b2Body *m_body_ptr = nullptr;
+
 public:
-  explicit Brick(Vector const position) : Element{ position, brick_width, brick_height } {}
-  [[nodiscard]] ElementType get_type() const override { return BRICK; }
+  explicit Brick(Vector const position) : Element{}
+  {
+    b2BodyDef groundBodyDef;
+    groundBodyDef.position.Set(position.x + (width() / 2.0f), position.y + (height() / 2.0f));
+
+    m_body_ptr = arkanoid_world.CreateBody(&groundBodyDef);
+
+    b2PolygonShape groundBox;
+    groundBox.SetAsBox(width(), height());
+
+    m_body_ptr->CreateFixture(&groundBox, 0.0f);
+  }
 
   void update() override {}
+  [[nodiscard]] ElementType get_type() const override { return BRICK; }
+  void set_position(Vector const position) override
+  {
+    m_body_ptr->SetTransform({ position.x, position.y }, m_body_ptr->GetAngle());
+  }
+
+  [[nodiscard]] Vector center_position() const override
+  {
+    auto pos = m_body_ptr->GetPosition();
+    return { pos.x, pos.y };
+  }
+
+  [[nodiscard]] int width() const override { return brick_width; }
+  [[nodiscard]] int height() const override { return brick_height; }
 };
 
 void fill_game_element(GameElement *const &game_element, arkanoid::Element const *element)
 {
   ElementPosition *position = new ElementPosition;
 
-  int const x = element->m_position.x;
-  int const y = element->m_position.y;
+  auto const pos = element->center_position();
+
+  float const x = pos.x;
+  float const y = pos.y;
 
   position->set_x(x);
   position->set_y(y);
@@ -459,7 +545,7 @@ void fill_game_update(GameUpdate *update, std::vector<arkanoid::Element *> const
 
 void parse_game_element(Element *element, GameElement const &net_element)
 {
-  element->m_position = { net_element.element_position().x(), net_element.element_position().y() };
+  element->set_position({ net_element.element_position().x(), net_element.element_position().y() });
   element->invert_position();
 
   if (element->get_type() == BALL) {
@@ -620,36 +706,15 @@ void draw(ftxui::Canvas &canvas, T1 const &drawable)
   }
 }
 
-int find_id_of_controller(std::map<int, std::unique_ptr<arkanoid::Element>> const &element_map, int const paddle_y)
+int find_id_of_controller(std::map<int, std::unique_ptr<arkanoid::Element>> const &element_map, bool const as_host)
 {
-  int id = -1;
+  int id = (as_host) ? 0 : 1;
 
-  std::for_each(element_map.begin(), element_map.end(), [&id, paddle_y](auto const &pair) {
-    auto &element_ptr = pair.second;
+  if (element_map.contains(id)) { return id; }
 
-    if (element_ptr->get_type() == PADDLE) {
-      if (element_ptr->top() == paddle_y) { id = element_ptr->id(); }
-    }
-  });
-
-  return id;
+  return -1;
 }
 
-/*
-void test_paddle_movement(arkanoid::Paddle *paddle)
-{
-  std::random_device r;
-  std::default_random_engine e1(r());
-  std::uniform_int_distribution<int> uniform_dist(1, 100);
-
-  float const multiplier = uniform_dist(e1) / 100.0f;
-
-  int const range = arkanoid::playing_field_right - arkanoid::paddle_width;
-  int const x = multiplier * x;
-
-  paddle->update_x(x);
-}
-*/
 void create_and_send_new_game_update(std::vector<arkanoid::Element *> const send_elements,
   connection::Connection &connection)
 {
@@ -662,10 +727,52 @@ void create_and_send_new_game_update(std::vector<arkanoid::Element *> const send
     .detach();
 }
 
+void test_box2d()
+{
+  b2World world{ { 0, 0 } };
+
+  b2BodyDef groundBodyDef;
+  groundBodyDef.position.Set(0.0f, -10.0f);
+
+  b2Body *groundBody = world.CreateBody(&groundBodyDef);
+
+  b2PolygonShape groundBox;
+  groundBox.SetAsBox(50.0f, 10.0f);
+
+  groundBody->CreateFixture(&groundBox, 0.0f);
+
+  b2BodyDef bodyDef;
+  bodyDef.type = b2_dynamicBody;
+  bodyDef.position.Set(0.0f, 4.0f);
+  b2Body *body = world.CreateBody(&bodyDef);
+
+  b2PolygonShape dynamicBox;
+  dynamicBox.SetAsBox(1.0f, 1.0f);
+
+  b2FixtureDef fixtureDef;
+  fixtureDef.shape = &dynamicBox;
+  fixtureDef.density = 1.0f;
+  fixtureDef.friction = 0.3f;
+
+  body->CreateFixture(&fixtureDef);
+
+  for (int32 i = 0; i < 60; ++i) {
+    if (i < 20) {
+      body->ApplyForceToCenter({ 0, -10.0f }, true);
+    } else {
+      body->ApplyForceToCenter({ 0, 10.0f }, true);
+    }
+    world.Step(1 / 60.0f, 6, 2);
+    b2Vec2 position = body->GetPosition();
+    printf("%4.2f %4.2f %4.2f\n", position.x, position.y);
+  }
+}
+
 int main()
 {
   using namespace ftxui;
   using namespace arkanoid;
+
 
   show_connection_methods([](bool const as_host, int const &port) {
     std::mutex element_mutex;
@@ -716,6 +823,11 @@ int main()
           std::lock_guard<std::mutex> lock{ element_mutex };
           std::for_each(
             element_map.begin(), element_map.end(), [&can](auto const &pair) { draw(can, *(pair.second)); });
+
+          if (element_map.contains(2)) {
+            auto pos = element_map.find(2)->second->center_position();
+            can.DrawText(0, 20, fmt::format("x: {}, y: {}", pos.x, pos.y));
+          }
         }
 
         long const timestamp =
@@ -723,6 +835,7 @@ int main()
             .count();
 
         can.DrawText(0, 0, std::to_string(timestamp));
+
 
         return canvas(can) | border;
       });
@@ -738,16 +851,19 @@ int main()
 
       Loop loop{ &screen, std::move(renderer) };
 
+      constexpr int frame_rate = 40.0;
+
       auto game_update_loop = [&element_map,
                                 &element_mutex,
                                 &controlling_paddle_id,
-                                paddle_y,
+                                as_host,
                                 &updated_elements,
-                                &mouse_x]() {// todo - mouse_x als kopie buggt
+                                &mouse_x,
+                                frame_rate]() {// todo - mouse_x als kopie buggt
         {
           {
             std::lock_guard<std::mutex> lock{ element_mutex };
-            if (controlling_paddle_id < 0) { controlling_paddle_id = find_id_of_controller(element_map, paddle_y); }
+            if (controlling_paddle_id < 0) { controlling_paddle_id = find_id_of_controller(element_map, as_host); }
 
             if (controlling_paddle_id >= 0) {
               arkanoid::Element *paddle_element = element_map.find(controlling_paddle_id)->second.get();
@@ -756,18 +872,18 @@ int main()
               int const new_paddle_x =
                 (mouse_x > playing_field_right - paddle_width) ? playing_field_right - paddle_width : mouse_x;
 
-              if (paddle_ptr->update_x(new_paddle_x)) { updated_elements.push_back(paddle_element); }
+              if (paddle_ptr->update_left(new_paddle_x)) { updated_elements.push_back(paddle_element); }
             }
           }
 
           {
             std::lock_guard<std::mutex> lock{ element_mutex };
-            std::for_each(element_map.begin(), element_map.end(), [](auto const &pair) { pair.second->update(); });
+            arkanoid::arkanoid_world.Step(1.0f / frame_rate, 8, 3);
           }
         }
       };
 
-      constexpr auto frame_time_budget{ std::chrono::seconds(1) / 40 };
+      constexpr auto frame_time_budget{ std::chrono::seconds(1) / frame_rate };
 
       while (!loop.HasQuitted()) {
         const auto frame_start_time{ std::chrono::steady_clock::now() };
