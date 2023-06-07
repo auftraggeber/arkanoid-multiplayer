@@ -50,6 +50,7 @@
 #include "box2d-incl/box2d/b2_polygon_shape.h"
 #include "box2d-incl/box2d/b2_settings.h"
 #include "box2d-incl/box2d/b2_world.h"
+#include "box2d-incl/box2d/b2_world_callbacks.h"
 #include "fmt/core.h"
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/event.hpp"
@@ -404,6 +405,8 @@ public:
     bodyDef.position.Set(position.x, position.y);
     // bodyDef.userData = b2BodyUserData{}; // todo: verlinkung auf dieses objekt.
     m_body_ptr = arkanoid_world->CreateBody(&bodyDef);
+    bodyDef.linearDamping = 0;
+    bodyDef.angularDamping = 0;
 
     b2PolygonShape dynamicBox;
     dynamicBox.SetAsBox(width(), height());
@@ -411,9 +414,10 @@ public:
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &dynamicBox;
     fixtureDef.density = 1.0f;
-    fixtureDef.friction = 0.3f;
+    fixtureDef.friction = 1.0F;
 
     m_body_ptr->CreateFixture(&fixtureDef);
+    m_body_ptr->SetLinearVelocity({ 0.2F, 0.3F });
   }
 
   [[nodiscard]] ElementType get_type() const override { return BALL; }
@@ -770,6 +774,14 @@ void test_box2d()
   }
 }
 
+class ContactListener : public b2ContactListener
+{
+
+  void PreSolve(b2Contact *contact, const b2Manifold *oldManifold) { contact->SetRestitution(1.0F); }
+};
+
+void build_world_border(b2World *world) {}
+
 int main()
 {
   using namespace ftxui;
@@ -783,6 +795,8 @@ int main()
     auto screen = ScreenInteractive::FitComponent();
     int const paddle_y{ playing_field_bottom - paddle_height };
     b2World arkanoid_world{ { 0, 0 } };
+    ContactListener listener;
+    arkanoid_world.SetContactListener(&listener);
 
     connection.register_receiver([&element_map, &element_mutex, &arkanoid_world](GameUpdate const &update) {
       std::lock_guard<std::mutex> lock{ element_mutex };
@@ -880,11 +894,9 @@ int main()
 
               if (paddle_ptr->update_left(new_paddle_x)) { updated_elements.push_back(paddle_element); }
             }
-          }
 
-          {
-            std::lock_guard<std::mutex> lock{ element_mutex };
-            arkanoid_world.Step(1.0f / frame_rate, 8, 3);
+            std::for_each(element_map.begin(), element_map.end(), [](auto const &pair) { pair.second->update(); });
+            arkanoid_world.Step(1.0F / (frame_rate), 1, 1);
           }
         }
       };
