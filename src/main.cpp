@@ -46,6 +46,7 @@
 #include "asio/write.hpp"
 #include "box2d-incl/box2d/b2_body.h"
 #include "box2d-incl/box2d/b2_broad_phase.h"
+#include "box2d-incl/box2d/b2_circle_shape.h"
 #include "box2d-incl/box2d/b2_math.h"
 #include "box2d-incl/box2d/b2_polygon_shape.h"
 #include "box2d-incl/box2d/b2_settings.h"
@@ -405,7 +406,7 @@ public:
     bodyDef.position.Set(position.x, position.y);
     // bodyDef.userData = b2BodyUserData{}; // todo: verlinkung auf dieses objekt.
     m_body_ptr = arkanoid_world->CreateBody(&bodyDef);
-    bodyDef.linearDamping = 0;
+    bodyDef.linearDamping = 1.0F;
     bodyDef.angularDamping = 0;
 
     b2PolygonShape dynamicBox;
@@ -413,8 +414,8 @@ public:
 
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &dynamicBox;
-    fixtureDef.density = 1.0f;
-    fixtureDef.friction = 1.0F;
+    fixtureDef.density = 1.0F;
+    fixtureDef.friction = 0.0F;// todo: andere friction = fehlerhaftes verhalten
 
     m_body_ptr->CreateFixture(&fixtureDef);
     m_body_ptr->SetLinearVelocity({ 0.2F, 0.3F });
@@ -437,6 +438,11 @@ public:
 
   [[nodiscard]] int width() const override { return ball_radius; }
   [[nodiscard]] int height() const override { return ball_radius; }
+  [[nodiscard]] Vector velocity() const
+  {
+    auto vel = m_body_ptr->GetLinearVelocity();
+    return { vel.x, vel.y };
+  }
 };
 
 class Paddle : public Element
@@ -777,10 +783,51 @@ void test_box2d()
 class ContactListener : public b2ContactListener
 {
 
-  void PreSolve(b2Contact *contact, const b2Manifold *oldManifold) { contact->SetRestitution(1.0F); }
+  void PreSolve(b2Contact *contact, const b2Manifold *oldManifold)
+  {
+    contact->SetFriction(0.0F);
+    contact->SetRestitution(1.0F);
+    contact->SetTangentSpeed(0.5F);
+  }
 };
 
-void build_world_border(b2World *world) {}
+void build_world_border(b2World *world)
+{
+  int const playing_field_width = arkanoid::playing_field_right - arkanoid::playing_field_left;
+  int const playing_field_height = arkanoid::playing_field_bottom - arkanoid::playing_field_top + 10;
+
+  // links
+  b2BodyDef leftDef;
+  leftDef.position.Set(arkanoid::playing_field_left - 1, arkanoid::playing_field_top - 10);
+  b2Body *leftBody = world->CreateBody(&leftDef);
+  b2PolygonShape leftBox;
+  leftBox.SetAsBox(1, playing_field_height + 2);
+  leftBody->CreateFixture(&leftBox, 1.0f);
+
+  // rechts
+  b2BodyDef rightDef;
+  rightDef.position.Set(arkanoid::playing_field_right, arkanoid::playing_field_top - 10);
+  b2Body *rightBody = world->CreateBody(&rightDef);
+  b2PolygonShape rightBox;
+  rightBox.SetAsBox(1, playing_field_height + 2);
+  rightBody->CreateFixture(&rightBox, 1.0f);
+
+  // oben
+  b2BodyDef topDef;
+  topDef.position.Set(arkanoid::playing_field_left - 1, arkanoid::playing_field_top - 10);
+  b2Body *topBody = world->CreateBody(&topDef);
+  b2PolygonShape topBox;
+  topBox.SetAsBox(playing_field_width + 2, 1);
+  topBody->CreateFixture(&topBox, 1.0F);
+
+  // unten
+  b2BodyDef bottomDef;
+  bottomDef.position.Set(arkanoid::playing_field_left - 1, arkanoid::playing_field_bottom + 9);
+  b2Body *bottomBody = world->CreateBody(&bottomDef);
+  b2PolygonShape bottomBox;
+  bottomBox.SetAsBox(playing_field_width + 2, 1);
+  bottomBody->CreateFixture(&bottomBox, 1.0F);
+}
 
 int main()
 {
@@ -797,6 +844,8 @@ int main()
     b2World arkanoid_world{ { 0, 0 } };
     ContactListener listener;
     arkanoid_world.SetContactListener(&listener);
+
+    build_world_border(&arkanoid_world);
 
     connection.register_receiver([&element_map, &element_mutex, &arkanoid_world](GameUpdate const &update) {
       std::lock_guard<std::mutex> lock{ element_mutex };
@@ -844,8 +893,13 @@ int main()
             element_map.begin(), element_map.end(), [&can](auto const &pair) { draw(can, *(pair.second)); });
 
           if (element_map.contains(2)) {
-            auto pos = element_map.find(2)->second->center_position();
-            can.DrawText(0, 20, fmt::format("x: {}, y: {}", pos.x, pos.y));
+            arkanoid::Element *ball_el_ptr = element_map.find(2)->second.get();
+
+            if (ball_el_ptr->get_type() == BALL) {
+              Ball *ball_ptr = static_cast<Ball *>(ball_el_ptr);// todo : dynamic cast
+              auto vel = ball_ptr->velocity();
+              can.DrawText(0, 10, fmt::format("x: {}, y: {}", vel.x, vel.y));
+            }
           }
         }
 
@@ -896,7 +950,7 @@ int main()
             }
 
             std::for_each(element_map.begin(), element_map.end(), [](auto const &pair) { pair.second->update(); });
-            arkanoid_world.Step(1.0F / (frame_rate), 1, 1);
+            arkanoid_world.Step(1.0F / (frame_rate), 4, 2);
           }
         }
       };
