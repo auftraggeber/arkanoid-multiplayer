@@ -47,6 +47,7 @@
 #include "box2d-incl/box2d/b2_body.h"
 #include "box2d-incl/box2d/b2_broad_phase.h"
 #include "box2d-incl/box2d/b2_circle_shape.h"
+#include "box2d-incl/box2d/b2_contact.h"
 #include "box2d-incl/box2d/b2_math.h"
 #include "box2d-incl/box2d/b2_polygon_shape.h"
 #include "box2d-incl/box2d/b2_settings.h"
@@ -285,15 +286,15 @@ public:
 
 namespace arkanoid {
 
-int constexpr canvas_width{ 164 }, canvas_height{ 180 };
+int constexpr canvas_width{ 167 }, canvas_height{ 180 };
 int constexpr playing_field_top{ 5 }, playing_field_bottom{ canvas_height - 10 }, playing_field_left{ 1 },
-  playing_field_right{ canvas_width - 1 };
+  playing_field_right{ canvas_width - 2 };
 int constexpr ball_radius{ 1 }, ball_speed{ 1 };
 int constexpr paddle_width{ 14 }, paddle_height{ 1 };
 int constexpr brick_width{ 14 }, brick_height{ 5 };
 int constexpr num_bricks_y{ 8 };
 int constexpr brick_distance_x{ 2 }, brick_distance_y{ 3 };
-float constexpr b2_coord_convertion_rate{ 50.0F };
+float constexpr b2_coord_convertion_rate{ 40.0F };
 
 class IdGenerator
 {
@@ -379,7 +380,8 @@ public:
   void invert_position()
   {
     Vector const position = center_position();
-    set_position({ playing_field_right - position.x, playing_field_bottom - position.y });
+    set_position(
+      { playing_field_right + playing_field_left - position.x, playing_field_bottom + playing_field_top - position.y });
   }
 
   [[nodiscard]] int left() const { return std::round(center_position().x - (width() / 2.0f)); }
@@ -706,16 +708,19 @@ void generate_bricks(std::map<int, std::unique_ptr<arkanoid::Element>> &elements
 {
   using namespace arkanoid;
 
-  int const num_bricks_x = (playing_field_right - brick_distance_x) / (brick_width + brick_distance_x);
+  int const num_bricks_x =
+    (playing_field_right - playing_field_left - brick_distance_x) / (brick_width + brick_distance_x);
 
   int const total_brick_height = (num_bricks_y * (brick_height + brick_distance_y)) + brick_distance_y;
-  int const top = (playing_field_bottom / 2) - (total_brick_height / 2);
+  int const total_brick_width = (num_bricks_x * (brick_width + brick_distance_x)) - brick_distance_x;
+  int const top = std::round(((playing_field_bottom - playing_field_top) / 2.0F) - (total_brick_height / 2.0F));
+  int const left = std::round(((playing_field_right - playing_field_left) - total_brick_width) / 2.0F);
 
   for (int i_x{ 0 }; i_x < num_bricks_x; ++i_x) {
     for (int i_y{ 0 }; i_y < num_bricks_y; ++i_y) {
 
-      int const x{ playing_field_left + ((brick_distance_x + brick_width) * i_x) };
-      int const y{ top + ((brick_distance_y + brick_height) * i_y) };
+      int const x{ playing_field_left + left + ((brick_distance_x + brick_width) * i_x) };
+      int const y{ playing_field_top + top + ((brick_distance_y + brick_height) * i_y) };
 
       std::unique_ptr<arkanoid::Element> brick = std::make_unique<arkanoid::Brick>(arkanoid::Vector{ x, y }, world);
       insert_element(elements, brick);
@@ -756,6 +761,15 @@ void create_and_send_new_game_update(std::vector<arkanoid::Element *> const send
 
 class ContactListener : public b2ContactListener
 {
+private:
+  std::map<int, std::unique_ptr<arkanoid::Element>> &m_map;
+  std::mutex &m_map_mutex;
+
+public:
+  explicit ContactListener(std::map<int, std::unique_ptr<arkanoid::Element>> &map, std::mutex &mutex)
+    : m_map{ map }, m_map_mutex{ mutex }
+  {}
+
 
   void PreSolve(b2Contact *contact, const b2Manifold *oldManifold)
   {
@@ -763,6 +777,8 @@ class ContactListener : public b2ContactListener
     contact->SetRestitution(1.0F);
     contact->SetTangentSpeed(0.5F);
   }
+
+  void EndContact(b2Contact *contact) {}
 };
 
 void build_world_border(b2World *world)
@@ -785,13 +801,13 @@ void build_world_border(b2World *world)
   };
 
   // links
-  generate(arkanoid::playing_field_left - 1, arkanoid::playing_field_top - 1, 1, playing_field_height + 2);
+  generate(arkanoid::playing_field_left - 2, arkanoid::playing_field_top - 1, 1, playing_field_height + 2);
   // rechts
-  generate(arkanoid::playing_field_right, arkanoid::playing_field_top - 1, 1, playing_field_height + 2);
+  generate(arkanoid::playing_field_right + 1, arkanoid::playing_field_top - 1, 1, playing_field_height + 2);
   // oben
-  generate(arkanoid::playing_field_left - 1, arkanoid::playing_field_top - 11, playing_field_width + 2, 1);
+  generate(arkanoid::playing_field_left - 2, arkanoid::playing_field_top - 11, playing_field_width + 4, 1);
   // unten
-  generate(arkanoid::playing_field_left - 1, arkanoid::playing_field_bottom + 10, playing_field_width + 2, 1);
+  generate(arkanoid::playing_field_left - 2, arkanoid::playing_field_bottom + 10, playing_field_width + 4, 1);
 }
 
 int main()
@@ -807,7 +823,7 @@ int main()
     auto screen = ScreenInteractive::FitComponent();
     int const paddle_y{ playing_field_bottom - paddle_height };
     b2World arkanoid_world{ { 0, 0 } };
-    ContactListener listener;
+    ContactListener listener{ element_map, element_mutex };
     arkanoid_world.SetContactListener(&listener);
 
     build_world_border(&arkanoid_world);
@@ -825,7 +841,7 @@ int main()
 
       std::unique_ptr<arkanoid::Element> paddle = std::make_unique<Paddle>(paddle_position, &arkanoid_world);
       std::unique_ptr<arkanoid::Element> paddle_enemy =
-        std::make_unique<Paddle>(paddle_position.sub(0, paddle_y), &arkanoid_world);
+        std::make_unique<Paddle>(paddle_position.sub(0, paddle_y).add(0, playing_field_top), &arkanoid_world);
       std::unique_ptr<arkanoid::Element> ball =
         std::make_unique<Ball>(paddle_position.add(paddle_width / 2, -10), &arkanoid_world);
 
@@ -874,8 +890,13 @@ int main()
 
         can.DrawText(0, 0, std::to_string(timestamp));
 
+        can.DrawBlockLine(
+          playing_field_left, playing_field_top, playing_field_left, playing_field_bottom, ftxui::Color::GrayLight);
+        can.DrawBlockLine(
+          playing_field_right, playing_field_top, playing_field_right, playing_field_bottom, ftxui::Color::GrayLight);
 
-        return canvas(can) | border;
+
+        return canvas(can);
       });
 
       renderer |= CatchEvent([&](Event event) {
