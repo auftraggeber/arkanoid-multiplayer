@@ -287,12 +287,13 @@ namespace arkanoid {
 
 int constexpr canvas_width{ 164 }, canvas_height{ 180 };
 int constexpr playing_field_top{ 5 }, playing_field_bottom{ canvas_height - 10 }, playing_field_left{ 1 },
-  playing_field_right{ canvas_width - 2 };
+  playing_field_right{ canvas_width - 1 };
 int constexpr ball_radius{ 1 }, ball_speed{ 1 };
 int constexpr paddle_width{ 14 }, paddle_height{ 1 };
 int constexpr brick_width{ 14 }, brick_height{ 5 };
 int constexpr num_bricks_y{ 8 };
 int constexpr brick_distance_x{ 2 }, brick_distance_y{ 3 };
+float constexpr b2_coord_convertion_rate{ 50.0F };
 
 class IdGenerator
 {
@@ -342,6 +343,15 @@ public:
   [[nodiscard]] int x_i() const { return std::round(x); }
   [[nodiscard]] int y_i() const { return std::round(y); }
 };
+
+[[nodiscard]] Vector convert_to_b2_coords(Vector const vector)
+{
+  return { vector.x * b2_coord_convertion_rate, vector.y * b2_coord_convertion_rate };
+}
+[[nodiscard]] Vector convert_to_arkanoid_coords(Vector const vector)
+{
+  return { vector.x / b2_coord_convertion_rate, vector.y / b2_coord_convertion_rate };
+}
 
 class Element
 {
@@ -398,8 +408,9 @@ private:
   friend void parse_game_element(Element *, GameElement const &);
 
 public:
-  explicit Ball(Vector const position, b2World *arkanoid_world) : Element{ ftxui::Color::Red }
+  explicit Ball(Vector const pos, b2World *arkanoid_world) : Element{ ftxui::Color::Red }
   {
+    auto const position = convert_to_b2_coords(pos);
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
     bodyDef.position.Set(position.x, position.y);
@@ -409,7 +420,7 @@ public:
     bodyDef.angularDamping = 0.0F;
 
     b2CircleShape dynamicBox;
-    dynamicBox.m_radius = 1.0F;
+    dynamicBox.m_radius = 1.0F * b2_coord_convertion_rate;
 
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &dynamicBox;
@@ -417,7 +428,7 @@ public:
     fixtureDef.friction = 0.0F;// todo: andere friction = fehlerhaftes verhalten
 
     m_body_ptr->CreateFixture(&fixtureDef);
-    m_body_ptr->SetLinearVelocity({ 2.0F, 3.0F });
+    m_body_ptr->SetLinearVelocity({ 6.0F, 9.0F });
     m_body_ptr->SetAngularVelocity(0);
     m_body_ptr->SetFixedRotation(true);
   }
@@ -426,15 +437,16 @@ public:
 
   void update() override {}
 
-  void set_position(Vector const position) override
+  void set_position(Vector const pos) override
   {
+    auto const position = convert_to_b2_coords(pos);
     m_body_ptr->SetTransform({ position.x, position.y }, m_body_ptr->GetAngle());
   }
 
   [[nodiscard]] Vector center_position() const override
   {
     auto pos = m_body_ptr->GetPosition();
-    return { pos.x, pos.y };
+    return convert_to_arkanoid_coords({ pos.x, pos.y });
   }
 
   [[nodiscard]] int width() const override { return ball_radius; }
@@ -452,15 +464,16 @@ private:
   b2Body *m_body_ptr = nullptr;
 
 public:
-  explicit Paddle(Vector const position, b2World *arkanoid_world) : Element{}
+  explicit Paddle(Vector const pos, b2World *arkanoid_world) : Element{}
   {
+    auto const position = convert_to_b2_coords(pos);
     b2BodyDef groundBodyDef;
     groundBodyDef.position.Set(position.x + (width() / 2.0f), position.y + (height() / 2.0f));
 
     m_body_ptr = arkanoid_world->CreateBody(&groundBodyDef);
 
     b2PolygonShape groundBox;
-    groundBox.SetAsBox(width(), height());
+    groundBox.SetAsBox(width() * b2_coord_convertion_rate, height() * b2_coord_convertion_rate);
 
     m_body_ptr->CreateFixture(&groundBox, 0.0f);
   }
@@ -476,15 +489,16 @@ public:
 
   void update() override {}
 
-  void set_position(Vector const position) override
+  void set_position(Vector const pos) override
   {
+    auto const position = convert_to_b2_coords(pos);
     m_body_ptr->SetTransform({ position.x, position.y }, m_body_ptr->GetAngle());
   }
 
   [[nodiscard]] Vector center_position() const override
   {
     auto pos = m_body_ptr->GetPosition();
-    return { pos.x, pos.y };
+    return convert_to_arkanoid_coords({ pos.x, pos.y });
   }
 
   [[nodiscard]] int width() const override { return paddle_width; }
@@ -498,31 +512,34 @@ private:
   b2Body *m_body_ptr = nullptr;
 
 public:
-  explicit Brick(Vector const position, b2World *arkanoid_world)
+  explicit Brick(Vector const pos, b2World *arkanoid_world)
     : Element{}// todo: b2world muss als pointer, da sonst make_unique nicht funktioniert
   {
+
+    auto const position = convert_to_b2_coords(pos.add(width() / 2.0F, height() / 2.0F));
     b2BodyDef groundBodyDef;
-    groundBodyDef.position.Set(position.x + (width() / 2.0f), position.y + (height() / 2.0f));
+    groundBodyDef.position.Set(position.x, position.y);
 
     m_body_ptr = arkanoid_world->CreateBody(&groundBodyDef);
 
     b2PolygonShape groundBox;
-    groundBox.SetAsBox(width(), height());
+    groundBox.SetAsBox(width() * b2_coord_convertion_rate, height() * b2_coord_convertion_rate);
 
     m_body_ptr->CreateFixture(&groundBox, 0.0f);
   }
 
   void update() override {}
   [[nodiscard]] ElementType get_type() const override { return BRICK; }
-  void set_position(Vector const position) override
+  void set_position(Vector const pos) override
   {
+    auto const position = convert_to_b2_coords(pos);
     m_body_ptr->SetTransform({ position.x, position.y }, m_body_ptr->GetAngle());
   }
 
   [[nodiscard]] Vector center_position() const override
   {
     auto pos = m_body_ptr->GetPosition();
-    return { pos.x, pos.y };
+    return convert_to_arkanoid_coords({ pos.x, pos.y });
   }
 
   [[nodiscard]] int width() const override { return brick_width; }
@@ -737,47 +754,6 @@ void create_and_send_new_game_update(std::vector<arkanoid::Element *> const send
     .detach();
 }
 
-void test_box2d()
-{
-  b2World world{ { 0, 0 } };
-
-  b2BodyDef groundBodyDef;
-  groundBodyDef.position.Set(0.0f, -10.0f);
-
-  b2Body *groundBody = world.CreateBody(&groundBodyDef);
-
-  b2PolygonShape groundBox;
-  groundBox.SetAsBox(50.0f, 10.0f);
-
-  groundBody->CreateFixture(&groundBox, 0.0f);
-
-  b2BodyDef bodyDef;
-  bodyDef.type = b2_dynamicBody;
-  bodyDef.position.Set(0.0f, 4.0f);
-  b2Body *body = world.CreateBody(&bodyDef);
-
-  b2PolygonShape dynamicBox;
-  dynamicBox.SetAsBox(1.0f, 1.0f);
-
-  b2FixtureDef fixtureDef;
-  fixtureDef.shape = &dynamicBox;
-  fixtureDef.density = 1.0f;
-  fixtureDef.friction = 0.3f;
-
-  body->CreateFixture(&fixtureDef);
-
-  for (int32 i = 0; i < 60; ++i) {
-    if (i < 20) {
-      body->ApplyForceToCenter({ 0, -10.0f }, true);
-    } else {
-      body->ApplyForceToCenter({ 0, 10.0f }, true);
-    }
-    world.Step(1 / 60.0f, 6, 2);
-    b2Vec2 position = body->GetPosition();
-    printf("%4.2f %4.2f %4.2f\n", position.x, position.y);
-  }
-}
-
 class ContactListener : public b2ContactListener
 {
 
@@ -792,39 +768,30 @@ class ContactListener : public b2ContactListener
 void build_world_border(b2World *world)
 {
   int const playing_field_width = arkanoid::playing_field_right - arkanoid::playing_field_left;
-  int const playing_field_height = arkanoid::playing_field_bottom - arkanoid::playing_field_top + 10;
+  int const playing_field_height = arkanoid::playing_field_bottom - arkanoid::playing_field_top;
+
+
+  auto generate = [&world](float const x, float const y, float width, float height) {
+    auto const position = arkanoid::convert_to_b2_coords(arkanoid::Vector{ x, y });
+    width *= arkanoid::b2_coord_convertion_rate;
+    height *= arkanoid::b2_coord_convertion_rate;
+
+    b2BodyDef def;
+    def.position.Set(position.x, position.y);
+    b2Body *body = world->CreateBody(&def);
+    b2PolygonShape box;
+    box.SetAsBox(width, height);
+    body->CreateFixture(&box, 1.0f);
+  };
 
   // links
-  b2BodyDef leftDef;
-  leftDef.position.Set(arkanoid::playing_field_left - 1, arkanoid::playing_field_top - 10);
-  b2Body *leftBody = world->CreateBody(&leftDef);
-  b2PolygonShape leftBox;
-  leftBox.SetAsBox(1, playing_field_height + 2);
-  leftBody->CreateFixture(&leftBox, 1.0f);
-
+  generate(arkanoid::playing_field_left - 1, arkanoid::playing_field_top - 1, 1, playing_field_height + 2);
   // rechts
-  b2BodyDef rightDef;
-  rightDef.position.Set(arkanoid::playing_field_right, arkanoid::playing_field_top - 10);
-  b2Body *rightBody = world->CreateBody(&rightDef);
-  b2PolygonShape rightBox;
-  rightBox.SetAsBox(1, playing_field_height + 2);
-  rightBody->CreateFixture(&rightBox, 1.0f);
-
+  generate(arkanoid::playing_field_right, arkanoid::playing_field_top - 1, 1, playing_field_height + 2);
   // oben
-  b2BodyDef topDef;
-  topDef.position.Set(arkanoid::playing_field_left - 1, arkanoid::playing_field_top - 10);
-  b2Body *topBody = world->CreateBody(&topDef);
-  b2PolygonShape topBox;
-  topBox.SetAsBox(playing_field_width + 2, 1);
-  topBody->CreateFixture(&topBox, 1.0F);
-
+  generate(arkanoid::playing_field_left - 1, arkanoid::playing_field_top - 11, playing_field_width + 2, 1);
   // unten
-  b2BodyDef bottomDef;
-  bottomDef.position.Set(arkanoid::playing_field_left - 1, arkanoid::playing_field_bottom + 9);
-  b2Body *bottomBody = world->CreateBody(&bottomDef);
-  b2PolygonShape bottomBox;
-  bottomBox.SetAsBox(playing_field_width + 2, 1);
-  bottomBody->CreateFixture(&bottomBox, 1.0F);
+  generate(arkanoid::playing_field_left - 1, arkanoid::playing_field_bottom + 10, playing_field_width + 2, 1);
 }
 
 int main()
