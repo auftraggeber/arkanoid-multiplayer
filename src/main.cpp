@@ -394,7 +394,6 @@ class Ball : public Element
 
 private:
   b2Body *m_body_ptr = nullptr;
-  Vector m_velocity{ 0.0f, 0.00025f };
 
   friend void parse_game_element(Element *, GameElement const &);
 
@@ -406,11 +405,11 @@ public:
     bodyDef.position.Set(position.x, position.y);
     // bodyDef.userData = b2BodyUserData{}; // todo: verlinkung auf dieses objekt.
     m_body_ptr = arkanoid_world->CreateBody(&bodyDef);
-    bodyDef.linearDamping = 1.0F;
-    bodyDef.angularDamping = 0;
+    bodyDef.linearDamping = 0.0F;
+    bodyDef.angularDamping = 0.0F;
 
-    b2PolygonShape dynamicBox;
-    dynamicBox.SetAsBox(width(), height());
+    b2CircleShape dynamicBox;
+    dynamicBox.m_radius = 1.0F;
 
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &dynamicBox;
@@ -418,7 +417,9 @@ public:
     fixtureDef.friction = 0.0F;// todo: andere friction = fehlerhaftes verhalten
 
     m_body_ptr->CreateFixture(&fixtureDef);
-    m_body_ptr->SetLinearVelocity({ 0.2F, 0.3F });
+    m_body_ptr->SetLinearVelocity({ 2.0F, 3.0F });
+    m_body_ptr->SetAngularVelocity(0);
+    m_body_ptr->SetFixedRotation(true);
   }
 
   [[nodiscard]] ElementType get_type() const override { return BALL; }
@@ -560,10 +561,7 @@ void parse_game_element(Element *element, GameElement const &net_element)
   element->set_position({ net_element.element_position().x(), net_element.element_position().y() });
   element->invert_position();
 
-  if (element->get_type() == BALL) {
-    Ball *ball = static_cast<Ball *>(element);
-    ball->m_velocity = ball->m_velocity.invert();
-  }
+  if (element->get_type() == BALL) { Ball *ball = static_cast<Ball *>(element); }
 }
 
 void parse_game_update(std::map<int, std::unique_ptr<Element>> &map, GameUpdate const &update, b2World *world)
