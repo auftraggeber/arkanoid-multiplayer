@@ -523,6 +523,7 @@ private:
   b2Body *m_body_ptr = nullptr;
   b2World *m_world_ptr;
   b2Fixture *m_fixture_ptr = nullptr;
+  int m_duration{ 1 };// todo -> variable duration
 
 public:
   explicit Brick(Vector const pos, b2World *arkanoid_world, std::map<b2Fixture *, Element *> &map)
