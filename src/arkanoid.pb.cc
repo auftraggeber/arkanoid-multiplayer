@@ -14,8 +14,23 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
+extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Ball_arkanoid_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Brick_arkanoid_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ElementPosition_arkanoid_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_GameElement_arkanoid_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<4> scc_info_GameElement_arkanoid_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Paddle_arkanoid_2eproto;
+class BallDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Ball> _instance;
+} _Ball_default_instance_;
+class PaddleDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Paddle> _instance;
+} _Paddle_default_instance_;
+class BrickDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Brick> _instance;
+} _Brick_default_instance_;
 class ElementPositionDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<ElementPosition> _instance;
@@ -23,11 +38,42 @@ class ElementPositionDefaultTypeInternal {
 class GameElementDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<GameElement> _instance;
+  const ::Ball* ball_;
+  const ::Paddle* paddle_;
+  const ::Brick* brick_;
 } _GameElement_default_instance_;
 class GameUpdateDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<GameUpdate> _instance;
 } _GameUpdate_default_instance_;
+static void InitDefaultsscc_info_Ball_arkanoid_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::_Ball_default_instance_;
+    new (ptr) ::Ball();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::Ball::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Ball_arkanoid_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Ball_arkanoid_2eproto}, {}};
+
+static void InitDefaultsscc_info_Brick_arkanoid_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::_Brick_default_instance_;
+    new (ptr) ::Brick();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::Brick::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Brick_arkanoid_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Brick_arkanoid_2eproto}, {}};
+
 static void InitDefaultsscc_info_ElementPosition_arkanoid_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -53,9 +99,12 @@ static void InitDefaultsscc_info_GameElement_arkanoid_2eproto() {
   ::GameElement::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_GameElement_arkanoid_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_GameElement_arkanoid_2eproto}, {
-      &scc_info_ElementPosition_arkanoid_2eproto.base,}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<4> scc_info_GameElement_arkanoid_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 4, 0, InitDefaultsscc_info_GameElement_arkanoid_2eproto}, {
+      &scc_info_ElementPosition_arkanoid_2eproto.base,
+      &scc_info_Ball_arkanoid_2eproto.base,
+      &scc_info_Paddle_arkanoid_2eproto.base,
+      &scc_info_Brick_arkanoid_2eproto.base,}};
 
 static void InitDefaultsscc_info_GameUpdate_arkanoid_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -72,11 +121,43 @@ static void InitDefaultsscc_info_GameUpdate_arkanoid_2eproto() {
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_GameUpdate_arkanoid_2eproto}, {
       &scc_info_GameElement_arkanoid_2eproto.base,}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_arkanoid_2eproto[3];
+static void InitDefaultsscc_info_Paddle_arkanoid_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::_Paddle_default_instance_;
+    new (ptr) ::Paddle();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::Paddle::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Paddle_arkanoid_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Paddle_arkanoid_2eproto}, {}};
+
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_arkanoid_2eproto[6];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_arkanoid_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_arkanoid_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_arkanoid_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::Ball, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::Ball, velocity_x_),
+  PROTOBUF_FIELD_OFFSET(::Ball, velocity_y_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::Paddle, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::Brick, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::Brick, duration_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::ElementPosition, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -87,11 +168,15 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_arkanoid_2eproto::offsets[] PR
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::GameElement, _internal_metadata_),
   ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
+  PROTOBUF_FIELD_OFFSET(::GameElement, _oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::GameElement, id_),
   PROTOBUF_FIELD_OFFSET(::GameElement, type_),
   PROTOBUF_FIELD_OFFSET(::GameElement, element_position_),
+  offsetof(::GameElementDefaultTypeInternal, ball_),
+  offsetof(::GameElementDefaultTypeInternal, paddle_),
+  offsetof(::GameElementDefaultTypeInternal, brick_),
+  PROTOBUF_FIELD_OFFSET(::GameElement, specific_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::GameUpdate, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -100,39 +185,52 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_arkanoid_2eproto::offsets[] PR
   PROTOBUF_FIELD_OFFSET(::GameUpdate, element_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::ElementPosition)},
-  { 7, -1, sizeof(::GameElement)},
-  { 15, -1, sizeof(::GameUpdate)},
+  { 0, -1, sizeof(::Ball)},
+  { 7, -1, sizeof(::Paddle)},
+  { 12, -1, sizeof(::Brick)},
+  { 18, -1, sizeof(::ElementPosition)},
+  { 25, -1, sizeof(::GameElement)},
+  { 37, -1, sizeof(::GameUpdate)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_Ball_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_Paddle_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_Brick_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_ElementPosition_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_GameElement_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_GameUpdate_default_instance_),
 };
 
 const char descriptor_table_protodef_arkanoid_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\016arkanoid.proto\"\'\n\017ElementPosition\022\t\n\001x"
-  "\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\"a\n\013GameElement\022\n\n\002id\030\001"
-  " \001(\005\022\032\n\004type\030\002 \001(\0162\014.ElementType\022*\n\020elem"
-  "ent_position\030\003 \001(\0132\020.ElementPosition\"+\n\n"
-  "GameUpdate\022\035\n\007element\030\001 \003(\0132\014.GameElemen"
-  "t*.\n\013ElementType\022\010\n\004BALL\020\000\022\n\n\006PADDLE\020\001\022\t"
-  "\n\005BRICK\020\002b\006proto3"
+  "\n\016arkanoid.proto\".\n\004Ball\022\022\n\nvelocity_x\030\001"
+  " \001(\002\022\022\n\nvelocity_y\030\002 \001(\002\"\010\n\006Paddle\"\031\n\005Br"
+  "ick\022\020\n\010duration\030\001 \001(\005\"\'\n\017ElementPosition"
+  "\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\"\270\001\n\013GameElement\022\n"
+  "\n\002id\030\001 \001(\005\022\032\n\004type\030\002 \001(\0162\014.ElementType\022*"
+  "\n\020element_position\030\003 \001(\0132\020.ElementPositi"
+  "on\022\025\n\004ball\030\005 \001(\0132\005.BallH\000\022\031\n\006paddle\030\006 \001("
+  "\0132\007.PaddleH\000\022\027\n\005brick\030\007 \001(\0132\006.BrickH\000B\n\n"
+  "\010specific\"+\n\nGameUpdate\022\035\n\007element\030\001 \003(\013"
+  "2\014.GameElement*.\n\013ElementType\022\010\n\004BALL\020\000\022"
+  "\n\n\006PADDLE\020\001\022\t\n\005BRICK\020\002b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_arkanoid_2eproto_deps[1] = {
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_arkanoid_2eproto_sccs[3] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_arkanoid_2eproto_sccs[6] = {
+  &scc_info_Ball_arkanoid_2eproto.base,
+  &scc_info_Brick_arkanoid_2eproto.base,
   &scc_info_ElementPosition_arkanoid_2eproto.base,
   &scc_info_GameElement_arkanoid_2eproto.base,
   &scc_info_GameUpdate_arkanoid_2eproto.base,
+  &scc_info_Paddle_arkanoid_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_arkanoid_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_arkanoid_2eproto = {
-  false, false, descriptor_table_protodef_arkanoid_2eproto, "arkanoid.proto", 257,
-  &descriptor_table_arkanoid_2eproto_once, descriptor_table_arkanoid_2eproto_sccs, descriptor_table_arkanoid_2eproto_deps, 3, 0,
+  false, false, descriptor_table_protodef_arkanoid_2eproto, "arkanoid.proto", 430,
+  &descriptor_table_arkanoid_2eproto_once, descriptor_table_arkanoid_2eproto_sccs, descriptor_table_arkanoid_2eproto_deps, 6, 0,
   schemas, file_default_instances, TableStruct_arkanoid_2eproto::offsets,
-  file_level_metadata_arkanoid_2eproto, 3, file_level_enum_descriptors_arkanoid_2eproto, file_level_service_descriptors_arkanoid_2eproto,
+  file_level_metadata_arkanoid_2eproto, 6, file_level_enum_descriptors_arkanoid_2eproto, file_level_service_descriptors_arkanoid_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -150,6 +248,595 @@ bool ElementType_IsValid(int value) {
     default:
       return false;
   }
+}
+
+
+// ===================================================================
+
+void Ball::InitAsDefaultInstance() {
+}
+class Ball::_Internal {
+ public:
+};
+
+Ball::Ball(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:Ball)
+}
+Ball::Ball(const Ball& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::memcpy(&velocity_x_, &from.velocity_x_,
+    static_cast<size_t>(reinterpret_cast<char*>(&velocity_y_) -
+    reinterpret_cast<char*>(&velocity_x_)) + sizeof(velocity_y_));
+  // @@protoc_insertion_point(copy_constructor:Ball)
+}
+
+void Ball::SharedCtor() {
+  ::memset(&velocity_x_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&velocity_y_) -
+      reinterpret_cast<char*>(&velocity_x_)) + sizeof(velocity_y_));
+}
+
+Ball::~Ball() {
+  // @@protoc_insertion_point(destructor:Ball)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void Ball::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void Ball::ArenaDtor(void* object) {
+  Ball* _this = reinterpret_cast< Ball* >(object);
+  (void)_this;
+}
+void Ball::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void Ball::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const Ball& Ball::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Ball_arkanoid_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void Ball::Clear() {
+// @@protoc_insertion_point(message_clear_start:Ball)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&velocity_x_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&velocity_y_) -
+      reinterpret_cast<char*>(&velocity_x_)) + sizeof(velocity_y_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* Ball::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // float velocity_x = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 13)) {
+          velocity_x_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float velocity_y = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 21)) {
+          velocity_y_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* Ball::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Ball)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // float velocity_x = 1;
+  if (!(this->velocity_x() <= 0 && this->velocity_x() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(1, this->_internal_velocity_x(), target);
+  }
+
+  // float velocity_y = 2;
+  if (!(this->velocity_y() <= 0 && this->velocity_y() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(2, this->_internal_velocity_y(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Ball)
+  return target;
+}
+
+size_t Ball::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Ball)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // float velocity_x = 1;
+  if (!(this->velocity_x() <= 0 && this->velocity_x() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float velocity_y = 2;
+  if (!(this->velocity_y() <= 0 && this->velocity_y() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Ball::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:Ball)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Ball* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Ball>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:Ball)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:Ball)
+    MergeFrom(*source);
+  }
+}
+
+void Ball::MergeFrom(const Ball& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:Ball)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!(from.velocity_x() <= 0 && from.velocity_x() >= 0)) {
+    _internal_set_velocity_x(from._internal_velocity_x());
+  }
+  if (!(from.velocity_y() <= 0 && from.velocity_y() >= 0)) {
+    _internal_set_velocity_y(from._internal_velocity_y());
+  }
+}
+
+void Ball::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:Ball)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Ball::CopyFrom(const Ball& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Ball)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Ball::IsInitialized() const {
+  return true;
+}
+
+void Ball::InternalSwap(Ball* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(Ball, velocity_y_)
+      + sizeof(Ball::velocity_y_)
+      - PROTOBUF_FIELD_OFFSET(Ball, velocity_x_)>(
+          reinterpret_cast<char*>(&velocity_x_),
+          reinterpret_cast<char*>(&other->velocity_x_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata Ball::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void Paddle::InitAsDefaultInstance() {
+}
+class Paddle::_Internal {
+ public:
+};
+
+Paddle::Paddle(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:Paddle)
+}
+Paddle::Paddle(const Paddle& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:Paddle)
+}
+
+void Paddle::SharedCtor() {
+}
+
+Paddle::~Paddle() {
+  // @@protoc_insertion_point(destructor:Paddle)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void Paddle::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void Paddle::ArenaDtor(void* object) {
+  Paddle* _this = reinterpret_cast< Paddle* >(object);
+  (void)_this;
+}
+void Paddle::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void Paddle::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const Paddle& Paddle::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Paddle_arkanoid_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void Paddle::Clear() {
+// @@protoc_insertion_point(message_clear_start:Paddle)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* Paddle::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* Paddle::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Paddle)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Paddle)
+  return target;
+}
+
+size_t Paddle::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Paddle)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Paddle::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:Paddle)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Paddle* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Paddle>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:Paddle)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:Paddle)
+    MergeFrom(*source);
+  }
+}
+
+void Paddle::MergeFrom(const Paddle& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:Paddle)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+}
+
+void Paddle::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:Paddle)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Paddle::CopyFrom(const Paddle& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Paddle)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Paddle::IsInitialized() const {
+  return true;
+}
+
+void Paddle::InternalSwap(Paddle* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata Paddle::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void Brick::InitAsDefaultInstance() {
+}
+class Brick::_Internal {
+ public:
+};
+
+Brick::Brick(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:Brick)
+}
+Brick::Brick(const Brick& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  duration_ = from.duration_;
+  // @@protoc_insertion_point(copy_constructor:Brick)
+}
+
+void Brick::SharedCtor() {
+  duration_ = 0;
+}
+
+Brick::~Brick() {
+  // @@protoc_insertion_point(destructor:Brick)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void Brick::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void Brick::ArenaDtor(void* object) {
+  Brick* _this = reinterpret_cast< Brick* >(object);
+  (void)_this;
+}
+void Brick::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void Brick::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const Brick& Brick::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Brick_arkanoid_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void Brick::Clear() {
+// @@protoc_insertion_point(message_clear_start:Brick)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  duration_ = 0;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* Brick::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // int32 duration = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          duration_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* Brick::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Brick)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 duration = 1;
+  if (this->duration() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_duration(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Brick)
+  return target;
+}
+
+size_t Brick::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Brick)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // int32 duration = 1;
+  if (this->duration() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_duration());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Brick::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:Brick)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Brick* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Brick>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:Brick)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:Brick)
+    MergeFrom(*source);
+  }
+}
+
+void Brick::MergeFrom(const Brick& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:Brick)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.duration() != 0) {
+    _internal_set_duration(from._internal_duration());
+  }
+}
+
+void Brick::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:Brick)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Brick::CopyFrom(const Brick& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Brick)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Brick::IsInitialized() const {
+  return true;
+}
+
+void Brick::InternalSwap(Brick* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  swap(duration_, other->duration_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata Brick::GetMetadata() const {
+  return GetMetadataStatic();
 }
 
 
@@ -385,15 +1072,81 @@ void ElementPosition::InternalSwap(ElementPosition* other) {
 void GameElement::InitAsDefaultInstance() {
   ::_GameElement_default_instance_._instance.get_mutable()->element_position_ = const_cast< ::ElementPosition*>(
       ::ElementPosition::internal_default_instance());
+  ::_GameElement_default_instance_.ball_ = const_cast< ::Ball*>(
+      ::Ball::internal_default_instance());
+  ::_GameElement_default_instance_.paddle_ = const_cast< ::Paddle*>(
+      ::Paddle::internal_default_instance());
+  ::_GameElement_default_instance_.brick_ = const_cast< ::Brick*>(
+      ::Brick::internal_default_instance());
 }
 class GameElement::_Internal {
  public:
   static const ::ElementPosition& element_position(const GameElement* msg);
+  static const ::Ball& ball(const GameElement* msg);
+  static const ::Paddle& paddle(const GameElement* msg);
+  static const ::Brick& brick(const GameElement* msg);
 };
 
 const ::ElementPosition&
 GameElement::_Internal::element_position(const GameElement* msg) {
   return *msg->element_position_;
+}
+const ::Ball&
+GameElement::_Internal::ball(const GameElement* msg) {
+  return *msg->specific_.ball_;
+}
+const ::Paddle&
+GameElement::_Internal::paddle(const GameElement* msg) {
+  return *msg->specific_.paddle_;
+}
+const ::Brick&
+GameElement::_Internal::brick(const GameElement* msg) {
+  return *msg->specific_.brick_;
+}
+void GameElement::set_allocated_ball(::Ball* ball) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_specific();
+  if (ball) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(ball);
+    if (message_arena != submessage_arena) {
+      ball = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, ball, submessage_arena);
+    }
+    set_has_ball();
+    specific_.ball_ = ball;
+  }
+  // @@protoc_insertion_point(field_set_allocated:GameElement.ball)
+}
+void GameElement::set_allocated_paddle(::Paddle* paddle) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_specific();
+  if (paddle) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(paddle);
+    if (message_arena != submessage_arena) {
+      paddle = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, paddle, submessage_arena);
+    }
+    set_has_paddle();
+    specific_.paddle_ = paddle;
+  }
+  // @@protoc_insertion_point(field_set_allocated:GameElement.paddle)
+}
+void GameElement::set_allocated_brick(::Brick* brick) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_specific();
+  if (brick) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(brick);
+    if (message_arena != submessage_arena) {
+      brick = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, brick, submessage_arena);
+    }
+    set_has_brick();
+    specific_.brick_ = brick;
+  }
+  // @@protoc_insertion_point(field_set_allocated:GameElement.brick)
 }
 GameElement::GameElement(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
@@ -412,6 +1165,24 @@ GameElement::GameElement(const GameElement& from)
   ::memcpy(&id_, &from.id_,
     static_cast<size_t>(reinterpret_cast<char*>(&type_) -
     reinterpret_cast<char*>(&id_)) + sizeof(type_));
+  clear_has_specific();
+  switch (from.specific_case()) {
+    case kBall: {
+      _internal_mutable_ball()->::Ball::MergeFrom(from._internal_ball());
+      break;
+    }
+    case kPaddle: {
+      _internal_mutable_paddle()->::Paddle::MergeFrom(from._internal_paddle());
+      break;
+    }
+    case kBrick: {
+      _internal_mutable_brick()->::Brick::MergeFrom(from._internal_brick());
+      break;
+    }
+    case SPECIFIC_NOT_SET: {
+      break;
+    }
+  }
   // @@protoc_insertion_point(copy_constructor:GameElement)
 }
 
@@ -420,6 +1191,7 @@ void GameElement::SharedCtor() {
   ::memset(&element_position_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&type_) -
       reinterpret_cast<char*>(&element_position_)) + sizeof(type_));
+  clear_has_specific();
 }
 
 GameElement::~GameElement() {
@@ -431,6 +1203,9 @@ GameElement::~GameElement() {
 void GameElement::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
   if (this != internal_default_instance()) delete element_position_;
+  if (has_specific()) {
+    clear_specific();
+  }
 }
 
 void GameElement::ArenaDtor(void* object) {
@@ -448,6 +1223,35 @@ const GameElement& GameElement::default_instance() {
 }
 
 
+void GameElement::clear_specific() {
+// @@protoc_insertion_point(one_of_clear_start:GameElement)
+  switch (specific_case()) {
+    case kBall: {
+      if (GetArena() == nullptr) {
+        delete specific_.ball_;
+      }
+      break;
+    }
+    case kPaddle: {
+      if (GetArena() == nullptr) {
+        delete specific_.paddle_;
+      }
+      break;
+    }
+    case kBrick: {
+      if (GetArena() == nullptr) {
+        delete specific_.brick_;
+      }
+      break;
+    }
+    case SPECIFIC_NOT_SET: {
+      break;
+    }
+  }
+  _oneof_case_[0] = SPECIFIC_NOT_SET;
+}
+
+
 void GameElement::Clear() {
 // @@protoc_insertion_point(message_clear_start:GameElement)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -461,6 +1265,7 @@ void GameElement::Clear() {
   ::memset(&id_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&type_) -
       reinterpret_cast<char*>(&id_)) + sizeof(type_));
+  clear_specific();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -491,6 +1296,27 @@ const char* GameElement::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
           ptr = ctx->ParseMessage(_internal_mutable_element_position(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .Ball ball = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+          ptr = ctx->ParseMessage(_internal_mutable_ball(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .Paddle paddle = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+          ptr = ctx->ParseMessage(_internal_mutable_paddle(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .Brick brick = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
+          ptr = ctx->ParseMessage(_internal_mutable_brick(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -543,6 +1369,30 @@ failure:
         3, _Internal::element_position(this), target, stream);
   }
 
+  // .Ball ball = 5;
+  if (_internal_has_ball()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        5, _Internal::ball(this), target, stream);
+  }
+
+  // .Paddle paddle = 6;
+  if (_internal_has_paddle()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        6, _Internal::paddle(this), target, stream);
+  }
+
+  // .Brick brick = 7;
+  if (_internal_has_brick()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        7, _Internal::brick(this), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -579,6 +1429,32 @@ size_t GameElement::ByteSizeLong() const {
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_type());
   }
 
+  switch (specific_case()) {
+    // .Ball ball = 5;
+    case kBall: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *specific_.ball_);
+      break;
+    }
+    // .Paddle paddle = 6;
+    case kPaddle: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *specific_.paddle_);
+      break;
+    }
+    // .Brick brick = 7;
+    case kBrick: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *specific_.brick_);
+      break;
+    }
+    case SPECIFIC_NOT_SET: {
+      break;
+    }
+  }
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
         _internal_metadata_, total_size, &_cached_size_);
@@ -619,6 +1495,23 @@ void GameElement::MergeFrom(const GameElement& from) {
   if (from.type() != 0) {
     _internal_set_type(from._internal_type());
   }
+  switch (from.specific_case()) {
+    case kBall: {
+      _internal_mutable_ball()->::Ball::MergeFrom(from._internal_ball());
+      break;
+    }
+    case kPaddle: {
+      _internal_mutable_paddle()->::Paddle::MergeFrom(from._internal_paddle());
+      break;
+    }
+    case kBrick: {
+      _internal_mutable_brick()->::Brick::MergeFrom(from._internal_brick());
+      break;
+    }
+    case SPECIFIC_NOT_SET: {
+      break;
+    }
+  }
 }
 
 void GameElement::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
@@ -648,6 +1541,8 @@ void GameElement::InternalSwap(GameElement* other) {
       - PROTOBUF_FIELD_OFFSET(GameElement, element_position_)>(
           reinterpret_cast<char*>(&element_position_),
           reinterpret_cast<char*>(&other->element_position_));
+  swap(specific_, other->specific_);
+  swap(_oneof_case_[0], other->_oneof_case_[0]);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata GameElement::GetMetadata() const {
@@ -860,6 +1755,15 @@ void GameUpdate::InternalSwap(GameUpdate* other) {
 
 // @@protoc_insertion_point(namespace_scope)
 PROTOBUF_NAMESPACE_OPEN
+template<> PROTOBUF_NOINLINE ::Ball* Arena::CreateMaybeMessage< ::Ball >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Ball >(arena);
+}
+template<> PROTOBUF_NOINLINE ::Paddle* Arena::CreateMaybeMessage< ::Paddle >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Paddle >(arena);
+}
+template<> PROTOBUF_NOINLINE ::Brick* Arena::CreateMaybeMessage< ::Brick >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Brick >(arena);
+}
 template<> PROTOBUF_NOINLINE ::ElementPosition* Arena::CreateMaybeMessage< ::ElementPosition >(Arena* arena) {
   return Arena::CreateMessageInternal< ::ElementPosition >(arena);
 }

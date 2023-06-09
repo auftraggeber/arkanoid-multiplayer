@@ -7,6 +7,18 @@ enum ElementType {
     BRICK = 2;
 }
 
+message Ball {
+    float velocity_x = 1;
+    float velocity_y = 2;
+}
+
+message Paddle {
+}
+
+message Brick {
+    int32 duration = 1;
+}
+
 message ElementPosition {
     float x = 1;
     float y = 2;
@@ -17,7 +29,7 @@ message GameElement {
     ElementType type = 2;
     ElementPosition element_position = 3; 
 
-    // oneof type { Ball ball = 4; Paddle paddle = 4; Brick brick = 4 }; // todo
+    oneof specific { Ball ball = 5; Paddle paddle = 6; Brick brick = 7;}; // todo
 }
 
 message GameUpdate {
