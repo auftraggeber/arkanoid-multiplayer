@@ -14,23 +14,23 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
-extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Ball_arkanoid_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Brick_arkanoid_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ElementPosition_arkanoid_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<4> scc_info_GameElement_arkanoid_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Paddle_arkanoid_2eproto;
-class BallDefaultTypeInternal {
+extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_NetBall_arkanoid_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_NetBrick_arkanoid_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_arkanoid_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_NetPaddle_arkanoid_2eproto;
+class NetBallDefaultTypeInternal {
  public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Ball> _instance;
-} _Ball_default_instance_;
-class PaddleDefaultTypeInternal {
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<NetBall> _instance;
+} _NetBall_default_instance_;
+class NetPaddleDefaultTypeInternal {
  public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Paddle> _instance;
-} _Paddle_default_instance_;
-class BrickDefaultTypeInternal {
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<NetPaddle> _instance;
+} _NetPaddle_default_instance_;
+class NetBrickDefaultTypeInternal {
  public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Brick> _instance;
-} _Brick_default_instance_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<NetBrick> _instance;
+} _NetBrick_default_instance_;
 class ElementPositionDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<ElementPosition> _instance;
@@ -38,42 +38,14 @@ class ElementPositionDefaultTypeInternal {
 class GameElementDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<GameElement> _instance;
-  const ::Ball* ball_;
-  const ::Paddle* paddle_;
-  const ::Brick* brick_;
+  const ::NetBall* ball_;
+  const ::NetPaddle* paddle_;
+  const ::NetBrick* brick_;
 } _GameElement_default_instance_;
 class GameUpdateDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<GameUpdate> _instance;
 } _GameUpdate_default_instance_;
-static void InitDefaultsscc_info_Ball_arkanoid_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::_Ball_default_instance_;
-    new (ptr) ::Ball();
-    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::Ball::InitAsDefaultInstance();
-}
-
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Ball_arkanoid_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Ball_arkanoid_2eproto}, {}};
-
-static void InitDefaultsscc_info_Brick_arkanoid_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::_Brick_default_instance_;
-    new (ptr) ::Brick();
-    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::Brick::InitAsDefaultInstance();
-}
-
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Brick_arkanoid_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Brick_arkanoid_2eproto}, {}};
-
 static void InitDefaultsscc_info_ElementPosition_arkanoid_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -102,9 +74,9 @@ static void InitDefaultsscc_info_GameElement_arkanoid_2eproto() {
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<4> scc_info_GameElement_arkanoid_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 4, 0, InitDefaultsscc_info_GameElement_arkanoid_2eproto}, {
       &scc_info_ElementPosition_arkanoid_2eproto.base,
-      &scc_info_Ball_arkanoid_2eproto.base,
-      &scc_info_Paddle_arkanoid_2eproto.base,
-      &scc_info_Brick_arkanoid_2eproto.base,}};
+      &scc_info_NetBall_arkanoid_2eproto.base,
+      &scc_info_NetPaddle_arkanoid_2eproto.base,
+      &scc_info_NetBrick_arkanoid_2eproto.base,}};
 
 static void InitDefaultsscc_info_GameUpdate_arkanoid_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -121,19 +93,47 @@ static void InitDefaultsscc_info_GameUpdate_arkanoid_2eproto() {
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_GameUpdate_arkanoid_2eproto}, {
       &scc_info_GameElement_arkanoid_2eproto.base,}};
 
-static void InitDefaultsscc_info_Paddle_arkanoid_2eproto() {
+static void InitDefaultsscc_info_NetBall_arkanoid_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::_Paddle_default_instance_;
-    new (ptr) ::Paddle();
+    void* ptr = &::_NetBall_default_instance_;
+    new (ptr) ::NetBall();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::Paddle::InitAsDefaultInstance();
+  ::NetBall::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Paddle_arkanoid_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Paddle_arkanoid_2eproto}, {}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_NetBall_arkanoid_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_NetBall_arkanoid_2eproto}, {}};
+
+static void InitDefaultsscc_info_NetBrick_arkanoid_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::_NetBrick_default_instance_;
+    new (ptr) ::NetBrick();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::NetBrick::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_NetBrick_arkanoid_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_NetBrick_arkanoid_2eproto}, {}};
+
+static void InitDefaultsscc_info_NetPaddle_arkanoid_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::_NetPaddle_default_instance_;
+    new (ptr) ::NetPaddle();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::NetPaddle::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_NetPaddle_arkanoid_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_NetPaddle_arkanoid_2eproto}, {}};
 
 static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_arkanoid_2eproto[6];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_arkanoid_2eproto[1];
@@ -141,23 +141,23 @@ static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_s
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_arkanoid_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::Ball, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::NetBall, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::Ball, velocity_x_),
-  PROTOBUF_FIELD_OFFSET(::Ball, velocity_y_),
+  PROTOBUF_FIELD_OFFSET(::NetBall, velocity_x_),
+  PROTOBUF_FIELD_OFFSET(::NetBall, velocity_y_),
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::Paddle, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::NetPaddle, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::Brick, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::NetBrick, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::Brick, duration_),
+  PROTOBUF_FIELD_OFFSET(::NetBrick, duration_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::ElementPosition, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -185,49 +185,50 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_arkanoid_2eproto::offsets[] PR
   PROTOBUF_FIELD_OFFSET(::GameUpdate, element_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::Ball)},
-  { 7, -1, sizeof(::Paddle)},
-  { 12, -1, sizeof(::Brick)},
+  { 0, -1, sizeof(::NetBall)},
+  { 7, -1, sizeof(::NetPaddle)},
+  { 12, -1, sizeof(::NetBrick)},
   { 18, -1, sizeof(::ElementPosition)},
   { 25, -1, sizeof(::GameElement)},
   { 37, -1, sizeof(::GameUpdate)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_Ball_default_instance_),
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_Paddle_default_instance_),
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_Brick_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_NetBall_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_NetPaddle_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_NetBrick_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_ElementPosition_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_GameElement_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_GameUpdate_default_instance_),
 };
 
 const char descriptor_table_protodef_arkanoid_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\016arkanoid.proto\".\n\004Ball\022\022\n\nvelocity_x\030\001"
-  " \001(\002\022\022\n\nvelocity_y\030\002 \001(\002\"\010\n\006Paddle\"\031\n\005Br"
-  "ick\022\020\n\010duration\030\001 \001(\005\"\'\n\017ElementPosition"
-  "\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\"\270\001\n\013GameElement\022\n"
-  "\n\002id\030\001 \001(\005\022\032\n\004type\030\002 \001(\0162\014.ElementType\022*"
-  "\n\020element_position\030\003 \001(\0132\020.ElementPositi"
-  "on\022\025\n\004ball\030\005 \001(\0132\005.BallH\000\022\031\n\006paddle\030\006 \001("
-  "\0132\007.PaddleH\000\022\027\n\005brick\030\007 \001(\0132\006.BrickH\000B\n\n"
-  "\010specific\"+\n\nGameUpdate\022\035\n\007element\030\001 \003(\013"
-  "2\014.GameElement*.\n\013ElementType\022\010\n\004BALL\020\000\022"
-  "\n\n\006PADDLE\020\001\022\t\n\005BRICK\020\002b\006proto3"
+  "\n\016arkanoid.proto\"1\n\007NetBall\022\022\n\nvelocity_"
+  "x\030\001 \001(\002\022\022\n\nvelocity_y\030\002 \001(\002\"\013\n\tNetPaddle"
+  "\"\034\n\010NetBrick\022\020\n\010duration\030\001 \001(\005\"\'\n\017Elemen"
+  "tPosition\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\"\301\001\n\013Game"
+  "Element\022\n\n\002id\030\001 \001(\005\022\032\n\004type\030\002 \001(\0162\014.Elem"
+  "entType\022*\n\020element_position\030\003 \001(\0132\020.Elem"
+  "entPosition\022\030\n\004ball\030\005 \001(\0132\010.NetBallH\000\022\034\n"
+  "\006paddle\030\006 \001(\0132\n.NetPaddleH\000\022\032\n\005brick\030\007 \001"
+  "(\0132\t.NetBrickH\000B\n\n\010specific\"+\n\nGameUpdat"
+  "e\022\035\n\007element\030\001 \003(\0132\014.GameElement*.\n\013Elem"
+  "entType\022\010\n\004BALL\020\000\022\n\n\006PADDLE\020\001\022\t\n\005BRICK\020\002"
+  "b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_arkanoid_2eproto_deps[1] = {
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_arkanoid_2eproto_sccs[6] = {
-  &scc_info_Ball_arkanoid_2eproto.base,
-  &scc_info_Brick_arkanoid_2eproto.base,
   &scc_info_ElementPosition_arkanoid_2eproto.base,
   &scc_info_GameElement_arkanoid_2eproto.base,
   &scc_info_GameUpdate_arkanoid_2eproto.base,
-  &scc_info_Paddle_arkanoid_2eproto.base,
+  &scc_info_NetBall_arkanoid_2eproto.base,
+  &scc_info_NetBrick_arkanoid_2eproto.base,
+  &scc_info_NetPaddle_arkanoid_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_arkanoid_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_arkanoid_2eproto = {
-  false, false, descriptor_table_protodef_arkanoid_2eproto, "arkanoid.proto", 430,
+  false, false, descriptor_table_protodef_arkanoid_2eproto, "arkanoid.proto", 448,
   &descriptor_table_arkanoid_2eproto_once, descriptor_table_arkanoid_2eproto_sccs, descriptor_table_arkanoid_2eproto_deps, 6, 0,
   schemas, file_default_instances, TableStruct_arkanoid_2eproto::offsets,
   file_level_metadata_arkanoid_2eproto, 6, file_level_enum_descriptors_arkanoid_2eproto, file_level_service_descriptors_arkanoid_2eproto,
@@ -253,60 +254,60 @@ bool ElementType_IsValid(int value) {
 
 // ===================================================================
 
-void Ball::InitAsDefaultInstance() {
+void NetBall::InitAsDefaultInstance() {
 }
-class Ball::_Internal {
+class NetBall::_Internal {
  public:
 };
 
-Ball::Ball(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+NetBall::NetBall(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:Ball)
+  // @@protoc_insertion_point(arena_constructor:NetBall)
 }
-Ball::Ball(const Ball& from)
+NetBall::NetBall(const NetBall& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::memcpy(&velocity_x_, &from.velocity_x_,
     static_cast<size_t>(reinterpret_cast<char*>(&velocity_y_) -
     reinterpret_cast<char*>(&velocity_x_)) + sizeof(velocity_y_));
-  // @@protoc_insertion_point(copy_constructor:Ball)
+  // @@protoc_insertion_point(copy_constructor:NetBall)
 }
 
-void Ball::SharedCtor() {
+void NetBall::SharedCtor() {
   ::memset(&velocity_x_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&velocity_y_) -
       reinterpret_cast<char*>(&velocity_x_)) + sizeof(velocity_y_));
 }
 
-Ball::~Ball() {
-  // @@protoc_insertion_point(destructor:Ball)
+NetBall::~NetBall() {
+  // @@protoc_insertion_point(destructor:NetBall)
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void Ball::SharedDtor() {
+void NetBall::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
 }
 
-void Ball::ArenaDtor(void* object) {
-  Ball* _this = reinterpret_cast< Ball* >(object);
+void NetBall::ArenaDtor(void* object) {
+  NetBall* _this = reinterpret_cast< NetBall* >(object);
   (void)_this;
 }
-void Ball::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+void NetBall::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
 }
-void Ball::SetCachedSize(int size) const {
+void NetBall::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const Ball& Ball::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Ball_arkanoid_2eproto.base);
+const NetBall& NetBall::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_NetBall_arkanoid_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void Ball::Clear() {
-// @@protoc_insertion_point(message_clear_start:Ball)
+void NetBall::Clear() {
+// @@protoc_insertion_point(message_clear_start:NetBall)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -317,7 +318,7 @@ void Ball::Clear() {
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* Ball::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* NetBall::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
@@ -361,9 +362,9 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* Ball::_InternalSerialize(
+::PROTOBUF_NAMESPACE_ID::uint8* NetBall::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:Ball)
+  // @@protoc_insertion_point(serialize_to_array_start:NetBall)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -383,12 +384,12 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:Ball)
+  // @@protoc_insertion_point(serialize_to_array_end:NetBall)
   return target;
 }
 
-size_t Ball::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:Ball)
+size_t NetBall::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:NetBall)
   size_t total_size = 0;
 
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -414,23 +415,23 @@ size_t Ball::ByteSizeLong() const {
   return total_size;
 }
 
-void Ball::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:Ball)
+void NetBall::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:NetBall)
   GOOGLE_DCHECK_NE(&from, this);
-  const Ball* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Ball>(
+  const NetBall* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<NetBall>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:Ball)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:NetBall)
     ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:Ball)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:NetBall)
     MergeFrom(*source);
   }
 }
 
-void Ball::MergeFrom(const Ball& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:Ball)
+void NetBall::MergeFrom(const NetBall& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:NetBall)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -444,90 +445,90 @@ void Ball::MergeFrom(const Ball& from) {
   }
 }
 
-void Ball::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:Ball)
+void NetBall::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:NetBall)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void Ball::CopyFrom(const Ball& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:Ball)
+void NetBall::CopyFrom(const NetBall& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:NetBall)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool Ball::IsInitialized() const {
+bool NetBall::IsInitialized() const {
   return true;
 }
 
-void Ball::InternalSwap(Ball* other) {
+void NetBall::InternalSwap(NetBall* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(Ball, velocity_y_)
-      + sizeof(Ball::velocity_y_)
-      - PROTOBUF_FIELD_OFFSET(Ball, velocity_x_)>(
+      PROTOBUF_FIELD_OFFSET(NetBall, velocity_y_)
+      + sizeof(NetBall::velocity_y_)
+      - PROTOBUF_FIELD_OFFSET(NetBall, velocity_x_)>(
           reinterpret_cast<char*>(&velocity_x_),
           reinterpret_cast<char*>(&other->velocity_x_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata Ball::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata NetBall::GetMetadata() const {
   return GetMetadataStatic();
 }
 
 
 // ===================================================================
 
-void Paddle::InitAsDefaultInstance() {
+void NetPaddle::InitAsDefaultInstance() {
 }
-class Paddle::_Internal {
+class NetPaddle::_Internal {
  public:
 };
 
-Paddle::Paddle(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+NetPaddle::NetPaddle(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:Paddle)
+  // @@protoc_insertion_point(arena_constructor:NetPaddle)
 }
-Paddle::Paddle(const Paddle& from)
+NetPaddle::NetPaddle(const NetPaddle& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:Paddle)
+  // @@protoc_insertion_point(copy_constructor:NetPaddle)
 }
 
-void Paddle::SharedCtor() {
+void NetPaddle::SharedCtor() {
 }
 
-Paddle::~Paddle() {
-  // @@protoc_insertion_point(destructor:Paddle)
+NetPaddle::~NetPaddle() {
+  // @@protoc_insertion_point(destructor:NetPaddle)
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void Paddle::SharedDtor() {
+void NetPaddle::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
 }
 
-void Paddle::ArenaDtor(void* object) {
-  Paddle* _this = reinterpret_cast< Paddle* >(object);
+void NetPaddle::ArenaDtor(void* object) {
+  NetPaddle* _this = reinterpret_cast< NetPaddle* >(object);
   (void)_this;
 }
-void Paddle::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+void NetPaddle::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
 }
-void Paddle::SetCachedSize(int size) const {
+void NetPaddle::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const Paddle& Paddle::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Paddle_arkanoid_2eproto.base);
+const NetPaddle& NetPaddle::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_NetPaddle_arkanoid_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void Paddle::Clear() {
-// @@protoc_insertion_point(message_clear_start:Paddle)
+void NetPaddle::Clear() {
+// @@protoc_insertion_point(message_clear_start:NetPaddle)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -535,7 +536,7 @@ void Paddle::Clear() {
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* Paddle::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* NetPaddle::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
@@ -560,9 +561,9 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* Paddle::_InternalSerialize(
+::PROTOBUF_NAMESPACE_ID::uint8* NetPaddle::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:Paddle)
+  // @@protoc_insertion_point(serialize_to_array_start:NetPaddle)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -570,12 +571,12 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:Paddle)
+  // @@protoc_insertion_point(serialize_to_array_end:NetPaddle)
   return target;
 }
 
-size_t Paddle::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:Paddle)
+size_t NetPaddle::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:NetPaddle)
   size_t total_size = 0;
 
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -591,23 +592,23 @@ size_t Paddle::ByteSizeLong() const {
   return total_size;
 }
 
-void Paddle::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:Paddle)
+void NetPaddle::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:NetPaddle)
   GOOGLE_DCHECK_NE(&from, this);
-  const Paddle* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Paddle>(
+  const NetPaddle* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<NetPaddle>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:Paddle)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:NetPaddle)
     ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:Paddle)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:NetPaddle)
     MergeFrom(*source);
   }
 }
 
-void Paddle::MergeFrom(const Paddle& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:Paddle)
+void NetPaddle::MergeFrom(const NetPaddle& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:NetPaddle)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -615,86 +616,86 @@ void Paddle::MergeFrom(const Paddle& from) {
 
 }
 
-void Paddle::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:Paddle)
+void NetPaddle::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:NetPaddle)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void Paddle::CopyFrom(const Paddle& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:Paddle)
+void NetPaddle::CopyFrom(const NetPaddle& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:NetPaddle)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool Paddle::IsInitialized() const {
+bool NetPaddle::IsInitialized() const {
   return true;
 }
 
-void Paddle::InternalSwap(Paddle* other) {
+void NetPaddle::InternalSwap(NetPaddle* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata Paddle::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata NetPaddle::GetMetadata() const {
   return GetMetadataStatic();
 }
 
 
 // ===================================================================
 
-void Brick::InitAsDefaultInstance() {
+void NetBrick::InitAsDefaultInstance() {
 }
-class Brick::_Internal {
+class NetBrick::_Internal {
  public:
 };
 
-Brick::Brick(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+NetBrick::NetBrick(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:Brick)
+  // @@protoc_insertion_point(arena_constructor:NetBrick)
 }
-Brick::Brick(const Brick& from)
+NetBrick::NetBrick(const NetBrick& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   duration_ = from.duration_;
-  // @@protoc_insertion_point(copy_constructor:Brick)
+  // @@protoc_insertion_point(copy_constructor:NetBrick)
 }
 
-void Brick::SharedCtor() {
+void NetBrick::SharedCtor() {
   duration_ = 0;
 }
 
-Brick::~Brick() {
-  // @@protoc_insertion_point(destructor:Brick)
+NetBrick::~NetBrick() {
+  // @@protoc_insertion_point(destructor:NetBrick)
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void Brick::SharedDtor() {
+void NetBrick::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
 }
 
-void Brick::ArenaDtor(void* object) {
-  Brick* _this = reinterpret_cast< Brick* >(object);
+void NetBrick::ArenaDtor(void* object) {
+  NetBrick* _this = reinterpret_cast< NetBrick* >(object);
   (void)_this;
 }
-void Brick::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+void NetBrick::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
 }
-void Brick::SetCachedSize(int size) const {
+void NetBrick::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const Brick& Brick::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Brick_arkanoid_2eproto.base);
+const NetBrick& NetBrick::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_NetBrick_arkanoid_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void Brick::Clear() {
-// @@protoc_insertion_point(message_clear_start:Brick)
+void NetBrick::Clear() {
+// @@protoc_insertion_point(message_clear_start:NetBrick)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -703,7 +704,7 @@ void Brick::Clear() {
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* Brick::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* NetBrick::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
@@ -740,9 +741,9 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* Brick::_InternalSerialize(
+::PROTOBUF_NAMESPACE_ID::uint8* NetBrick::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:Brick)
+  // @@protoc_insertion_point(serialize_to_array_start:NetBrick)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -756,12 +757,12 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:Brick)
+  // @@protoc_insertion_point(serialize_to_array_end:NetBrick)
   return target;
 }
 
-size_t Brick::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:Brick)
+size_t NetBrick::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:NetBrick)
   size_t total_size = 0;
 
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -784,23 +785,23 @@ size_t Brick::ByteSizeLong() const {
   return total_size;
 }
 
-void Brick::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:Brick)
+void NetBrick::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:NetBrick)
   GOOGLE_DCHECK_NE(&from, this);
-  const Brick* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Brick>(
+  const NetBrick* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<NetBrick>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:Brick)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:NetBrick)
     ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:Brick)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:NetBrick)
     MergeFrom(*source);
   }
 }
 
-void Brick::MergeFrom(const Brick& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:Brick)
+void NetBrick::MergeFrom(const NetBrick& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:NetBrick)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -811,31 +812,31 @@ void Brick::MergeFrom(const Brick& from) {
   }
 }
 
-void Brick::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:Brick)
+void NetBrick::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:NetBrick)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void Brick::CopyFrom(const Brick& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:Brick)
+void NetBrick::CopyFrom(const NetBrick& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:NetBrick)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool Brick::IsInitialized() const {
+bool NetBrick::IsInitialized() const {
   return true;
 }
 
-void Brick::InternalSwap(Brick* other) {
+void NetBrick::InternalSwap(NetBrick* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   swap(duration_, other->duration_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata Brick::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata NetBrick::GetMetadata() const {
   return GetMetadataStatic();
 }
 
@@ -1072,38 +1073,38 @@ void ElementPosition::InternalSwap(ElementPosition* other) {
 void GameElement::InitAsDefaultInstance() {
   ::_GameElement_default_instance_._instance.get_mutable()->element_position_ = const_cast< ::ElementPosition*>(
       ::ElementPosition::internal_default_instance());
-  ::_GameElement_default_instance_.ball_ = const_cast< ::Ball*>(
-      ::Ball::internal_default_instance());
-  ::_GameElement_default_instance_.paddle_ = const_cast< ::Paddle*>(
-      ::Paddle::internal_default_instance());
-  ::_GameElement_default_instance_.brick_ = const_cast< ::Brick*>(
-      ::Brick::internal_default_instance());
+  ::_GameElement_default_instance_.ball_ = const_cast< ::NetBall*>(
+      ::NetBall::internal_default_instance());
+  ::_GameElement_default_instance_.paddle_ = const_cast< ::NetPaddle*>(
+      ::NetPaddle::internal_default_instance());
+  ::_GameElement_default_instance_.brick_ = const_cast< ::NetBrick*>(
+      ::NetBrick::internal_default_instance());
 }
 class GameElement::_Internal {
  public:
   static const ::ElementPosition& element_position(const GameElement* msg);
-  static const ::Ball& ball(const GameElement* msg);
-  static const ::Paddle& paddle(const GameElement* msg);
-  static const ::Brick& brick(const GameElement* msg);
+  static const ::NetBall& ball(const GameElement* msg);
+  static const ::NetPaddle& paddle(const GameElement* msg);
+  static const ::NetBrick& brick(const GameElement* msg);
 };
 
 const ::ElementPosition&
 GameElement::_Internal::element_position(const GameElement* msg) {
   return *msg->element_position_;
 }
-const ::Ball&
+const ::NetBall&
 GameElement::_Internal::ball(const GameElement* msg) {
   return *msg->specific_.ball_;
 }
-const ::Paddle&
+const ::NetPaddle&
 GameElement::_Internal::paddle(const GameElement* msg) {
   return *msg->specific_.paddle_;
 }
-const ::Brick&
+const ::NetBrick&
 GameElement::_Internal::brick(const GameElement* msg) {
   return *msg->specific_.brick_;
 }
-void GameElement::set_allocated_ball(::Ball* ball) {
+void GameElement::set_allocated_ball(::NetBall* ball) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
   clear_specific();
   if (ball) {
@@ -1118,7 +1119,7 @@ void GameElement::set_allocated_ball(::Ball* ball) {
   }
   // @@protoc_insertion_point(field_set_allocated:GameElement.ball)
 }
-void GameElement::set_allocated_paddle(::Paddle* paddle) {
+void GameElement::set_allocated_paddle(::NetPaddle* paddle) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
   clear_specific();
   if (paddle) {
@@ -1133,7 +1134,7 @@ void GameElement::set_allocated_paddle(::Paddle* paddle) {
   }
   // @@protoc_insertion_point(field_set_allocated:GameElement.paddle)
 }
-void GameElement::set_allocated_brick(::Brick* brick) {
+void GameElement::set_allocated_brick(::NetBrick* brick) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
   clear_specific();
   if (brick) {
@@ -1168,15 +1169,15 @@ GameElement::GameElement(const GameElement& from)
   clear_has_specific();
   switch (from.specific_case()) {
     case kBall: {
-      _internal_mutable_ball()->::Ball::MergeFrom(from._internal_ball());
+      _internal_mutable_ball()->::NetBall::MergeFrom(from._internal_ball());
       break;
     }
     case kPaddle: {
-      _internal_mutable_paddle()->::Paddle::MergeFrom(from._internal_paddle());
+      _internal_mutable_paddle()->::NetPaddle::MergeFrom(from._internal_paddle());
       break;
     }
     case kBrick: {
-      _internal_mutable_brick()->::Brick::MergeFrom(from._internal_brick());
+      _internal_mutable_brick()->::NetBrick::MergeFrom(from._internal_brick());
       break;
     }
     case SPECIFIC_NOT_SET: {
@@ -1299,21 +1300,21 @@ const char* GameElement::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .Ball ball = 5;
+      // .NetBall ball = 5;
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
           ptr = ctx->ParseMessage(_internal_mutable_ball(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .Paddle paddle = 6;
+      // .NetPaddle paddle = 6;
       case 6:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
           ptr = ctx->ParseMessage(_internal_mutable_paddle(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .Brick brick = 7;
+      // .NetBrick brick = 7;
       case 7:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
           ptr = ctx->ParseMessage(_internal_mutable_brick(), ptr);
@@ -1369,7 +1370,7 @@ failure:
         3, _Internal::element_position(this), target, stream);
   }
 
-  // .Ball ball = 5;
+  // .NetBall ball = 5;
   if (_internal_has_ball()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
@@ -1377,7 +1378,7 @@ failure:
         5, _Internal::ball(this), target, stream);
   }
 
-  // .Paddle paddle = 6;
+  // .NetPaddle paddle = 6;
   if (_internal_has_paddle()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
@@ -1385,7 +1386,7 @@ failure:
         6, _Internal::paddle(this), target, stream);
   }
 
-  // .Brick brick = 7;
+  // .NetBrick brick = 7;
   if (_internal_has_brick()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
@@ -1430,21 +1431,21 @@ size_t GameElement::ByteSizeLong() const {
   }
 
   switch (specific_case()) {
-    // .Ball ball = 5;
+    // .NetBall ball = 5;
     case kBall: {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
           *specific_.ball_);
       break;
     }
-    // .Paddle paddle = 6;
+    // .NetPaddle paddle = 6;
     case kPaddle: {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
           *specific_.paddle_);
       break;
     }
-    // .Brick brick = 7;
+    // .NetBrick brick = 7;
     case kBrick: {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
@@ -1497,15 +1498,15 @@ void GameElement::MergeFrom(const GameElement& from) {
   }
   switch (from.specific_case()) {
     case kBall: {
-      _internal_mutable_ball()->::Ball::MergeFrom(from._internal_ball());
+      _internal_mutable_ball()->::NetBall::MergeFrom(from._internal_ball());
       break;
     }
     case kPaddle: {
-      _internal_mutable_paddle()->::Paddle::MergeFrom(from._internal_paddle());
+      _internal_mutable_paddle()->::NetPaddle::MergeFrom(from._internal_paddle());
       break;
     }
     case kBrick: {
-      _internal_mutable_brick()->::Brick::MergeFrom(from._internal_brick());
+      _internal_mutable_brick()->::NetBrick::MergeFrom(from._internal_brick());
       break;
     }
     case SPECIFIC_NOT_SET: {
@@ -1755,14 +1756,14 @@ void GameUpdate::InternalSwap(GameUpdate* other) {
 
 // @@protoc_insertion_point(namespace_scope)
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::Ball* Arena::CreateMaybeMessage< ::Ball >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::Ball >(arena);
+template<> PROTOBUF_NOINLINE ::NetBall* Arena::CreateMaybeMessage< ::NetBall >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::NetBall >(arena);
 }
-template<> PROTOBUF_NOINLINE ::Paddle* Arena::CreateMaybeMessage< ::Paddle >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::Paddle >(arena);
+template<> PROTOBUF_NOINLINE ::NetPaddle* Arena::CreateMaybeMessage< ::NetPaddle >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::NetPaddle >(arena);
 }
-template<> PROTOBUF_NOINLINE ::Brick* Arena::CreateMaybeMessage< ::Brick >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::Brick >(arena);
+template<> PROTOBUF_NOINLINE ::NetBrick* Arena::CreateMaybeMessage< ::NetBrick >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::NetBrick >(arena);
 }
 template<> PROTOBUF_NOINLINE ::ElementPosition* Arena::CreateMaybeMessage< ::ElementPosition >(Arena* arena) {
   return Arena::CreateMessageInternal< ::ElementPosition >(arena);

@@ -55,12 +55,6 @@ struct TableStruct_arkanoid_2eproto {
   static const ::PROTOBUF_NAMESPACE_ID::uint32 offsets[];
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_arkanoid_2eproto;
-class Ball;
-class BallDefaultTypeInternal;
-extern BallDefaultTypeInternal _Ball_default_instance_;
-class Brick;
-class BrickDefaultTypeInternal;
-extern BrickDefaultTypeInternal _Brick_default_instance_;
 class ElementPosition;
 class ElementPositionDefaultTypeInternal;
 extern ElementPositionDefaultTypeInternal _ElementPosition_default_instance_;
@@ -70,16 +64,22 @@ extern GameElementDefaultTypeInternal _GameElement_default_instance_;
 class GameUpdate;
 class GameUpdateDefaultTypeInternal;
 extern GameUpdateDefaultTypeInternal _GameUpdate_default_instance_;
-class Paddle;
-class PaddleDefaultTypeInternal;
-extern PaddleDefaultTypeInternal _Paddle_default_instance_;
+class NetBall;
+class NetBallDefaultTypeInternal;
+extern NetBallDefaultTypeInternal _NetBall_default_instance_;
+class NetBrick;
+class NetBrickDefaultTypeInternal;
+extern NetBrickDefaultTypeInternal _NetBrick_default_instance_;
+class NetPaddle;
+class NetPaddleDefaultTypeInternal;
+extern NetPaddleDefaultTypeInternal _NetPaddle_default_instance_;
 PROTOBUF_NAMESPACE_OPEN
-template<> ::Ball* Arena::CreateMaybeMessage<::Ball>(Arena*);
-template<> ::Brick* Arena::CreateMaybeMessage<::Brick>(Arena*);
 template<> ::ElementPosition* Arena::CreateMaybeMessage<::ElementPosition>(Arena*);
 template<> ::GameElement* Arena::CreateMaybeMessage<::GameElement>(Arena*);
 template<> ::GameUpdate* Arena::CreateMaybeMessage<::GameUpdate>(Arena*);
-template<> ::Paddle* Arena::CreateMaybeMessage<::Paddle>(Arena*);
+template<> ::NetBall* Arena::CreateMaybeMessage<::NetBall>(Arena*);
+template<> ::NetBrick* Arena::CreateMaybeMessage<::NetBrick>(Arena*);
+template<> ::NetPaddle* Arena::CreateMaybeMessage<::NetPaddle>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 
 enum ElementType : int {
@@ -110,23 +110,23 @@ inline bool ElementType_Parse(
 }
 // ===================================================================
 
-class Ball PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Ball) */ {
+class NetBall PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:NetBall) */ {
  public:
-  inline Ball() : Ball(nullptr) {};
-  virtual ~Ball();
+  inline NetBall() : NetBall(nullptr) {};
+  virtual ~NetBall();
 
-  Ball(const Ball& from);
-  Ball(Ball&& from) noexcept
-    : Ball() {
+  NetBall(const NetBall& from);
+  NetBall(NetBall&& from) noexcept
+    : NetBall() {
     *this = ::std::move(from);
   }
 
-  inline Ball& operator=(const Ball& from) {
+  inline NetBall& operator=(const NetBall& from) {
     CopyFrom(from);
     return *this;
   }
-  inline Ball& operator=(Ball&& from) noexcept {
+  inline NetBall& operator=(NetBall&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -144,20 +144,20 @@ class Ball PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const Ball& default_instance();
+  static const NetBall& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Ball* internal_default_instance() {
-    return reinterpret_cast<const Ball*>(
-               &_Ball_default_instance_);
+  static inline const NetBall* internal_default_instance() {
+    return reinterpret_cast<const NetBall*>(
+               &_NetBall_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     0;
 
-  friend void swap(Ball& a, Ball& b) {
+  friend void swap(NetBall& a, NetBall& b) {
     a.Swap(&b);
   }
-  inline void Swap(Ball* other) {
+  inline void Swap(NetBall* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -165,7 +165,7 @@ class Ball PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(Ball* other) {
+  void UnsafeArenaSwap(NetBall* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -173,17 +173,17 @@ class Ball PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline Ball* New() const final {
-    return CreateMaybeMessage<Ball>(nullptr);
+  inline NetBall* New() const final {
+    return CreateMaybeMessage<NetBall>(nullptr);
   }
 
-  Ball* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<Ball>(arena);
+  NetBall* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<NetBall>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const Ball& from);
-  void MergeFrom(const Ball& from);
+  void CopyFrom(const NetBall& from);
+  void MergeFrom(const NetBall& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -197,13 +197,13 @@ class Ball PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(Ball* other);
+  void InternalSwap(NetBall* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "Ball";
+    return "NetBall";
   }
   protected:
-  explicit Ball(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit NetBall(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -244,7 +244,7 @@ class Ball PROTOBUF_FINAL :
   void _internal_set_velocity_y(float value);
   public:
 
-  // @@protoc_insertion_point(class_scope:Ball)
+  // @@protoc_insertion_point(class_scope:NetBall)
  private:
   class _Internal;
 
@@ -258,23 +258,23 @@ class Ball PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
-class Paddle PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Paddle) */ {
+class NetPaddle PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:NetPaddle) */ {
  public:
-  inline Paddle() : Paddle(nullptr) {};
-  virtual ~Paddle();
+  inline NetPaddle() : NetPaddle(nullptr) {};
+  virtual ~NetPaddle();
 
-  Paddle(const Paddle& from);
-  Paddle(Paddle&& from) noexcept
-    : Paddle() {
+  NetPaddle(const NetPaddle& from);
+  NetPaddle(NetPaddle&& from) noexcept
+    : NetPaddle() {
     *this = ::std::move(from);
   }
 
-  inline Paddle& operator=(const Paddle& from) {
+  inline NetPaddle& operator=(const NetPaddle& from) {
     CopyFrom(from);
     return *this;
   }
-  inline Paddle& operator=(Paddle&& from) noexcept {
+  inline NetPaddle& operator=(NetPaddle&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -292,20 +292,20 @@ class Paddle PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const Paddle& default_instance();
+  static const NetPaddle& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Paddle* internal_default_instance() {
-    return reinterpret_cast<const Paddle*>(
-               &_Paddle_default_instance_);
+  static inline const NetPaddle* internal_default_instance() {
+    return reinterpret_cast<const NetPaddle*>(
+               &_NetPaddle_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     1;
 
-  friend void swap(Paddle& a, Paddle& b) {
+  friend void swap(NetPaddle& a, NetPaddle& b) {
     a.Swap(&b);
   }
-  inline void Swap(Paddle* other) {
+  inline void Swap(NetPaddle* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -313,7 +313,7 @@ class Paddle PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(Paddle* other) {
+  void UnsafeArenaSwap(NetPaddle* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -321,17 +321,17 @@ class Paddle PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline Paddle* New() const final {
-    return CreateMaybeMessage<Paddle>(nullptr);
+  inline NetPaddle* New() const final {
+    return CreateMaybeMessage<NetPaddle>(nullptr);
   }
 
-  Paddle* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<Paddle>(arena);
+  NetPaddle* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<NetPaddle>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const Paddle& from);
-  void MergeFrom(const Paddle& from);
+  void CopyFrom(const NetPaddle& from);
+  void MergeFrom(const NetPaddle& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -345,13 +345,13 @@ class Paddle PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(Paddle* other);
+  void InternalSwap(NetPaddle* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "Paddle";
+    return "NetPaddle";
   }
   protected:
-  explicit Paddle(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit NetPaddle(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -370,7 +370,7 @@ class Paddle PROTOBUF_FINAL :
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:Paddle)
+  // @@protoc_insertion_point(class_scope:NetPaddle)
  private:
   class _Internal;
 
@@ -382,23 +382,23 @@ class Paddle PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
-class Brick PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Brick) */ {
+class NetBrick PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:NetBrick) */ {
  public:
-  inline Brick() : Brick(nullptr) {};
-  virtual ~Brick();
+  inline NetBrick() : NetBrick(nullptr) {};
+  virtual ~NetBrick();
 
-  Brick(const Brick& from);
-  Brick(Brick&& from) noexcept
-    : Brick() {
+  NetBrick(const NetBrick& from);
+  NetBrick(NetBrick&& from) noexcept
+    : NetBrick() {
     *this = ::std::move(from);
   }
 
-  inline Brick& operator=(const Brick& from) {
+  inline NetBrick& operator=(const NetBrick& from) {
     CopyFrom(from);
     return *this;
   }
-  inline Brick& operator=(Brick&& from) noexcept {
+  inline NetBrick& operator=(NetBrick&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -416,20 +416,20 @@ class Brick PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const Brick& default_instance();
+  static const NetBrick& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Brick* internal_default_instance() {
-    return reinterpret_cast<const Brick*>(
-               &_Brick_default_instance_);
+  static inline const NetBrick* internal_default_instance() {
+    return reinterpret_cast<const NetBrick*>(
+               &_NetBrick_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     2;
 
-  friend void swap(Brick& a, Brick& b) {
+  friend void swap(NetBrick& a, NetBrick& b) {
     a.Swap(&b);
   }
-  inline void Swap(Brick* other) {
+  inline void Swap(NetBrick* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -437,7 +437,7 @@ class Brick PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(Brick* other) {
+  void UnsafeArenaSwap(NetBrick* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -445,17 +445,17 @@ class Brick PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline Brick* New() const final {
-    return CreateMaybeMessage<Brick>(nullptr);
+  inline NetBrick* New() const final {
+    return CreateMaybeMessage<NetBrick>(nullptr);
   }
 
-  Brick* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<Brick>(arena);
+  NetBrick* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<NetBrick>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const Brick& from);
-  void MergeFrom(const Brick& from);
+  void CopyFrom(const NetBrick& from);
+  void MergeFrom(const NetBrick& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -469,13 +469,13 @@ class Brick PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(Brick* other);
+  void InternalSwap(NetBrick* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "Brick";
+    return "NetBrick";
   }
   protected:
-  explicit Brick(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit NetBrick(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -506,7 +506,7 @@ class Brick PROTOBUF_FINAL :
   void _internal_set_duration(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
-  // @@protoc_insertion_point(class_scope:Brick)
+  // @@protoc_insertion_point(class_scope:NetBrick)
  private:
   class _Internal;
 
@@ -830,59 +830,59 @@ class GameElement PROTOBUF_FINAL :
   void _internal_set_type(::ElementType value);
   public:
 
-  // .Ball ball = 5;
+  // .NetBall ball = 5;
   bool has_ball() const;
   private:
   bool _internal_has_ball() const;
   public:
   void clear_ball();
-  const ::Ball& ball() const;
-  ::Ball* release_ball();
-  ::Ball* mutable_ball();
-  void set_allocated_ball(::Ball* ball);
+  const ::NetBall& ball() const;
+  ::NetBall* release_ball();
+  ::NetBall* mutable_ball();
+  void set_allocated_ball(::NetBall* ball);
   private:
-  const ::Ball& _internal_ball() const;
-  ::Ball* _internal_mutable_ball();
+  const ::NetBall& _internal_ball() const;
+  ::NetBall* _internal_mutable_ball();
   public:
   void unsafe_arena_set_allocated_ball(
-      ::Ball* ball);
-  ::Ball* unsafe_arena_release_ball();
+      ::NetBall* ball);
+  ::NetBall* unsafe_arena_release_ball();
 
-  // .Paddle paddle = 6;
+  // .NetPaddle paddle = 6;
   bool has_paddle() const;
   private:
   bool _internal_has_paddle() const;
   public:
   void clear_paddle();
-  const ::Paddle& paddle() const;
-  ::Paddle* release_paddle();
-  ::Paddle* mutable_paddle();
-  void set_allocated_paddle(::Paddle* paddle);
+  const ::NetPaddle& paddle() const;
+  ::NetPaddle* release_paddle();
+  ::NetPaddle* mutable_paddle();
+  void set_allocated_paddle(::NetPaddle* paddle);
   private:
-  const ::Paddle& _internal_paddle() const;
-  ::Paddle* _internal_mutable_paddle();
+  const ::NetPaddle& _internal_paddle() const;
+  ::NetPaddle* _internal_mutable_paddle();
   public:
   void unsafe_arena_set_allocated_paddle(
-      ::Paddle* paddle);
-  ::Paddle* unsafe_arena_release_paddle();
+      ::NetPaddle* paddle);
+  ::NetPaddle* unsafe_arena_release_paddle();
 
-  // .Brick brick = 7;
+  // .NetBrick brick = 7;
   bool has_brick() const;
   private:
   bool _internal_has_brick() const;
   public:
   void clear_brick();
-  const ::Brick& brick() const;
-  ::Brick* release_brick();
-  ::Brick* mutable_brick();
-  void set_allocated_brick(::Brick* brick);
+  const ::NetBrick& brick() const;
+  ::NetBrick* release_brick();
+  ::NetBrick* mutable_brick();
+  void set_allocated_brick(::NetBrick* brick);
   private:
-  const ::Brick& _internal_brick() const;
-  ::Brick* _internal_mutable_brick();
+  const ::NetBrick& _internal_brick() const;
+  ::NetBrick* _internal_mutable_brick();
   public:
   void unsafe_arena_set_allocated_brick(
-      ::Brick* brick);
-  ::Brick* unsafe_arena_release_brick();
+      ::NetBrick* brick);
+  ::NetBrick* unsafe_arena_release_brick();
 
   void clear_specific();
   SpecificCase specific_case() const;
@@ -904,9 +904,9 @@ class GameElement PROTOBUF_FINAL :
   int type_;
   union SpecificUnion {
     SpecificUnion() {}
-    ::Ball* ball_;
-    ::Paddle* paddle_;
-    ::Brick* brick_;
+    ::NetBall* ball_;
+    ::NetPaddle* paddle_;
+    ::NetBrick* brick_;
   } specific_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -1068,74 +1068,74 @@ class GameUpdate PROTOBUF_FINAL :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// Ball
+// NetBall
 
 // float velocity_x = 1;
-inline void Ball::clear_velocity_x() {
+inline void NetBall::clear_velocity_x() {
   velocity_x_ = 0;
 }
-inline float Ball::_internal_velocity_x() const {
+inline float NetBall::_internal_velocity_x() const {
   return velocity_x_;
 }
-inline float Ball::velocity_x() const {
-  // @@protoc_insertion_point(field_get:Ball.velocity_x)
+inline float NetBall::velocity_x() const {
+  // @@protoc_insertion_point(field_get:NetBall.velocity_x)
   return _internal_velocity_x();
 }
-inline void Ball::_internal_set_velocity_x(float value) {
+inline void NetBall::_internal_set_velocity_x(float value) {
   
   velocity_x_ = value;
 }
-inline void Ball::set_velocity_x(float value) {
+inline void NetBall::set_velocity_x(float value) {
   _internal_set_velocity_x(value);
-  // @@protoc_insertion_point(field_set:Ball.velocity_x)
+  // @@protoc_insertion_point(field_set:NetBall.velocity_x)
 }
 
 // float velocity_y = 2;
-inline void Ball::clear_velocity_y() {
+inline void NetBall::clear_velocity_y() {
   velocity_y_ = 0;
 }
-inline float Ball::_internal_velocity_y() const {
+inline float NetBall::_internal_velocity_y() const {
   return velocity_y_;
 }
-inline float Ball::velocity_y() const {
-  // @@protoc_insertion_point(field_get:Ball.velocity_y)
+inline float NetBall::velocity_y() const {
+  // @@protoc_insertion_point(field_get:NetBall.velocity_y)
   return _internal_velocity_y();
 }
-inline void Ball::_internal_set_velocity_y(float value) {
+inline void NetBall::_internal_set_velocity_y(float value) {
   
   velocity_y_ = value;
 }
-inline void Ball::set_velocity_y(float value) {
+inline void NetBall::set_velocity_y(float value) {
   _internal_set_velocity_y(value);
-  // @@protoc_insertion_point(field_set:Ball.velocity_y)
+  // @@protoc_insertion_point(field_set:NetBall.velocity_y)
 }
 
 // -------------------------------------------------------------------
 
-// Paddle
+// NetPaddle
 
 // -------------------------------------------------------------------
 
-// Brick
+// NetBrick
 
 // int32 duration = 1;
-inline void Brick::clear_duration() {
+inline void NetBrick::clear_duration() {
   duration_ = 0;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 Brick::_internal_duration() const {
+inline ::PROTOBUF_NAMESPACE_ID::int32 NetBrick::_internal_duration() const {
   return duration_;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 Brick::duration() const {
-  // @@protoc_insertion_point(field_get:Brick.duration)
+inline ::PROTOBUF_NAMESPACE_ID::int32 NetBrick::duration() const {
+  // @@protoc_insertion_point(field_get:NetBrick.duration)
   return _internal_duration();
 }
-inline void Brick::_internal_set_duration(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void NetBrick::_internal_set_duration(::PROTOBUF_NAMESPACE_ID::int32 value) {
   
   duration_ = value;
 }
-inline void Brick::set_duration(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void NetBrick::set_duration(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_duration(value);
-  // @@protoc_insertion_point(field_set:Brick.duration)
+  // @@protoc_insertion_point(field_set:NetBrick.duration)
 }
 
 // -------------------------------------------------------------------
@@ -1307,7 +1307,7 @@ inline void GameElement::set_allocated_element_position(::ElementPosition* eleme
   // @@protoc_insertion_point(field_set_allocated:GameElement.element_position)
 }
 
-// .Ball ball = 5;
+// .NetBall ball = 5;
 inline bool GameElement::_internal_has_ball() const {
   return specific_case() == kBall;
 }
@@ -1325,11 +1325,11 @@ inline void GameElement::clear_ball() {
     clear_has_specific();
   }
 }
-inline ::Ball* GameElement::release_ball() {
+inline ::NetBall* GameElement::release_ball() {
   // @@protoc_insertion_point(field_release:GameElement.ball)
   if (_internal_has_ball()) {
     clear_has_specific();
-      ::Ball* temp = specific_.ball_;
+      ::NetBall* temp = specific_.ball_;
     if (GetArena() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
@@ -1339,27 +1339,27 @@ inline ::Ball* GameElement::release_ball() {
     return nullptr;
   }
 }
-inline const ::Ball& GameElement::_internal_ball() const {
+inline const ::NetBall& GameElement::_internal_ball() const {
   return _internal_has_ball()
       ? *specific_.ball_
-      : *reinterpret_cast< ::Ball*>(&::_Ball_default_instance_);
+      : *reinterpret_cast< ::NetBall*>(&::_NetBall_default_instance_);
 }
-inline const ::Ball& GameElement::ball() const {
+inline const ::NetBall& GameElement::ball() const {
   // @@protoc_insertion_point(field_get:GameElement.ball)
   return _internal_ball();
 }
-inline ::Ball* GameElement::unsafe_arena_release_ball() {
+inline ::NetBall* GameElement::unsafe_arena_release_ball() {
   // @@protoc_insertion_point(field_unsafe_arena_release:GameElement.ball)
   if (_internal_has_ball()) {
     clear_has_specific();
-    ::Ball* temp = specific_.ball_;
+    ::NetBall* temp = specific_.ball_;
     specific_.ball_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void GameElement::unsafe_arena_set_allocated_ball(::Ball* ball) {
+inline void GameElement::unsafe_arena_set_allocated_ball(::NetBall* ball) {
   clear_specific();
   if (ball) {
     set_has_ball();
@@ -1367,20 +1367,20 @@ inline void GameElement::unsafe_arena_set_allocated_ball(::Ball* ball) {
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:GameElement.ball)
 }
-inline ::Ball* GameElement::_internal_mutable_ball() {
+inline ::NetBall* GameElement::_internal_mutable_ball() {
   if (!_internal_has_ball()) {
     clear_specific();
     set_has_ball();
-    specific_.ball_ = CreateMaybeMessage< ::Ball >(GetArena());
+    specific_.ball_ = CreateMaybeMessage< ::NetBall >(GetArena());
   }
   return specific_.ball_;
 }
-inline ::Ball* GameElement::mutable_ball() {
+inline ::NetBall* GameElement::mutable_ball() {
   // @@protoc_insertion_point(field_mutable:GameElement.ball)
   return _internal_mutable_ball();
 }
 
-// .Paddle paddle = 6;
+// .NetPaddle paddle = 6;
 inline bool GameElement::_internal_has_paddle() const {
   return specific_case() == kPaddle;
 }
@@ -1398,11 +1398,11 @@ inline void GameElement::clear_paddle() {
     clear_has_specific();
   }
 }
-inline ::Paddle* GameElement::release_paddle() {
+inline ::NetPaddle* GameElement::release_paddle() {
   // @@protoc_insertion_point(field_release:GameElement.paddle)
   if (_internal_has_paddle()) {
     clear_has_specific();
-      ::Paddle* temp = specific_.paddle_;
+      ::NetPaddle* temp = specific_.paddle_;
     if (GetArena() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
@@ -1412,27 +1412,27 @@ inline ::Paddle* GameElement::release_paddle() {
     return nullptr;
   }
 }
-inline const ::Paddle& GameElement::_internal_paddle() const {
+inline const ::NetPaddle& GameElement::_internal_paddle() const {
   return _internal_has_paddle()
       ? *specific_.paddle_
-      : *reinterpret_cast< ::Paddle*>(&::_Paddle_default_instance_);
+      : *reinterpret_cast< ::NetPaddle*>(&::_NetPaddle_default_instance_);
 }
-inline const ::Paddle& GameElement::paddle() const {
+inline const ::NetPaddle& GameElement::paddle() const {
   // @@protoc_insertion_point(field_get:GameElement.paddle)
   return _internal_paddle();
 }
-inline ::Paddle* GameElement::unsafe_arena_release_paddle() {
+inline ::NetPaddle* GameElement::unsafe_arena_release_paddle() {
   // @@protoc_insertion_point(field_unsafe_arena_release:GameElement.paddle)
   if (_internal_has_paddle()) {
     clear_has_specific();
-    ::Paddle* temp = specific_.paddle_;
+    ::NetPaddle* temp = specific_.paddle_;
     specific_.paddle_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void GameElement::unsafe_arena_set_allocated_paddle(::Paddle* paddle) {
+inline void GameElement::unsafe_arena_set_allocated_paddle(::NetPaddle* paddle) {
   clear_specific();
   if (paddle) {
     set_has_paddle();
@@ -1440,20 +1440,20 @@ inline void GameElement::unsafe_arena_set_allocated_paddle(::Paddle* paddle) {
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:GameElement.paddle)
 }
-inline ::Paddle* GameElement::_internal_mutable_paddle() {
+inline ::NetPaddle* GameElement::_internal_mutable_paddle() {
   if (!_internal_has_paddle()) {
     clear_specific();
     set_has_paddle();
-    specific_.paddle_ = CreateMaybeMessage< ::Paddle >(GetArena());
+    specific_.paddle_ = CreateMaybeMessage< ::NetPaddle >(GetArena());
   }
   return specific_.paddle_;
 }
-inline ::Paddle* GameElement::mutable_paddle() {
+inline ::NetPaddle* GameElement::mutable_paddle() {
   // @@protoc_insertion_point(field_mutable:GameElement.paddle)
   return _internal_mutable_paddle();
 }
 
-// .Brick brick = 7;
+// .NetBrick brick = 7;
 inline bool GameElement::_internal_has_brick() const {
   return specific_case() == kBrick;
 }
@@ -1471,11 +1471,11 @@ inline void GameElement::clear_brick() {
     clear_has_specific();
   }
 }
-inline ::Brick* GameElement::release_brick() {
+inline ::NetBrick* GameElement::release_brick() {
   // @@protoc_insertion_point(field_release:GameElement.brick)
   if (_internal_has_brick()) {
     clear_has_specific();
-      ::Brick* temp = specific_.brick_;
+      ::NetBrick* temp = specific_.brick_;
     if (GetArena() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
@@ -1485,27 +1485,27 @@ inline ::Brick* GameElement::release_brick() {
     return nullptr;
   }
 }
-inline const ::Brick& GameElement::_internal_brick() const {
+inline const ::NetBrick& GameElement::_internal_brick() const {
   return _internal_has_brick()
       ? *specific_.brick_
-      : *reinterpret_cast< ::Brick*>(&::_Brick_default_instance_);
+      : *reinterpret_cast< ::NetBrick*>(&::_NetBrick_default_instance_);
 }
-inline const ::Brick& GameElement::brick() const {
+inline const ::NetBrick& GameElement::brick() const {
   // @@protoc_insertion_point(field_get:GameElement.brick)
   return _internal_brick();
 }
-inline ::Brick* GameElement::unsafe_arena_release_brick() {
+inline ::NetBrick* GameElement::unsafe_arena_release_brick() {
   // @@protoc_insertion_point(field_unsafe_arena_release:GameElement.brick)
   if (_internal_has_brick()) {
     clear_has_specific();
-    ::Brick* temp = specific_.brick_;
+    ::NetBrick* temp = specific_.brick_;
     specific_.brick_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void GameElement::unsafe_arena_set_allocated_brick(::Brick* brick) {
+inline void GameElement::unsafe_arena_set_allocated_brick(::NetBrick* brick) {
   clear_specific();
   if (brick) {
     set_has_brick();
@@ -1513,15 +1513,15 @@ inline void GameElement::unsafe_arena_set_allocated_brick(::Brick* brick) {
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:GameElement.brick)
 }
-inline ::Brick* GameElement::_internal_mutable_brick() {
+inline ::NetBrick* GameElement::_internal_mutable_brick() {
   if (!_internal_has_brick()) {
     clear_specific();
     set_has_brick();
-    specific_.brick_ = CreateMaybeMessage< ::Brick >(GetArena());
+    specific_.brick_ = CreateMaybeMessage< ::NetBrick >(GetArena());
   }
   return specific_.brick_;
 }
-inline ::Brick* GameElement::mutable_brick() {
+inline ::NetBrick* GameElement::mutable_brick() {
   // @@protoc_insertion_point(field_mutable:GameElement.brick)
   return _internal_mutable_brick();
 }
