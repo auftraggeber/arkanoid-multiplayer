@@ -1068,24 +1068,35 @@ int main()
     }
 
     if (connection.has_connected()) {
-      int controlling_paddle_id{ -1 };
+      std::pair<Paddle *, Paddle *> paddle_ptrs{ nullptr, nullptr };
+
       int mouse_x{ paddle_position.x_i() };
       std::vector<arkanoid::Element *> updated_elements;
 
       auto renderer = Renderer([&] {
         Canvas can = Canvas(canvas_width, canvas_height);
+        int your_score{ 0 }, enemy_score{ 0 };
+
 
         {
           std::lock_guard<std::mutex> lock{ element_mutex };
           std::for_each(
             element_map.begin(), element_map.end(), [&can](auto const &pair) { draw(can, *(pair.second)); });
+
+          if (paddle_ptrs.first != nullptr) { your_score = paddle_ptrs.first->score(); }
+          if (paddle_ptrs.second != nullptr) { enemy_score = paddle_ptrs.second->score(); }
         }
 
-        can.DrawText(
-          15, playing_field_bottom + 2, fmt::format("Synchronisationen versendet: {}", connection.game_updates_sent()));
         can.DrawText(15,
-          playing_field_bottom + 7,
+          playing_field_bottom + 10,
+          fmt::format("Synchronisationen versendet: {}", connection.game_updates_sent()));
+        can.DrawText(15,
+          playing_field_bottom + 15,
           fmt::format("Synchronisationen empfangen: {}", connection.game_updates_received()));
+
+        can.DrawText(playing_field_right - 40, playing_field_bottom + 10, fmt::format("Deine Punkte: {}", your_score));
+        can.DrawText(
+          playing_field_right - 40, playing_field_bottom + 15, fmt::format("Punkte Gegner: {}", enemy_score));
 
 
         can.DrawBlockLine(
@@ -1112,7 +1123,7 @@ int main()
 
       auto game_update_loop = [&element_map,
                                 &element_mutex,
-                                &controlling_paddle_id,
+                                &paddle_ptrs,
                                 as_host,
                                 &updated_elements,
                                 &mouse_x,
@@ -1121,11 +1132,25 @@ int main()
         {
           {
             std::lock_guard<std::mutex> lock{ element_mutex };
-            if (controlling_paddle_id < 0) { controlling_paddle_id = find_id_of_controller(element_map, as_host); }
 
-            if (controlling_paddle_id >= 0) {
-              arkanoid::Element *paddle_element = element_map.find(controlling_paddle_id)->second.get();
-              auto *paddle_ptr = dynamic_cast<Paddle *>(paddle_element);
+            if (paddle_ptrs.first == nullptr || paddle_ptrs.second == nullptr) {
+              std::for_each(element_map.begin(), element_map.end(), [&paddle_ptrs](auto &pair) {
+                auto *element_ptr = pair.second.get();
+
+                if (element_ptr->get_type() == PADDLE) {
+                  auto *paddle_ptr = dynamic_cast<Paddle *>(element_ptr);
+
+                  if (paddle_ptr->is_controlled_by_this_game_instance()) {
+                    paddle_ptrs.first = paddle_ptr;
+                  } else {
+                    paddle_ptrs.second = paddle_ptr;
+                  }
+                }
+              });
+            }
+
+            if (paddle_ptrs.first != nullptr) {
+              auto *paddle_ptr = paddle_ptrs.first;
 
               int new_paddle_x = mouse_x;
               int const half_width = paddle_ptr->width() / 2;
