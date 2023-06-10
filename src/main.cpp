@@ -228,7 +228,11 @@ public:
     }
   }
 
-  void close() { m_socket.close(); }
+  void close()
+  {
+    std::lock_guard<std::mutex> lock{ m_conntected_mutex };
+    m_socket.close();
+  }
 
   void send(GameUpdate game_update, bool const add_to_queue_if_currently_in_use = false)
   {
@@ -295,6 +299,7 @@ int constexpr brick_width{ 14 }, brick_height{ 5 };
 int constexpr num_bricks_y{ 8 };
 int constexpr brick_distance_x{ 2 }, brick_distance_y{ 3 };
 float constexpr b2_coord_convertion_rate{ 40.0F };
+int constexpr brick_max_duration{ 3 }, brick_min_duration{ 1 };
 
 class IdGenerator
 {
@@ -366,6 +371,7 @@ public:
   [[nodiscard]] virtual int width() const = 0;
   [[nodiscard]] virtual int height() const = 0;
   [[nodiscard]] virtual bool exists() { return true; }
+  [[nodiscard]] virtual ftxui::Color color() const { return m_color; };
 
 protected:
   int m_id;
@@ -399,8 +405,6 @@ public:
   [[nodiscard]] int bottom() const { return top() + height(); }
 
   [[nodiscard]] int id() const { return m_id; }
-
-  [[nodiscard]] ftxui::Color color() const { return m_color; };
 };
 
 IdGenerator Element::id_generator = IdGenerator{ 0 };
@@ -586,6 +590,19 @@ public:
   }
   [[nodiscard]] bool did_update() override { return false; }
   [[nodiscard]] int duration() const { return m_duration; }
+  [[nodiscard]] ftxui::Color color() const override
+  {
+    auto const duration = static_cast<float>(m_duration);
+    float const ratio = duration / brick_max_duration;
+
+    if (ratio >= (4.0F / 6.0F)) {
+      return ftxui::Color::Yellow;
+    } else if (ratio >= (2.0F / 6.0F)) {
+      return ftxui::Color::Green;
+    }
+
+    return ftxui::Color::White;
+  }
 };
 
 void fill_game_element(GameElement *const &game_element, arkanoid::Element const *element)
@@ -774,6 +791,9 @@ void generate_bricks(std::map<int, std::unique_ptr<arkanoid::Element>> &elements
   std::map<b2Fixture *, arkanoid::Element *> &map)
 {
   using namespace arkanoid;
+  std::random_device random_device;
+  std::default_random_engine random_engine{ random_device() };
+  std::uniform_int_distribution<int> uni_dist{ brick_min_duration, brick_max_duration };
 
   int const num_bricks_x =
     (playing_field_right - playing_field_left - brick_distance_x) / (brick_width + brick_distance_x);
@@ -790,7 +810,7 @@ void generate_bricks(std::map<int, std::unique_ptr<arkanoid::Element>> &elements
       int const y{ playing_field_top + top + ((brick_distance_y + brick_height) * i_y) };
 
       std::unique_ptr<arkanoid::Element> brick =
-        std::make_unique<arkanoid::Brick>(arkanoid::Vector{ x, y }, world, map, 1);
+        std::make_unique<arkanoid::Brick>(arkanoid::Vector{ x, y }, world, map, uni_dist(random_engine));
       insert_element(elements, brick);
     }
   }
@@ -843,7 +863,6 @@ private:
     if (element->get_type() == arkanoid::BRICK) {
       auto *brick_ptr = dynamic_cast<arkanoid::Brick *>(element);
       brick_ptr->hit();
-      m_b2_element_map.erase(iterator);
     }
   }
 
