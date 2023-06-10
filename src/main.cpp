@@ -424,6 +424,7 @@ private:
   bool m_updated{ false };
   bool m_is_controlled_by_this_game_instance{ false };
   int m_score{ 0 };
+  friend void parse_game_element(Element *, GameElement const &);
 
 public:
   explicit Paddle(Vector const pos, b2World *arkanoid_world, std::map<b2Fixture *, Element *> &map) : Element{}
@@ -481,7 +482,11 @@ public:
     return convert_to_arkanoid_coords({ pos.x, pos.y });
   }
 
-  void add_score(int const score) { m_score += score; }
+  void add_score(int const score)
+  {
+    m_score += score;
+    m_updated = m_updated || score != 0;
+  }
 
   [[nodiscard]] int width() const override { return paddle_width; }
   [[nodiscard]] int height() const override { return paddle_height; }
@@ -680,7 +685,7 @@ void fill_game_element(GameElement *const &game_element, arkanoid::Element const
     auto *net_paddle = new NetPaddle;
 
     net_paddle->set_controlled_by_sender(paddle->is_controlled_by_this_game_instance());
-    net_paddle->set_score(0);// todo
+    net_paddle->set_score(paddle->score());
 
     game_element->set_allocated_paddle(net_paddle);
   }
@@ -712,7 +717,7 @@ void parse_game_element(Element *element, GameElement const &net_element)
   } else if (element->get_type() == PADDLE && net_element.has_paddle()) {
     auto *paddle = dynamic_cast<Paddle *>(element);
     paddle->set_is_controlled_by_this_game_instance(!net_element.paddle().controlled_by_sender());
-    // todo: score
+    paddle->m_score = net_element.paddle().score();
   }
 }
 
