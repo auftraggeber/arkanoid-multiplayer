@@ -1,12 +1,6 @@
 syntax = "proto3";
 // namespace arkanoid::io // todo
 
-enum ElementType {
-    BALL = 0;
-    PADDLE = 1;
-    BRICK = 2;
-}
-
 message NetBall {
     float velocity_x = 1;
     float velocity_y = 2;
@@ -26,10 +20,9 @@ message ElementPosition {
 
 message GameElement {
     int32 id = 1;
-    ElementType type = 2;
-    ElementPosition element_position = 3; 
+    ElementPosition element_position = 2; 
 
-    oneof specific { NetBall ball = 5; NetPaddle paddle = 6; NetBrick brick = 7;}; // todo
+    oneof specific { NetBall ball = 3; NetPaddle paddle = 4; NetBrick brick = 5;}; // todo
 }
 
 message GameUpdate {

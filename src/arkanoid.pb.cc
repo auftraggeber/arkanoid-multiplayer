@@ -136,7 +136,7 @@ static void InitDefaultsscc_info_NetPaddle_arkanoid_2eproto() {
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_NetPaddle_arkanoid_2eproto}, {}};
 
 static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_arkanoid_2eproto[6];
-static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_arkanoid_2eproto[1];
+static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_arkanoid_2eproto = nullptr;
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_arkanoid_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_arkanoid_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -171,7 +171,6 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_arkanoid_2eproto::offsets[] PR
   PROTOBUF_FIELD_OFFSET(::GameElement, _oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::GameElement, id_),
-  PROTOBUF_FIELD_OFFSET(::GameElement, type_),
   PROTOBUF_FIELD_OFFSET(::GameElement, element_position_),
   offsetof(::GameElementDefaultTypeInternal, ball_),
   offsetof(::GameElementDefaultTypeInternal, paddle_),
@@ -190,7 +189,7 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 12, -1, sizeof(::NetBrick)},
   { 18, -1, sizeof(::ElementPosition)},
   { 25, -1, sizeof(::GameElement)},
-  { 37, -1, sizeof(::GameUpdate)},
+  { 36, -1, sizeof(::GameUpdate)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -206,15 +205,13 @@ const char descriptor_table_protodef_arkanoid_2eproto[] PROTOBUF_SECTION_VARIABL
   "\n\016arkanoid.proto\"1\n\007NetBall\022\022\n\nvelocity_"
   "x\030\001 \001(\002\022\022\n\nvelocity_y\030\002 \001(\002\"\013\n\tNetPaddle"
   "\"\034\n\010NetBrick\022\020\n\010duration\030\001 \001(\005\"\'\n\017Elemen"
-  "tPosition\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\"\301\001\n\013Game"
-  "Element\022\n\n\002id\030\001 \001(\005\022\032\n\004type\030\002 \001(\0162\014.Elem"
-  "entType\022*\n\020element_position\030\003 \001(\0132\020.Elem"
-  "entPosition\022\030\n\004ball\030\005 \001(\0132\010.NetBallH\000\022\034\n"
-  "\006paddle\030\006 \001(\0132\n.NetPaddleH\000\022\032\n\005brick\030\007 \001"
-  "(\0132\t.NetBrickH\000B\n\n\010specific\"+\n\nGameUpdat"
-  "e\022\035\n\007element\030\001 \003(\0132\014.GameElement*.\n\013Elem"
-  "entType\022\010\n\004BALL\020\000\022\n\n\006PADDLE\020\001\022\t\n\005BRICK\020\002"
-  "b\006proto3"
+  "tPosition\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\"\245\001\n\013Game"
+  "Element\022\n\n\002id\030\001 \001(\005\022*\n\020element_position\030"
+  "\002 \001(\0132\020.ElementPosition\022\030\n\004ball\030\003 \001(\0132\010."
+  "NetBallH\000\022\034\n\006paddle\030\004 \001(\0132\n.NetPaddleH\000\022"
+  "\032\n\005brick\030\005 \001(\0132\t.NetBrickH\000B\n\n\010specific\""
+  "+\n\nGameUpdate\022\035\n\007element\030\001 \003(\0132\014.GameEle"
+  "mentb\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_arkanoid_2eproto_deps[1] = {
 };
@@ -228,7 +225,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_ark
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_arkanoid_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_arkanoid_2eproto = {
-  false, false, descriptor_table_protodef_arkanoid_2eproto, "arkanoid.proto", 448,
+  false, false, descriptor_table_protodef_arkanoid_2eproto, "arkanoid.proto", 372,
   &descriptor_table_arkanoid_2eproto_once, descriptor_table_arkanoid_2eproto_sccs, descriptor_table_arkanoid_2eproto_deps, 6, 0,
   schemas, file_default_instances, TableStruct_arkanoid_2eproto::offsets,
   file_level_metadata_arkanoid_2eproto, 6, file_level_enum_descriptors_arkanoid_2eproto, file_level_service_descriptors_arkanoid_2eproto,
@@ -236,21 +233,6 @@ const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_arkano
 
 // Force running AddDescriptors() at dynamic initialization time.
 static bool dynamic_init_dummy_arkanoid_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_arkanoid_2eproto)), true);
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ElementType_descriptor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_arkanoid_2eproto);
-  return file_level_enum_descriptors_arkanoid_2eproto[0];
-}
-bool ElementType_IsValid(int value) {
-  switch (value) {
-    case 0:
-    case 1:
-    case 2:
-      return true;
-    default:
-      return false;
-  }
-}
-
 
 // ===================================================================
 
@@ -1163,9 +1145,7 @@ GameElement::GameElement(const GameElement& from)
   } else {
     element_position_ = nullptr;
   }
-  ::memcpy(&id_, &from.id_,
-    static_cast<size_t>(reinterpret_cast<char*>(&type_) -
-    reinterpret_cast<char*>(&id_)) + sizeof(type_));
+  id_ = from.id_;
   clear_has_specific();
   switch (from.specific_case()) {
     case kBall: {
@@ -1190,8 +1170,8 @@ GameElement::GameElement(const GameElement& from)
 void GameElement::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_GameElement_arkanoid_2eproto.base);
   ::memset(&element_position_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&type_) -
-      reinterpret_cast<char*>(&element_position_)) + sizeof(type_));
+      reinterpret_cast<char*>(&id_) -
+      reinterpret_cast<char*>(&element_position_)) + sizeof(id_));
   clear_has_specific();
 }
 
@@ -1263,9 +1243,7 @@ void GameElement::Clear() {
     delete element_position_;
   }
   element_position_ = nullptr;
-  ::memset(&id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&type_) -
-      reinterpret_cast<char*>(&id_)) + sizeof(type_));
+  id_ = 0;
   clear_specific();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
@@ -1285,38 +1263,30 @@ const char* GameElement::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .ElementType type = 2;
+      // .ElementPosition element_position = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-          _internal_set_type(static_cast<::ElementType>(val));
-        } else goto handle_unusual;
-        continue;
-      // .ElementPosition element_position = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
           ptr = ctx->ParseMessage(_internal_mutable_element_position(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .NetBall ball = 5;
-      case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+      // .NetBall ball = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
           ptr = ctx->ParseMessage(_internal_mutable_ball(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .NetPaddle paddle = 6;
-      case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+      // .NetPaddle paddle = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
           ptr = ctx->ParseMessage(_internal_mutable_paddle(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .NetBrick brick = 7;
-      case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
+      // .NetBrick brick = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
           ptr = ctx->ParseMessage(_internal_mutable_brick(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
@@ -1355,43 +1325,36 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_id(), target);
   }
 
-  // .ElementType type = 2;
-  if (this->type() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
-      2, this->_internal_type(), target);
-  }
-
-  // .ElementPosition element_position = 3;
+  // .ElementPosition element_position = 2;
   if (this->has_element_position()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        3, _Internal::element_position(this), target, stream);
+        2, _Internal::element_position(this), target, stream);
   }
 
-  // .NetBall ball = 5;
+  // .NetBall ball = 3;
   if (_internal_has_ball()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        5, _Internal::ball(this), target, stream);
+        3, _Internal::ball(this), target, stream);
   }
 
-  // .NetPaddle paddle = 6;
+  // .NetPaddle paddle = 4;
   if (_internal_has_paddle()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        6, _Internal::paddle(this), target, stream);
+        4, _Internal::paddle(this), target, stream);
   }
 
-  // .NetBrick brick = 7;
+  // .NetBrick brick = 5;
   if (_internal_has_brick()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        7, _Internal::brick(this), target, stream);
+        5, _Internal::brick(this), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -1410,7 +1373,7 @@ size_t GameElement::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // .ElementPosition element_position = 3;
+  // .ElementPosition element_position = 2;
   if (this->has_element_position()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
@@ -1424,28 +1387,22 @@ size_t GameElement::ByteSizeLong() const {
         this->_internal_id());
   }
 
-  // .ElementType type = 2;
-  if (this->type() != 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_type());
-  }
-
   switch (specific_case()) {
-    // .NetBall ball = 5;
+    // .NetBall ball = 3;
     case kBall: {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
           *specific_.ball_);
       break;
     }
-    // .NetPaddle paddle = 6;
+    // .NetPaddle paddle = 4;
     case kPaddle: {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
           *specific_.paddle_);
       break;
     }
-    // .NetBrick brick = 7;
+    // .NetBrick brick = 5;
     case kBrick: {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
@@ -1493,9 +1450,6 @@ void GameElement::MergeFrom(const GameElement& from) {
   if (from.id() != 0) {
     _internal_set_id(from._internal_id());
   }
-  if (from.type() != 0) {
-    _internal_set_type(from._internal_type());
-  }
   switch (from.specific_case()) {
     case kBall: {
       _internal_mutable_ball()->::NetBall::MergeFrom(from._internal_ball());
@@ -1537,8 +1491,8 @@ void GameElement::InternalSwap(GameElement* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(GameElement, type_)
-      + sizeof(GameElement::type_)
+      PROTOBUF_FIELD_OFFSET(GameElement, id_)
+      + sizeof(GameElement::id_)
       - PROTOBUF_FIELD_OFFSET(GameElement, element_position_)>(
           reinterpret_cast<char*>(&element_position_),
           reinterpret_cast<char*>(&other->element_position_));

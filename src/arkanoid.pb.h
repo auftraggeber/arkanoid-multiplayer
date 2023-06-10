@@ -31,7 +31,6 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
-#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -82,32 +81,6 @@ template<> ::NetBrick* Arena::CreateMaybeMessage<::NetBrick>(Arena*);
 template<> ::NetPaddle* Arena::CreateMaybeMessage<::NetPaddle>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 
-enum ElementType : int {
-  BALL = 0,
-  PADDLE = 1,
-  BRICK = 2,
-  ElementType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
-  ElementType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
-};
-bool ElementType_IsValid(int value);
-constexpr ElementType ElementType_MIN = BALL;
-constexpr ElementType ElementType_MAX = BRICK;
-constexpr int ElementType_ARRAYSIZE = ElementType_MAX + 1;
-
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ElementType_descriptor();
-template<typename T>
-inline const std::string& ElementType_Name(T enum_t_value) {
-  static_assert(::std::is_same<T, ElementType>::value ||
-    ::std::is_integral<T>::value,
-    "Incorrect type passed to function ElementType_Name.");
-  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
-    ElementType_descriptor(), enum_t_value);
-}
-inline bool ElementType_Parse(
-    const std::string& name, ElementType* value) {
-  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<ElementType>(
-    ElementType_descriptor(), name, value);
-}
 // ===================================================================
 
 class NetBall PROTOBUF_FINAL :
@@ -704,9 +677,9 @@ class GameElement PROTOBUF_FINAL :
   static const GameElement& default_instance();
 
   enum SpecificCase {
-    kBall = 5,
-    kPaddle = 6,
-    kBrick = 7,
+    kBall = 3,
+    kPaddle = 4,
+    kBrick = 5,
     SPECIFIC_NOT_SET = 0,
   };
 
@@ -787,14 +760,13 @@ class GameElement PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kElementPositionFieldNumber = 3,
+    kElementPositionFieldNumber = 2,
     kIdFieldNumber = 1,
-    kTypeFieldNumber = 2,
-    kBallFieldNumber = 5,
-    kPaddleFieldNumber = 6,
-    kBrickFieldNumber = 7,
+    kBallFieldNumber = 3,
+    kPaddleFieldNumber = 4,
+    kBrickFieldNumber = 5,
   };
-  // .ElementPosition element_position = 3;
+  // .ElementPosition element_position = 2;
   bool has_element_position() const;
   private:
   bool _internal_has_element_position() const;
@@ -821,16 +793,7 @@ class GameElement PROTOBUF_FINAL :
   void _internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
-  // .ElementType type = 2;
-  void clear_type();
-  ::ElementType type() const;
-  void set_type(::ElementType value);
-  private:
-  ::ElementType _internal_type() const;
-  void _internal_set_type(::ElementType value);
-  public:
-
-  // .NetBall ball = 5;
+  // .NetBall ball = 3;
   bool has_ball() const;
   private:
   bool _internal_has_ball() const;
@@ -848,7 +811,7 @@ class GameElement PROTOBUF_FINAL :
       ::NetBall* ball);
   ::NetBall* unsafe_arena_release_ball();
 
-  // .NetPaddle paddle = 6;
+  // .NetPaddle paddle = 4;
   bool has_paddle() const;
   private:
   bool _internal_has_paddle() const;
@@ -866,7 +829,7 @@ class GameElement PROTOBUF_FINAL :
       ::NetPaddle* paddle);
   ::NetPaddle* unsafe_arena_release_paddle();
 
-  // .NetBrick brick = 7;
+  // .NetBrick brick = 5;
   bool has_brick() const;
   private:
   bool _internal_has_brick() const;
@@ -901,7 +864,6 @@ class GameElement PROTOBUF_FINAL :
   typedef void DestructorSkippable_;
   ::ElementPosition* element_position_;
   ::PROTOBUF_NAMESPACE_ID::int32 id_;
-  int type_;
   union SpecificUnion {
     SpecificUnion() {}
     ::NetBall* ball_;
@@ -1206,27 +1168,7 @@ inline void GameElement::set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
   // @@protoc_insertion_point(field_set:GameElement.id)
 }
 
-// .ElementType type = 2;
-inline void GameElement::clear_type() {
-  type_ = 0;
-}
-inline ::ElementType GameElement::_internal_type() const {
-  return static_cast< ::ElementType >(type_);
-}
-inline ::ElementType GameElement::type() const {
-  // @@protoc_insertion_point(field_get:GameElement.type)
-  return _internal_type();
-}
-inline void GameElement::_internal_set_type(::ElementType value) {
-  
-  type_ = value;
-}
-inline void GameElement::set_type(::ElementType value) {
-  _internal_set_type(value);
-  // @@protoc_insertion_point(field_set:GameElement.type)
-}
-
-// .ElementPosition element_position = 3;
+// .ElementPosition element_position = 2;
 inline bool GameElement::_internal_has_element_position() const {
   return this != internal_default_instance() && element_position_ != nullptr;
 }
@@ -1307,7 +1249,7 @@ inline void GameElement::set_allocated_element_position(::ElementPosition* eleme
   // @@protoc_insertion_point(field_set_allocated:GameElement.element_position)
 }
 
-// .NetBall ball = 5;
+// .NetBall ball = 3;
 inline bool GameElement::_internal_has_ball() const {
   return specific_case() == kBall;
 }
@@ -1380,7 +1322,7 @@ inline ::NetBall* GameElement::mutable_ball() {
   return _internal_mutable_ball();
 }
 
-// .NetPaddle paddle = 6;
+// .NetPaddle paddle = 4;
 inline bool GameElement::_internal_has_paddle() const {
   return specific_case() == kPaddle;
 }
@@ -1453,7 +1395,7 @@ inline ::NetPaddle* GameElement::mutable_paddle() {
   return _internal_mutable_paddle();
 }
 
-// .NetBrick brick = 7;
+// .NetBrick brick = 5;
 inline bool GameElement::_internal_has_brick() const {
   return specific_case() == kBrick;
 }
@@ -1594,16 +1536,6 @@ GameUpdate::element() const {
 
 // @@protoc_insertion_point(namespace_scope)
 
-
-PROTOBUF_NAMESPACE_OPEN
-
-template <> struct is_proto_enum< ::ElementType> : ::std::true_type {};
-template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::ElementType>() {
-  return ::ElementType_descriptor();
-}
-
-PROTOBUF_NAMESPACE_CLOSE
 
 // @@protoc_insertion_point(global_scope)
 

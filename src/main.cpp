@@ -230,15 +230,14 @@ public:
 
   void close() { m_socket.close(); }
 
-  void send(GameUpdate &game_update, bool const add_to_queue_if_currently_in_use = false)
+  void send(GameUpdate game_update, bool const add_to_queue_if_currently_in_use = false)
   {
 
     auto recursive{ [this]() {
       if (m_next_game_updates.empty()) { return; }
       GameUpdate update = m_next_game_updates.front();
-      GameUpdate update_copy = update;// todo - einfacher ?
       m_next_game_updates.pop();
-      send(update_copy);
+      send(update);
     } };
 
     {
@@ -355,15 +354,18 @@ public:
   return { vector.x / b2_coord_convertion_rate, vector.y / b2_coord_convertion_rate };
 }
 
+
+enum ElementType { BALL, BRICK, PADDLE };
 class Element
 {
 public:
   [[nodiscard]] virtual ElementType get_type() const = 0;
-  virtual void post_update(std::map<int, std::unique_ptr<Element>> &) = 0;
+  virtual bool did_update() = 0;
   virtual void set_position(Vector const) = 0;
-  virtual Vector center_position() const = 0;
-  virtual int width() const = 0;
-  virtual int height() const = 0;
+  [[nodiscard]] virtual Vector center_position() const = 0;
+  [[nodiscard]] virtual int width() const = 0;
+  [[nodiscard]] virtual int height() const = 0;
+  [[nodiscard]] virtual bool exists() { return true; }
 
 protected:
   int m_id;
@@ -395,8 +397,6 @@ public:
   [[nodiscard]] int top() const { return std::round(center_position().y - (height() / 2.0f)); }
 
   [[nodiscard]] int bottom() const { return top() + height(); }
-
-  [[nodiscard]] bool exists() const { return true; }
 
   [[nodiscard]] int id() const { return m_id; }
 
@@ -444,12 +444,17 @@ public:
 
   [[nodiscard]] ElementType get_type() const override { return BALL; }
 
-  void post_update(std::map<int, std::unique_ptr<Element>> &map) override {}
+  bool did_update() override { return false; }
 
   void set_position(Vector const pos) override
   {
     auto const position = convert_to_b2_coords(pos);
     m_body_ptr->SetTransform({ position.x, position.y }, m_body_ptr->GetAngle());
+  }
+
+  void set_velocity(Vector const vector)
+  {
+    if (m_body_ptr != nullptr) { m_body_ptr->SetLinearVelocity({ vector.x, vector.y }); }
   }
 
   [[nodiscard]] Vector center_position() const override
@@ -471,6 +476,7 @@ class Paddle : public Element
 {
 private:
   b2Body *m_body_ptr = nullptr;
+  bool m_updated{ false };
 
 public:
   explicit Paddle(Vector const pos, b2World *arkanoid_world, std::map<b2Fixture *, Element *> &map) : Element{}
@@ -493,12 +499,22 @@ public:
   [[nodiscard]] bool update_left(int const new_x)
   {
     Vector pos = center_position();
-    pos.x = new_x + (width() / 2);
+    pos.x = new_x;
     set_position(pos);
+    m_updated = true;
     return true;
   }
 
-  void post_update(std::map<int, std::unique_ptr<Element>> &map) override {}
+  bool did_update() override
+  {
+    if (m_updated) {
+      m_updated = false;
+      return true;
+    }
+
+    return false;
+  }
+
 
   void set_position(Vector const pos) override
   {
@@ -521,13 +537,14 @@ class Brick : public Element
 
 private:
   b2Body *m_body_ptr = nullptr;
-  b2World *m_world_ptr;
-  b2Fixture *m_fixture_ptr = nullptr;
-  int m_duration{ 1 };// todo -> variable duration
+  int m_duration;// todo -> variable duration
+
+  friend void parse_game_element(Element *, GameElement const &);
 
 public:
-  explicit Brick(Vector const pos, b2World *arkanoid_world, std::map<b2Fixture *, Element *> &map)
-    : Element{}, m_world_ptr{ arkanoid_world }// todo: b2world muss als pointer, da sonst make_unique nicht funktioniert
+  explicit Brick(Vector const pos, b2World *arkanoid_world, std::map<b2Fixture *, Element *> &map, int const duration)
+    : Element{}, m_duration{ duration }
+  // todo: b2world muss als pointer, da sonst make_unique nicht funktioniert
   {
 
     auto const position = convert_to_b2_coords(pos.add(width() / 2.0F, height() / 2.0F));
@@ -539,24 +556,13 @@ public:
     b2PolygonShape groundBox;
     groundBox.SetAsBox(width() * b2_coord_convertion_rate, height() * b2_coord_convertion_rate);
 
-    m_fixture_ptr = m_body_ptr->CreateFixture(&groundBox, 0.0f);
+    auto *fixture = m_body_ptr->CreateFixture(&groundBox, 0.0f);
 
-    map.insert({ m_fixture_ptr, this });
+    map.insert({ fixture, this });
   }
 
-  void post_update(std::map<int, std::unique_ptr<Element>> &map) override {}
+  void hit() { --m_duration; }
 
-  [[nodiscard]] bool destroy()
-  {
-    if (m_body_ptr != nullptr && m_fixture_ptr != nullptr && m_world_ptr != nullptr) {
-
-      m_body_ptr->DestroyFixture(m_fixture_ptr);
-      m_world_ptr->DestroyBody(m_body_ptr);
-      return true;
-    }
-
-    return false;
-  }
 
   [[nodiscard]] ElementType get_type() const override { return BRICK; }
   void set_position(Vector const pos) override
@@ -573,11 +579,18 @@ public:
 
   [[nodiscard]] int width() const override { return brick_width; }
   [[nodiscard]] int height() const override { return brick_height; }
+  [[nodiscard]] bool exists() override
+  {
+    if (m_body_ptr != nullptr && m_duration <= 0 && m_body_ptr->IsEnabled()) { m_body_ptr->SetEnabled(false); }
+    return m_duration > 0;
+  }
+  [[nodiscard]] bool did_update() override { return false; }
+  [[nodiscard]] int duration() const { return m_duration; }
 };
 
 void fill_game_element(GameElement *const &game_element, arkanoid::Element const *element)
 {
-  ElementPosition *position = new ElementPosition;
+  auto *position = new ElementPosition;
 
   auto const pos = element->center_position();
 
@@ -588,26 +601,57 @@ void fill_game_element(GameElement *const &game_element, arkanoid::Element const
   position->set_y(y);
 
   game_element->set_id(element->id());
-  game_element->set_type(element->get_type());
   game_element->set_allocated_element_position(position);
+
+  if (element->get_type() == BALL) {
+    auto const *ball = dynamic_cast<const Ball *>(element);
+    auto *net_ball = new NetBall;
+
+    auto vel = ball->velocity();
+
+    net_ball->set_velocity_x(vel.x);
+    net_ball->set_velocity_y(vel.y);
+
+    game_element->set_allocated_ball(net_ball);
+  } else if (element->get_type() == BRICK) {
+    auto const *brick = dynamic_cast<const Brick *>(element);
+    auto *net_brick = new NetBrick;
+
+    net_brick->set_duration(brick->duration());
+
+    game_element->set_allocated_brick(net_brick);
+  } else if (element->get_type() == PADDLE) {
+    auto const *paddle = dynamic_cast<const Paddle *>(element);
+    auto *net_paddle = new NetPaddle;
+
+    game_element->set_allocated_paddle(net_paddle);
+  }
 }
 
 void fill_game_update(GameUpdate *update, std::vector<arkanoid::Element *> const &elements)
 {
 
-  std::for_each(elements.begin(), elements.end(), [&update](auto const &element) {
+  std::for_each(elements.begin(), elements.end(), [&update](arkanoid::Element const *element_ptr) {
+    if (element_ptr == nullptr) { return; }
     GameElement *game_element = update->add_element();
 
-    fill_game_element(game_element, element);
+    fill_game_element(game_element, element_ptr);
   });
 }
 
 void parse_game_element(Element *element, GameElement const &net_element)
 {
   element->set_position({ net_element.element_position().x(), net_element.element_position().y() });
-  element->invert_position();
+  // element->invert_position();
 
-  if (element->get_type() == BALL) { Ball *ball = static_cast<Ball *>(element); }
+  if (element->get_type() == BALL && net_element.has_ball()) {
+    auto *ball = dynamic_cast<Ball *>(element);
+    ball->set_velocity(
+      arkanoid::Vector{ net_element.ball().velocity_x(), net_element.ball().velocity_y() } /*.invert()*/);
+  } else if (element->get_type() == BRICK && net_element.has_brick()) {
+    auto *brick = dynamic_cast<Brick *>(element);
+    brick->m_duration = net_element.brick().duration();
+  }
 }
 
 void parse_game_update(std::map<int, std::unique_ptr<Element>> &map,
@@ -624,22 +668,13 @@ void parse_game_update(std::map<int, std::unique_ptr<Element>> &map,
     if (new_id) {
       std::unique_ptr<Element> arkanoid_element_ptr = nullptr;
 
-      switch (net_element.type()) {
-      case BALL: {
+      if (net_element.has_ball()) {
         arkanoid_element_ptr = std::make_unique<Ball>(position, world, b2_map);
-        break;
-      }
-
-      case PADDLE: {
+      } else if (net_element.has_brick()) {
+        arkanoid_element_ptr = std::make_unique<Brick>(position, world, b2_map, net_element.brick().duration());
+      } else if (net_element.has_paddle()) {
         arkanoid_element_ptr = std::make_unique<Paddle>(position, world, b2_map);
-        break;
       }
-      case BRICK: {
-        arkanoid_element_ptr = std::make_unique<Brick>(position, world, b2_map);
-        break;
-      }
-      }
-
       arkanoid_element_ptr->m_id = net_element.id();
       parse_game_element(arkanoid_element_ptr.get(), net_element);
       insert_element(map, arkanoid_element_ptr);
@@ -755,14 +790,14 @@ void generate_bricks(std::map<int, std::unique_ptr<arkanoid::Element>> &elements
       int const y{ playing_field_top + top + ((brick_distance_y + brick_height) * i_y) };
 
       std::unique_ptr<arkanoid::Element> brick =
-        std::make_unique<arkanoid::Brick>(arkanoid::Vector{ x, y }, world, map);
+        std::make_unique<arkanoid::Brick>(arkanoid::Vector{ x, y }, world, map, 1);
       insert_element(elements, brick);
     }
   }
 }
 
 template<typename T1>//
-void draw(ftxui::Canvas &canvas, T1 const &drawable)
+void draw(ftxui::Canvas &canvas, T1 &drawable)
 {
   if (!drawable.exists()) { return; }
 
@@ -773,19 +808,23 @@ void draw(ftxui::Canvas &canvas, T1 const &drawable)
 
 int find_id_of_controller(std::map<int, std::unique_ptr<arkanoid::Element>> const &element_map, bool const as_host)
 {
-  int id = (as_host) ? 0 : 1;
+  int const id = (as_host) ? 0 : 1;
 
   if (element_map.contains(id)) { return id; }
 
   return -1;
 }
 
-void create_and_send_new_game_update(std::vector<arkanoid::Element *> const send_elements,
-  connection::Connection &connection)
+void create_and_send_new_game_update(std::vector<arkanoid::Element *> const &send_elements,
+  connection::Connection &connection,
+  std::mutex &game_update_mutex)
 {
-  std::thread([send_elements, &connection]() {// todo: sicherheit?
+  std::thread([send_elements, &connection, &game_update_mutex]() {// todo: sicherheit?
     GameUpdate update;
-    arkanoid::fill_game_update(&update, send_elements);
+    {
+      std::lock_guard<std::mutex> game_update_lock{ game_update_mutex };
+      arkanoid::fill_game_update(&update, send_elements);
+    }
 
     connection.send(update);
   })
@@ -796,23 +835,20 @@ class ContactListener : public b2ContactListener
 {
 private:
   std::map<b2Fixture *, arkanoid::Element *> &m_b2_element_map;
-  std::vector<arkanoid::Element *> &m_destroy_elements;
 
   void UpdateElementAfterContact(std::map<b2Fixture *, arkanoid::Element *>::iterator const &iterator)
   {
     auto *element = iterator->second;
 
-    if (element->get_type() == BRICK) {
+    if (element->get_type() == arkanoid::BRICK) {
+      auto *brick_ptr = dynamic_cast<arkanoid::Brick *>(element);
+      brick_ptr->hit();
       m_b2_element_map.erase(iterator);
-      m_destroy_elements.push_back(element);
     }
   }
 
 public:
-  explicit ContactListener(std::map<b2Fixture *, arkanoid::Element *> &b2_map,
-    std::vector<arkanoid::Element *> &destroy_elements)
-    : m_b2_element_map{ b2_map }, m_destroy_elements{ destroy_elements }
-  {}
+  explicit ContactListener(std::map<b2Fixture *, arkanoid::Element *> &b2_map) : m_b2_element_map{ b2_map } {}
 
 
   void PreSolve(b2Contact *contact, const b2Manifold *oldManifold)
@@ -873,14 +909,14 @@ int main()
 
   show_connection_methods([](bool const as_host, int const &port) {
     std::mutex element_mutex;
+    std::mutex game_update_mutex;
     std::map<int, std::unique_ptr<arkanoid::Element>> element_map;
     std::map<b2Fixture *, arkanoid::Element *> b2_element_map;
-    std::vector<arkanoid::Element *> destroy_elements;
     connection::Connection connection;
     auto screen = ScreenInteractive::FitComponent();
     int const paddle_y{ playing_field_bottom - paddle_height };
     b2World arkanoid_world{ { 0, 0 } };
-    ContactListener listener{ b2_element_map, destroy_elements };
+    ContactListener listener{ b2_element_map };
     arkanoid_world.SetContactListener(&listener);
 
     build_world_border(&arkanoid_world);
@@ -937,7 +973,7 @@ int main()
             arkanoid::Element *ball_el_ptr = element_map.find(2)->second.get();
 
             if (ball_el_ptr->get_type() == BALL) {
-              Ball *ball_ptr = static_cast<Ball *>(ball_el_ptr);// todo : dynamic cast
+              Ball *ball_ptr = dynamic_cast<Ball *>(ball_el_ptr);// todo : dynamic cast
               auto vel = ball_ptr->velocity();
               can.DrawText(0, 10, fmt::format("x: {}, y: {}", vel.x, vel.y));
             }
@@ -979,8 +1015,7 @@ int main()
                                 &updated_elements,
                                 &mouse_x,
                                 frame_rate,
-                                &arkanoid_world,
-                                &destroy_elements]() {// todo - mouse_x als kopie buggt
+                                &arkanoid_world]() {// todo - mouse_x als kopie buggt
         {
           {
             std::lock_guard<std::mutex> lock{ element_mutex };
@@ -990,26 +1025,18 @@ int main()
               arkanoid::Element *paddle_element = element_map.find(controlling_paddle_id)->second.get();
               auto *paddle_ptr = dynamic_cast<Paddle *>(paddle_element);
 
-              int const new_paddle_x =
-                (mouse_x > playing_field_right - paddle_width) ? playing_field_right - paddle_width : mouse_x;
+              int const new_paddle_x = (mouse_x > playing_field_right - paddle_width)
+                                         ? playing_field_right - paddle_width
+                                       : (mouse_x < playing_field_left) ? playing_field_left
+                                                                        : mouse_x;
 
               if (paddle_ptr->update_left(new_paddle_x)) { updated_elements.push_back(paddle_element); }
             }
 
             arkanoid_world.Step(1.0F / (frame_rate), 4, 2);
 
-            std::for_each(destroy_elements.begin(), destroy_elements.end(), [&element_map](auto *element) {
-              if (element->get_type() == BRICK && element_map.contains(element->id())) {
-                auto *brick_ptr = dynamic_cast<Brick *>(element);
-
-                if (brick_ptr->destroy()) { element_map.erase(element_map.find(element->id())); }
-              }
-            });
-
-            destroy_elements.clear();
-
-            std::for_each(element_map.begin(), element_map.end(), [&element_map](auto const &pair) {
-              pair.second->post_update(element_map);
+            std::for_each(element_map.begin(), element_map.end(), [&updated_elements](auto const &pair) {
+              if (pair.second->did_update()) { updated_elements.push_back(pair.second.get()); }
             });
           }
         }
@@ -1026,7 +1053,7 @@ int main()
         game_update_loop();
 
         if (!updated_elements.empty()) {
-          create_and_send_new_game_update(updated_elements, connection);
+          create_and_send_new_game_update(updated_elements, connection, game_update_mutex);
           updated_elements.clear();
         }
 
@@ -1035,6 +1062,7 @@ int main()
         if (unused_frame_time > std::chrono::seconds(0)) { std::this_thread::sleep_for(unused_frame_time); }
       }
 
+      std::lock_guard<std::mutex> game_update_lock{ game_update_mutex };
       connection.close();
     }
   });
