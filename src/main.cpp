@@ -416,83 +416,6 @@ public:
 
 IdGenerator Element::id_generator = IdGenerator{ 0 };
 
-class Ball : public Element
-{
-
-private:
-  b2Body *m_body_ptr = nullptr;
-  bool m_updated{ false };
-
-  friend void parse_game_element(Element *, GameElement const &);
-
-public:
-  explicit Ball(Vector const pos, b2World *arkanoid_world, std::map<b2Fixture *, Element *> &map)
-    : Element{ ftxui::Color::Red }
-  {
-    auto const position = convert_to_b2_coords(pos);
-    b2BodyDef bodyDef;
-    bodyDef.type = b2_dynamicBody;
-    bodyDef.position.Set(position.x, position.y);
-    // bodyDef.userData = b2BodyUserData{}; // todo: verlinkung auf dieses objekt.
-    m_body_ptr = arkanoid_world->CreateBody(&bodyDef);
-    bodyDef.linearDamping = 0.0F;
-    bodyDef.angularDamping = 0.0F;
-
-    b2CircleShape dynamicBox;
-    dynamicBox.m_radius = 1.0F * b2_coord_convertion_rate;
-
-    b2FixtureDef fixtureDef;
-    fixtureDef.shape = &dynamicBox;
-    fixtureDef.density = 1.0F;
-    fixtureDef.friction = 0.0F;// todo: andere friction = fehlerhaftes verhalten
-
-    auto fixture = m_body_ptr->CreateFixture(&fixtureDef);
-    m_body_ptr->SetLinearVelocity({ 2.0F, 3.0F });
-    m_body_ptr->SetAngularVelocity(0);
-    m_body_ptr->SetFixedRotation(true);
-
-    map.insert({ fixture, this });
-  }
-
-  [[nodiscard]] ElementType get_type() const override { return BALL; }
-
-  bool did_update() override
-  {
-
-    if (m_updated) {
-      m_updated = false;
-      return true;
-    }
-    return false;
-  }
-
-  void set_position(Vector const pos) override
-  {
-    auto const position = convert_to_b2_coords(pos);
-    m_body_ptr->SetTransform({ position.x, position.y }, m_body_ptr->GetAngle());
-  }
-
-  void set_velocity(Vector const vector)
-  {
-    if (m_body_ptr != nullptr) { m_body_ptr->SetLinearVelocity({ vector.x, vector.y }); }
-  }
-
-  void add_to_next_update() { m_updated = true; }
-
-  [[nodiscard]] Vector center_position() const override
-  {
-    auto pos = m_body_ptr->GetPosition();
-    return convert_to_arkanoid_coords({ pos.x, pos.y });
-  }
-
-  [[nodiscard]] int width() const override { return ball_radius; }
-  [[nodiscard]] int height() const override { return ball_radius; }
-  [[nodiscard]] Vector velocity() const
-  {
-    auto vel = m_body_ptr->GetLinearVelocity();
-    return { vel.x, vel.y };
-  }
-};
 
 class Paddle : public Element
 {
@@ -500,6 +423,7 @@ private:
   b2Body *m_body_ptr = nullptr;
   bool m_updated{ false };
   bool m_is_controlled_by_this_game_instance{ false };
+  int m_score{ 0 };
 
 public:
   explicit Paddle(Vector const pos, b2World *arkanoid_world, std::map<b2Fixture *, Element *> &map) : Element{}
@@ -513,13 +437,14 @@ public:
     b2PolygonShape groundBox;
     groundBox.SetAsBox(width() * b2_coord_convertion_rate, height() * b2_coord_convertion_rate);
 
-    auto fixture = m_body_ptr->CreateFixture(&groundBox, 0.0f);
+    auto *fixture = m_body_ptr->CreateFixture(&groundBox, 0.0f);
 
     map.insert({ fixture, this });
   }
+
   [[nodiscard]] ElementType get_type() const override { return PADDLE; }
 
-  [[nodiscard]] bool update_x(int const new_x)
+  bool update_x(int const new_x)
   {
     Vector old_position = center_position();
     Vector pos = old_position;
@@ -530,6 +455,12 @@ public:
 
     m_updated = true;
     return true;
+  }
+
+  void add_score(int const add)
+  {
+    m_score += add;
+    m_updated = true;
   }
 
   bool did_update() override
@@ -564,6 +495,89 @@ public:
   {
     return (is_controlled_by_this_game_instance()) ? ftxui::Color::White : ftxui::Color::GrayDark;
   }
+  [[nodiscard]] int score() const { return m_score; }
+};
+
+class Ball : public Element
+{
+
+private:
+  b2Body *m_body_ptr = nullptr;
+  bool m_updated{ false };
+  Paddle *m_paddle_ptr{ nullptr };
+
+  friend void parse_game_element(Element *, GameElement const &);
+
+public:
+  explicit Ball(Vector const pos, b2World *arkanoid_world, std::map<b2Fixture *, Element *> &map)
+    : Element{ ftxui::Color::Red }
+  {
+    auto const position = convert_to_b2_coords(pos);
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_dynamicBody;
+    bodyDef.position.Set(position.x, position.y);
+    // bodyDef.userData = b2BodyUserData{}; // todo: verlinkung auf dieses objekt.
+    m_body_ptr = arkanoid_world->CreateBody(&bodyDef);
+    bodyDef.linearDamping = 0.0F;
+    bodyDef.angularDamping = 0.0F;
+
+    b2CircleShape dynamicBox;
+    dynamicBox.m_radius = 1.0F * b2_coord_convertion_rate;
+
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &dynamicBox;
+    fixtureDef.density = 1.0F;
+    fixtureDef.friction = 0.0F;// todo: andere friction = fehlerhaftes verhalten
+
+    auto *fixture = m_body_ptr->CreateFixture(&fixtureDef);
+    m_body_ptr->SetLinearVelocity({ 2.0F, 3.0F });
+    m_body_ptr->SetAngularVelocity(0);
+    m_body_ptr->SetFixedRotation(true);
+
+    map.insert({ fixture, this });
+  }
+
+  [[nodiscard]] ElementType get_type() const override { return BALL; }
+
+  bool did_update() override
+  {
+
+    if (m_updated) {
+      m_updated = false;
+      return true;
+    }
+    return false;
+  }
+
+  void set_position(Vector const pos) override
+  {
+    auto const position = convert_to_b2_coords(pos);
+    m_body_ptr->SetTransform({ position.x, position.y }, m_body_ptr->GetAngle());
+  }
+
+  void set_velocity(Vector const vector)
+  {
+    if (m_body_ptr != nullptr) { m_body_ptr->SetLinearVelocity({ vector.x, vector.y }); }
+  }
+
+  void add_to_next_update() { m_updated = true; }
+
+  void set_last_paddle(Paddle *const paddle) { m_paddle_ptr = paddle; }
+
+  [[nodiscard]] Vector center_position() const override
+  {
+    auto pos = m_body_ptr->GetPosition();
+    return convert_to_arkanoid_coords({ pos.x, pos.y });
+  }
+
+  [[nodiscard]] int width() const override { return ball_radius; }
+  [[nodiscard]] int height() const override { return ball_radius; }
+  [[nodiscard]] Vector velocity() const
+  {
+    auto vel = m_body_ptr->GetLinearVelocity();
+    return { vel.x, vel.y };
+  }
+  [[nodiscard]] Paddle *last_paddle() const { return m_paddle_ptr; }
 };
 
 class Brick : public Element
@@ -933,9 +947,15 @@ private:
     auto *paddle_ptr = dynamic_multiple_cast<Paddle *>(first_element_ptr, secound_element_ptr);
 
 
-    if (brick_ptr != nullptr && ball_ptr != nullptr) { brick_ptr->hit(); }
+    if (brick_ptr != nullptr && ball_ptr != nullptr) {
+      brick_ptr->hit();
+      if (ball_ptr->last_paddle() != nullptr) { ball_ptr->last_paddle()->add_score(1); }
+    }
     if (ball_ptr != nullptr && paddle_ptr != nullptr) {
-      if (paddle_ptr->is_controlled_by_this_game_instance()) { ball_ptr->add_to_next_update(); }
+      if (paddle_ptr->is_controlled_by_this_game_instance()) {
+        // ball_ptr->set_last_paddle(paddle_ptr);
+        ball_ptr->add_to_next_update();
+      }
     }
   }
 
@@ -1054,24 +1074,33 @@ int main()
     }
 
     if (connection.has_connected()) {
-      int controlling_paddle_id{ -1 };
+      Paddle *controlling_paddle_ptr{ nullptr };
+      Paddle *enemy_paddle_ptr{ nullptr };
       int mouse_x{ paddle_position.x_i() };
       std::vector<arkanoid::Element *> updated_elements;
 
       auto renderer = Renderer([&] {
         Canvas can = Canvas(canvas_width, canvas_height);
+        int your_score{ 0 }, enemy_score{ 0 };
 
         {
           std::lock_guard<std::mutex> lock{ element_mutex };
           std::for_each(
             element_map.begin(), element_map.end(), [&can](auto const &pair) { draw(can, *(pair.second)); });
+
+          if (controlling_paddle_ptr != nullptr) { your_score = controlling_paddle_ptr->score(); }
+          if (enemy_paddle_ptr != nullptr) { enemy_score = enemy_paddle_ptr->score(); }
         }
 
-        can.DrawText(
-          15, playing_field_bottom + 2, fmt::format("Synchronisationen versendet: {}", connection.game_updates_sent()));
         can.DrawText(15,
-          playing_field_bottom + 7,
+          playing_field_bottom + 10,
+          fmt::format("Synchronisationen versendet: {}", connection.game_updates_sent()));
+        can.DrawText(15,
+          playing_field_bottom + 15,
           fmt::format("Synchronisationen empfangen: {}", connection.game_updates_received()));
+
+        can.DrawText(playing_field_right - 30, playing_field_bottom + 10, fmt::format("Deine Punkte: {}", your_score));
+        can.DrawText(playing_field_right - 30, playing_field_top + 15, fmt::format("Punkte (Gegner): {}", enemy_score));
 
 
         can.DrawBlockLine(
@@ -1098,7 +1127,8 @@ int main()
 
       auto game_update_loop = [&element_map,
                                 &element_mutex,
-                                &controlling_paddle_id,
+                                &controlling_paddle_ptr,
+                                &enemy_paddle_ptr,
                                 as_host,
                                 &updated_elements,
                                 &mouse_x,
@@ -1107,28 +1137,42 @@ int main()
         {
           {
             std::lock_guard<std::mutex> lock{ element_mutex };
-            if (controlling_paddle_id < 0) { controlling_paddle_id = find_id_of_controller(element_map, as_host); }
 
-            if (controlling_paddle_id >= 0) {
-              arkanoid::Element *paddle_element = element_map.find(controlling_paddle_id)->second.get();
-              auto *paddle_ptr = dynamic_cast<Paddle *>(paddle_element);
+            if (controlling_paddle_ptr == nullptr || enemy_paddle_ptr == nullptr) {
+              std::for_each(
+                element_map.begin(), element_map.end(), [&controlling_paddle_ptr, &enemy_paddle_ptr](auto const &pair) {
+                  if (pair.second->get_type() == PADDLE) {
+                    auto *const paddle_ptr = dynamic_cast<Paddle *>(pair.second.get());
 
+                    if (paddle_ptr != nullptr) {
+                      if (paddle_ptr->is_controlled_by_this_game_instance()) {
+                        controlling_paddle_ptr = paddle_ptr;
+                      } else {
+                        enemy_paddle_ptr = paddle_ptr;
+                      }
+                    }
+                  }
+                });
+            }
+
+            if (controlling_paddle_ptr != nullptr) {
               int new_paddle_x = mouse_x;
-              int const half_width = paddle_ptr->width() / 2;
+              int const half_width = controlling_paddle_ptr->width() / 2;
               std::pair<int, int> constrains{ playing_field_left + half_width, playing_field_right - half_width };
 
               if (new_paddle_x < constrains.first) { new_paddle_x = constrains.first; }
               if (new_paddle_x > constrains.second) { new_paddle_x = constrains.second; }// todo: auslagern
-              paddle_ptr->update_x(new_paddle_x);
+              controlling_paddle_ptr->update_x(new_paddle_x);
             }
-
-            arkanoid_world.Step(1.0F / (frame_rate), 4, 2);
-
-            std::for_each(element_map.begin(), element_map.end(), [&updated_elements](auto const &pair) {
-              if (pair.second->did_update()) { updated_elements.push_back(pair.second.get()); }
-            });
           }
+
+          arkanoid_world.Step(1.0F / (frame_rate), 4, 2);
+
+          std::for_each(element_map.begin(), element_map.end(), [&updated_elements](auto const &pair) {
+            if (pair.second->did_update()) { updated_elements.push_back(pair.second.get()); }
+          });
         }
+
       };
 
       constexpr auto frame_time_budget{ std::chrono::seconds(1) / frame_rate };
