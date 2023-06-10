@@ -416,6 +416,78 @@ public:
 
 IdGenerator Element::id_generator = IdGenerator{ 0 };
 
+
+class Paddle : public Element
+{
+private:
+  b2Body *m_body_ptr = nullptr;
+  bool m_updated{ false };
+  bool m_is_controlled_by_this_game_instance{ false };
+
+public:
+  explicit Paddle(Vector const pos, b2World *arkanoid_world, std::map<b2Fixture *, Element *> &map) : Element{}
+  {
+    auto const position = convert_to_b2_coords(pos);
+    b2BodyDef groundBodyDef;
+    groundBodyDef.position.Set(position.x + (width() / 2.0f), position.y + (height() / 2.0f));
+
+    m_body_ptr = arkanoid_world->CreateBody(&groundBodyDef);
+
+    b2PolygonShape groundBox;
+    groundBox.SetAsBox(width() * b2_coord_convertion_rate, height() * b2_coord_convertion_rate);
+
+    auto fixture = m_body_ptr->CreateFixture(&groundBox, 0.0f);
+
+    map.insert({ fixture, this });
+  }
+  [[nodiscard]] ElementType get_type() const override { return PADDLE; }
+
+  [[nodiscard]] bool update_x(int const new_x)
+  {
+    Vector old_position = center_position();
+    Vector pos = old_position;
+
+    pos.x = new_x;
+    set_position(pos);
+    if (old_position.x < new_x + 1.0F && old_position.x > new_x - 1.0F) { return false; }// todo: möglicher feinschliff
+
+    m_updated = true;
+    return true;
+  }
+
+  bool did_update() override
+  {
+    if (m_updated) {
+      m_updated = false;
+      return true;
+    }
+
+    return false;
+  }
+
+
+  void set_position(Vector const pos) override
+  {
+    auto const position = convert_to_b2_coords(pos);
+    m_body_ptr->SetTransform({ position.x, position.y }, m_body_ptr->GetAngle());
+  }
+
+  void set_is_controlled_by_this_game_instance(bool const c) { m_is_controlled_by_this_game_instance = c; }
+
+  [[nodiscard]] Vector center_position() const override
+  {
+    auto pos = m_body_ptr->GetPosition();
+    return convert_to_arkanoid_coords({ pos.x, pos.y });
+  }
+
+  [[nodiscard]] int width() const override { return paddle_width; }
+  [[nodiscard]] int height() const override { return paddle_height; }
+  [[nodiscard]] bool is_controlled_by_this_game_instance() const { return m_is_controlled_by_this_game_instance; }
+  [[nodiscard]] ftxui::Color color() const override
+  {
+    return (is_controlled_by_this_game_instance()) ? ftxui::Color::White : ftxui::Color::GrayDark;
+  }
+};
 class Ball : public Element
 {
 
@@ -491,78 +563,6 @@ public:
   {
     auto vel = m_body_ptr->GetLinearVelocity();
     return { vel.x, vel.y };
-  }
-};
-
-class Paddle : public Element
-{
-private:
-  b2Body *m_body_ptr = nullptr;
-  bool m_updated{ false };
-  bool m_is_controlled_by_this_game_instance{ false };
-
-public:
-  explicit Paddle(Vector const pos, b2World *arkanoid_world, std::map<b2Fixture *, Element *> &map) : Element{}
-  {
-    auto const position = convert_to_b2_coords(pos);
-    b2BodyDef groundBodyDef;
-    groundBodyDef.position.Set(position.x + (width() / 2.0f), position.y + (height() / 2.0f));
-
-    m_body_ptr = arkanoid_world->CreateBody(&groundBodyDef);
-
-    b2PolygonShape groundBox;
-    groundBox.SetAsBox(width() * b2_coord_convertion_rate, height() * b2_coord_convertion_rate);
-
-    auto fixture = m_body_ptr->CreateFixture(&groundBox, 0.0f);
-
-    map.insert({ fixture, this });
-  }
-  [[nodiscard]] ElementType get_type() const override { return PADDLE; }
-
-  [[nodiscard]] bool update_x(int const new_x)
-  {
-    Vector old_position = center_position();
-    Vector pos = old_position;
-
-    pos.x = new_x;
-    set_position(pos);
-    if (old_position.x < new_x + 1.0F && old_position.x > new_x - 1.0F) { return false; }// todo: möglicher feinschliff
-
-    m_updated = true;
-    return true;
-  }
-
-  bool did_update() override
-  {
-    if (m_updated) {
-      m_updated = false;
-      return true;
-    }
-
-    return false;
-  }
-
-
-  void set_position(Vector const pos) override
-  {
-    auto const position = convert_to_b2_coords(pos);
-    m_body_ptr->SetTransform({ position.x, position.y }, m_body_ptr->GetAngle());
-  }
-
-  void set_is_controlled_by_this_game_instance(bool const c) { m_is_controlled_by_this_game_instance = c; }
-
-  [[nodiscard]] Vector center_position() const override
-  {
-    auto pos = m_body_ptr->GetPosition();
-    return convert_to_arkanoid_coords({ pos.x, pos.y });
-  }
-
-  [[nodiscard]] int width() const override { return paddle_width; }
-  [[nodiscard]] int height() const override { return paddle_height; }
-  [[nodiscard]] bool is_controlled_by_this_game_instance() const { return m_is_controlled_by_this_game_instance; }
-  [[nodiscard]] ftxui::Color color() const override
-  {
-    return (is_controlled_by_this_game_instance()) ? ftxui::Color::White : ftxui::Color::GrayDark;
   }
 };
 
