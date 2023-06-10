@@ -423,6 +423,7 @@ private:
   b2Body *m_body_ptr = nullptr;
   bool m_updated{ false };
   bool m_is_controlled_by_this_game_instance{ false };
+  int m_score{ 0 };
 
 public:
   explicit Paddle(Vector const pos, b2World *arkanoid_world, std::map<b2Fixture *, Element *> &map) : Element{}
@@ -480,6 +481,8 @@ public:
     return convert_to_arkanoid_coords({ pos.x, pos.y });
   }
 
+  void add_score(int const score) { m_score += score; }
+
   [[nodiscard]] int width() const override { return paddle_width; }
   [[nodiscard]] int height() const override { return paddle_height; }
   [[nodiscard]] bool is_controlled_by_this_game_instance() const { return m_is_controlled_by_this_game_instance; }
@@ -487,13 +490,15 @@ public:
   {
     return (is_controlled_by_this_game_instance()) ? ftxui::Color::White : ftxui::Color::GrayDark;
   }
+  [[nodiscard]] int score() const { return m_score; }
 };
 class Ball : public Element
 {
 
 private:
-  b2Body *m_body_ptr = nullptr;
+  b2Body *m_body_ptr{ nullptr };
   bool m_updated{ false };
+  Paddle *m_paddle_ptr{ nullptr };
 
   friend void parse_game_element(Element *, GameElement const &);
 
@@ -549,6 +554,8 @@ public:
     if (m_body_ptr != nullptr) { m_body_ptr->SetLinearVelocity({ vector.x, vector.y }); }
   }
 
+  void set_last_paddle(Paddle *const paddle) { m_paddle_ptr = paddle; }
+
   void add_to_next_update() { m_updated = true; }
 
   [[nodiscard]] Vector center_position() const override
@@ -564,6 +571,7 @@ public:
     auto vel = m_body_ptr->GetLinearVelocity();
     return { vel.x, vel.y };
   }
+  [[nodiscard]] Paddle *last_paddle() const { return m_paddle_ptr; }
 };
 
 class Brick : public Element
@@ -933,9 +941,15 @@ private:
     auto *paddle_ptr = dynamic_multiple_cast<Paddle *>(first_element_ptr, secound_element_ptr);
 
 
-    if (brick_ptr != nullptr && ball_ptr != nullptr) { brick_ptr->hit(); }
+    if (brick_ptr != nullptr && ball_ptr != nullptr) {
+      brick_ptr->hit();
+      if (ball_ptr->last_paddle() != nullptr) { ball_ptr->last_paddle()->add_score(1); }
+    }
     if (ball_ptr != nullptr && paddle_ptr != nullptr) {
-      if (paddle_ptr->is_controlled_by_this_game_instance()) { ball_ptr->add_to_next_update(); }
+      if (paddle_ptr->is_controlled_by_this_game_instance()) {
+        ball_ptr->add_to_next_update();
+        ball_ptr->set_last_paddle(paddle_ptr);
+      }
     }
   }
 
