@@ -297,8 +297,8 @@ public:
 
 namespace arkanoid {
 
-int constexpr canvas_width{ 167 }, canvas_height{ 180 };
-int constexpr playing_field_top{ 5 }, playing_field_bottom{ canvas_height - 10 }, playing_field_left{ 1 },
+int constexpr canvas_width{ 167 }, canvas_height{ 200 };
+int constexpr playing_field_top{ 5 }, playing_field_bottom{ canvas_height - 30 }, playing_field_left{ 1 },
   playing_field_right{ canvas_width - 2 };
 int constexpr ball_radius{ 1 }, ball_speed{ 1 };
 int constexpr paddle_width{ 14 }, paddle_height{ 1 };
@@ -519,7 +519,7 @@ public:
   }
   [[nodiscard]] ElementType get_type() const override { return PADDLE; }
 
-  [[nodiscard]] bool update_left(int const new_x)
+  [[nodiscard]] bool update_x(int const new_x)
   {
     Vector old_position = center_position();
     Vector pos = old_position;
@@ -560,6 +560,10 @@ public:
   [[nodiscard]] int width() const override { return paddle_width; }
   [[nodiscard]] int height() const override { return paddle_height; }
   [[nodiscard]] bool is_controlled_by_this_game_instance() const { return m_is_controlled_by_this_game_instance; }
+  [[nodiscard]] ftxui::Color color() const override
+  {
+    return (is_controlled_by_this_game_instance()) ? ftxui::Color::White : ftxui::Color::GrayDark;
+  }
 };
 
 class Brick : public Element
@@ -939,14 +943,14 @@ public:
   explicit ContactListener(std::map<b2Fixture *, arkanoid::Element *> &b2_map) : m_b2_element_map{ b2_map } {}
 
 
-  void PreSolve(b2Contact *contact, const b2Manifold *oldManifold)
+  void PreSolve(b2Contact *contact, const b2Manifold *oldManifold) override
   {
     contact->SetFriction(0.0F);
     contact->SetRestitution(1.0F);
     contact->SetTangentSpeed(0.5F);
   }
 
-  void EndContact(b2Contact *contact)
+  void EndContact(b2Contact *contact) override
   {
     if (m_b2_element_map.contains(contact->GetFixtureA())) {
       auto pairA = m_b2_element_map.find(contact->GetFixtureA());
@@ -1004,6 +1008,7 @@ int main()
     b2World arkanoid_world{ { 0, 0 } };
     ContactListener listener{ b2_element_map };
     arkanoid_world.SetContactListener(&listener);
+    arkanoid::Vector const paddle_position = { (canvas_width / 2) - (paddle_width / 2), paddle_y };
 
     build_world_border(&arkanoid_world);
 
@@ -1017,7 +1022,6 @@ int main()
     show_connecting_state(connection);
 
     if (as_host) {
-      arkanoid::Vector const paddle_position = { (canvas_width / 2) - (paddle_width / 2), paddle_y };
 
       {
         std::lock_guard<std::mutex> lock{ element_mutex };
@@ -1051,7 +1055,7 @@ int main()
 
     if (connection.has_connected()) {
       int controlling_paddle_id{ -1 };
-      int mouse_x{};
+      int mouse_x{ paddle_position.x_i() };
       std::vector<arkanoid::Element *> updated_elements;
 
       auto renderer = Renderer([&] {
@@ -1061,29 +1065,14 @@ int main()
           std::lock_guard<std::mutex> lock{ element_mutex };
           std::for_each(
             element_map.begin(), element_map.end(), [&can](auto const &pair) { draw(can, *(pair.second)); });
-
-          if (element_map.contains(2)) {
-            arkanoid::Element *ball_el_ptr = element_map.find(2)->second.get();
-
-            if (ball_el_ptr->get_type() == BALL) {
-              Ball *ball_ptr = dynamic_cast<Ball *>(ball_el_ptr);// todo : dynamic cast
-              auto vel = ball_ptr->velocity();
-              can.DrawText(0, 10, fmt::format("x: {}, y: {}", vel.x, vel.y));
-            }
-          }
         }
 
-        long const timestamp =
-          std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch())
-            .count();
+        can.DrawText(
+          15, playing_field_bottom + 2, fmt::format("Synchronisationen versendet: {}", connection.game_updates_sent()));
+        can.DrawText(15,
+          playing_field_bottom + 7,
+          fmt::format("Synchronisationen empfangen: {}", connection.game_updates_received()));
 
-        can.DrawText(0, 0, std::to_string(timestamp));
-
-        if (as_host) {
-          can.DrawText(15, 5, std::to_string(connection.game_updates_sent()));
-        } else {
-          can.DrawText(15, 5, std::to_string(connection.game_updates_received()));
-        }
 
         can.DrawBlockLine(
           playing_field_left, playing_field_top, playing_field_left, playing_field_bottom, ftxui::Color::GrayLight);
@@ -1124,12 +1113,13 @@ int main()
               arkanoid::Element *paddle_element = element_map.find(controlling_paddle_id)->second.get();
               auto *paddle_ptr = dynamic_cast<Paddle *>(paddle_element);
 
-              int const new_paddle_x = (mouse_x > playing_field_right - paddle_width)
-                                         ? playing_field_right - paddle_width
-                                       : (mouse_x < playing_field_left) ? playing_field_left
-                                                                        : mouse_x;
+              int new_paddle_x = mouse_x;
+              int const half_width = paddle_ptr->width() / 2;
+              std::pair<int, int> constrains{ playing_field_left + half_width, playing_field_right - half_width };
 
-              paddle_ptr->update_left(new_paddle_x);
+              if (new_paddle_x < constrains.first) { new_paddle_x = constrains.first; }
+              if (new_paddle_x > constrains.second) { new_paddle_x = constrains.second; }// todo: auslagern
+              paddle_ptr->update_x(new_paddle_x);
             }
 
             arkanoid_world.Step(1.0F / (frame_rate), 4, 2);
