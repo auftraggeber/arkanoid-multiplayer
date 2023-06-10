@@ -343,6 +343,28 @@ class NetPaddle PROTOBUF_FINAL :
 
   // accessors -------------------------------------------------------
 
+  enum : int {
+    kScoreFieldNumber = 1,
+    kControlledBySenderFieldNumber = 2,
+  };
+  // int32 score = 1;
+  void clear_score();
+  ::PROTOBUF_NAMESPACE_ID::int32 score() const;
+  void set_score(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_score() const;
+  void _internal_set_score(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // bool controlled_by_sender = 2;
+  void clear_controlled_by_sender();
+  bool controlled_by_sender() const;
+  void set_controlled_by_sender(bool value);
+  private:
+  bool _internal_controlled_by_sender() const;
+  void _internal_set_controlled_by_sender(bool value);
+  public:
+
   // @@protoc_insertion_point(class_scope:NetPaddle)
  private:
   class _Internal;
@@ -350,6 +372,8 @@ class NetPaddle PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::int32 score_;
+  bool controlled_by_sender_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_arkanoid_2eproto;
 };
@@ -1075,6 +1099,46 @@ inline void NetBall::set_velocity_y(float value) {
 // -------------------------------------------------------------------
 
 // NetPaddle
+
+// int32 score = 1;
+inline void NetPaddle::clear_score() {
+  score_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 NetPaddle::_internal_score() const {
+  return score_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 NetPaddle::score() const {
+  // @@protoc_insertion_point(field_get:NetPaddle.score)
+  return _internal_score();
+}
+inline void NetPaddle::_internal_set_score(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  score_ = value;
+}
+inline void NetPaddle::set_score(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_score(value);
+  // @@protoc_insertion_point(field_set:NetPaddle.score)
+}
+
+// bool controlled_by_sender = 2;
+inline void NetPaddle::clear_controlled_by_sender() {
+  controlled_by_sender_ = false;
+}
+inline bool NetPaddle::_internal_controlled_by_sender() const {
+  return controlled_by_sender_;
+}
+inline bool NetPaddle::controlled_by_sender() const {
+  // @@protoc_insertion_point(field_get:NetPaddle.controlled_by_sender)
+  return _internal_controlled_by_sender();
+}
+inline void NetPaddle::_internal_set_controlled_by_sender(bool value) {
+  
+  controlled_by_sender_ = value;
+}
+inline void NetPaddle::set_controlled_by_sender(bool value) {
+  _internal_set_controlled_by_sender(value);
+  // @@protoc_insertion_point(field_set:NetPaddle.controlled_by_sender)
+}
 
 // -------------------------------------------------------------------
 
