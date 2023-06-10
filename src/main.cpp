@@ -112,7 +112,8 @@ private:
   std::vector<std::function<void(GameUpdate const &)>> m_receivers;
   bool m_connected{ false }, m_sending{ false };
   std::queue<GameUpdate> m_next_game_updates;
-  std::mutex m_receivers_mutex, m_conntected_mutex, m_send_mutex;
+  std::mutex m_receivers_mutex, m_conntected_mutex, m_send_mutex, m_send_c_mutex, m_receive_c_mutex;
+  int m_gu_send_counter{ 0 }, m_gu_receive_counter{ 0 };
 
   void connect_to_on_this_thread(std::string const &host, int const &port)
   {
@@ -170,6 +171,10 @@ private:
             buffer.consume(bytes_transferred);
 
             if (update.ParseFromString(message)) { call_receivers(update); }
+            {
+              std::lock_guard<std::mutex> c_lock{ m_receive_c_mutex };
+              ++m_gu_receive_counter;
+            }
 
             debug(fmt::format("Nachricht empfangen: {}\n", message));
           } catch (asio::system_error const &e) {
@@ -256,6 +261,10 @@ public:
         std::lock_guard<std::mutex> lock{ m_send_mutex };
         m_sending = false;
       }
+      {
+        std::lock_guard<std::mutex> c_lock{ m_send_c_mutex };
+        ++m_gu_send_counter;
+      }
     }).detach();
   }
 
@@ -269,6 +278,18 @@ public:
   {
     std::lock_guard<std::mutex> lock{ m_conntected_mutex };
     return m_connected;
+  }
+
+  [[nodiscard]] int game_updates_sent()
+  {
+    std::lock_guard<std::mutex> lock{ m_send_c_mutex };
+    return m_gu_send_counter;
+  }
+
+  [[nodiscard]] int game_updates_received()
+  {
+    std::lock_guard<std::mutex> lock{ m_receive_c_mutex };
+    return m_gu_receive_counter;
   }
 };
 
@@ -284,7 +305,7 @@ int constexpr paddle_width{ 14 }, paddle_height{ 1 };
 int constexpr brick_width{ 14 }, brick_height{ 5 };
 int constexpr num_bricks_y{ 8 };
 int constexpr brick_distance_x{ 2 }, brick_distance_y{ 3 };
-float constexpr b2_coord_convertion_rate{ 40.0F };
+float constexpr b2_coord_convertion_rate{ 140.0F };
 int constexpr brick_max_duration{ 3 }, brick_min_duration{ 1 };
 
 class IdGenerator
@@ -426,7 +447,7 @@ public:
     fixtureDef.friction = 0.0F;// todo: andere friction = fehlerhaftes verhalten
 
     auto fixture = m_body_ptr->CreateFixture(&fixtureDef);
-    m_body_ptr->SetLinearVelocity({ 6.0F, 9.0F });
+    m_body_ptr->SetLinearVelocity({ 2.0F, 3.0F });
     m_body_ptr->SetAngularVelocity(0);
     m_body_ptr->SetFixedRotation(true);
 
@@ -500,9 +521,13 @@ public:
 
   [[nodiscard]] bool update_left(int const new_x)
   {
-    Vector pos = center_position();
+    Vector old_position = center_position();
+    Vector pos = old_position;
+
     pos.x = new_x;
     set_position(pos);
+    if (old_position.x < new_x + 1.0F && old_position.x > new_x - 1.0F) { return false; }// todo: möglicher feinschliff
+
     m_updated = true;
     return true;
   }
@@ -1053,6 +1078,12 @@ int main()
             .count();
 
         can.DrawText(0, 0, std::to_string(timestamp));
+
+        if (as_host) {
+          can.DrawText(15, 5, std::to_string(connection.game_updates_sent()));
+        } else {
+          can.DrawText(15, 5, std::to_string(connection.game_updates_received()));
+        }
 
         can.DrawBlockLine(
           playing_field_left, playing_field_top, playing_field_left, playing_field_bottom, ftxui::Color::GrayLight);
