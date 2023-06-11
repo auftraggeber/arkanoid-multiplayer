@@ -583,8 +583,9 @@ class Brick : public Element
 {
 
 private:
-  b2Body *m_body_ptr = nullptr;
-  int m_duration;// todo -> variable duration
+  b2Body *m_body_ptr{ nullptr };
+  int m_duration;
+  bool m_updated{ false };
 
   friend void parse_game_element(Element *, GameElement const &);
 
@@ -608,7 +609,18 @@ public:
     map.insert({ fixture, this });
   }
 
-  void hit() { --m_duration; }
+  void hit(Ball *ball)
+  {
+    if ((ball->last_paddle() != nullptr && ball->last_paddle()->is_controlled_by_this_game_instance())
+        || m_duration > 1) {
+      --m_duration;
+
+      if (m_duration <= 0) {
+        m_updated = true;
+        ball->add_to_next_update();
+      }
+    }
+  }
 
 
   [[nodiscard]] ElementType get_type() const override { return BRICK; }
@@ -631,7 +643,15 @@ public:
     if (m_body_ptr != nullptr && m_duration <= 0 && m_body_ptr->IsEnabled()) { m_body_ptr->SetEnabled(false); }
     return m_duration > 0;
   }
-  [[nodiscard]] bool did_update() override { return false; }
+  [[nodiscard]] bool did_update() override
+  {
+    if (m_updated) {
+      m_updated = false;
+      return true;
+    }
+
+    return false;
+  }
   [[nodiscard]] int duration() const { return m_duration; }
   [[nodiscard]] ftxui::Color color() const override
   {
@@ -947,7 +967,7 @@ private:
 
 
     if (brick_ptr != nullptr && ball_ptr != nullptr) {
-      brick_ptr->hit();
+      brick_ptr->hit(ball_ptr);
       if (ball_ptr->last_paddle() != nullptr) { ball_ptr->last_paddle()->add_score(1); }
     }
     if (ball_ptr != nullptr && paddle_ptr != nullptr) {
