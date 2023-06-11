@@ -8,6 +8,7 @@
 #include "box2d-incl/box2d/b2_polygon_shape.h"
 #include "box2d-incl/box2d/b2_world.h"
 #include <cmath>
+#include <cstring>
 #include <ftxui/screen/color.hpp>
 #include <iostream>
 
@@ -26,6 +27,8 @@ int constexpr brick_distance_x{ 2 }, brick_distance_y{ 3 };
 float constexpr b2_coord_convertion_rate{ 140.0F };
 int constexpr brick_max_duration{ 3 }, brick_min_duration{ 1 };
 float constexpr ball_velocity_x{ 2.0F }, ball_velocity_y{ 2.5F };
+float constexpr ball_force_y{ 0.08F }, ball_force_push_when_zero{ 0.7F };
+bool constexpr ball_forces{ true };
 
 class IdGenerator
 {
@@ -262,8 +265,38 @@ public:
 
   [[nodiscard]] ElementType get_type() const override { return BALL; }
 
+  [[nodiscard]] Vector velocity() const
+  {
+    auto vel = m_body_ptr->GetLinearVelocity();
+    return { vel.x, vel.y };
+  }
+
   bool did_update() override
   {
+
+    if (ball_forces && m_body_ptr != nullptr) {
+
+      float const middle_y = ((playing_field_bottom - playing_field_top) / 2.0F) + playing_field_top;
+      float const middle_x = ((playing_field_right - playing_field_left) / 2.0F) + playing_field_left;
+      auto const position = center_position();
+      auto const vel = velocity();
+      auto const gravity = convert_to_b2_coords(Vector{ 0.0F, ball_force_y });
+      float correct_direction_x{ 0.0F };
+      float corrent_direction_y{ 0.0F };
+      if (std::abs(vel.x) <= 0.1F) {// zu linear
+        correct_direction_x = (position.x < middle_x) ? ball_force_push_when_zero : -ball_force_push_when_zero;
+      }
+      if (std::abs(vel.y) <= 0.1F) {
+        corrent_direction_y = (position.y < middle_y) ? ball_force_push_when_zero : -ball_force_push_when_zero;
+      }
+
+      if (position.y > middle_y) {
+        m_body_ptr->ApplyForceToCenter({ gravity.x + correct_direction_x, gravity.y + corrent_direction_y }, false);
+      } else if (position.y < middle_y) {
+        m_body_ptr->ApplyForceToCenter({ -gravity.x + correct_direction_x, -gravity.y + corrent_direction_y }, false);
+      }
+    }
+
 
     if (m_updated) {
       m_updated = false;
@@ -275,7 +308,7 @@ public:
   void set_position(Vector const pos) override
   {
     auto const position = convert_to_b2_coords(pos);
-    m_body_ptr->SetTransform({ position.x, position.y }, m_body_ptr->GetAngle());
+    m_body_ptr->SetTransform({ position.x, position.y }, 0);
   }
 
   void set_velocity(Vector const vector)
@@ -295,11 +328,6 @@ public:
 
   [[nodiscard]] int width() const override { return ball_radius; }
   [[nodiscard]] int height() const override { return ball_radius; }
-  [[nodiscard]] Vector velocity() const
-  {
-    auto vel = m_body_ptr->GetLinearVelocity();
-    return { vel.x, vel.y };
-  }
   [[nodiscard]] Paddle *last_paddle() const { return m_paddle_ptr; }
 };
 
