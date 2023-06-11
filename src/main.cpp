@@ -353,6 +353,130 @@ std::array<b2Fixture *, 2> build_b2_world_border(b2World *world)
   return { fix_1, fix_2 };
 }
 
+void draw_information_texts(ftxui::Canvas &can,
+  connection::Connection &connection,
+  int const your_score,
+  int const enemy_score)
+{
+  using namespace arkanoid;
+  can.DrawText(
+    15, playing_field_bottom + 10, fmt::format("Synchronisationen versendet: {}", connection.game_updates_sent()));
+  can.DrawText(
+    15, playing_field_bottom + 15, fmt::format("Synchronisationen empfangen: {}", connection.game_updates_received()));
+
+  can.DrawText(playing_field_right - 40, playing_field_bottom + 10, fmt::format("Deine Punkte: {}", your_score));
+  can.DrawText(playing_field_right - 40, playing_field_bottom + 15, fmt::format("Punkte Gegner: {}", enemy_score));
+}
+
+[[nodiscard]] bool find_paddle_ptrs(std::array<arkanoid::Paddle *, 2> &paddle_ptrs,
+  std::array<b2Fixture *, 2> const &back_plates,
+  std::map<int, std::unique_ptr<arkanoid::Element>> const &element_map,
+  ContactListener &listener)
+{
+  using namespace arkanoid;
+  if (paddle_ptrs[0] == nullptr || paddle_ptrs[1] == nullptr) {
+    auto found_iterator = std::find_if(
+      element_map.begin(), element_map.end(), [](const auto &pair) { return pair.second->get_type() == PADDLE; });
+
+    if (found_iterator != element_map.end()) {
+      std::for_each(found_iterator, element_map.end(), [&paddle_ptrs](auto const &pair) {
+        auto *element_ptr = pair.second.get();
+
+        if (element_ptr->get_type() == PADDLE) {
+          auto *paddle_ptr = dynamic_cast<Paddle *>(element_ptr);
+
+          if (paddle_ptr->is_controlled_by_this_game_instance()) {
+            paddle_ptrs[0] = paddle_ptr;
+          } else {
+            paddle_ptrs[1] = paddle_ptr;
+          }
+        }
+      });
+
+      if (paddle_ptrs[0] != nullptr && paddle_ptrs[1] != nullptr && back_plates[0] != nullptr
+          && back_plates[1] != nullptr) {
+        auto const distance_paddle_0_to_plate_0 =
+          std::abs(arkanoid::convert_to_arkanoid_coords(back_plates[0]->GetBody()->GetPosition()).y
+                   - paddle_ptrs[0]->center_position().y);
+        auto const distance_paddle_1_to_plate_0 =
+          std::abs(arkanoid::convert_to_arkanoid_coords(back_plates[0]->GetBody()->GetPosition()).y
+                   - paddle_ptrs[1]->center_position().y);
+        if (distance_paddle_0_to_plate_0 <= distance_paddle_1_to_plate_0) {
+          listener.add_back_plate(back_plates[0], paddle_ptrs[0]);
+          listener.add_back_plate(back_plates[1], paddle_ptrs[1]);
+        } else {
+          listener.add_back_plate(back_plates[0], paddle_ptrs[1]);
+          listener.add_back_plate(back_plates[1], paddle_ptrs[0]);
+        }
+      }
+    }
+  }
+
+  return paddle_ptrs[0] != nullptr;
+}
+
+void update_paddle_position(arkanoid::Paddle *paddle_ptr, int const mouse_x)
+{
+  using namespace arkanoid;
+  int new_paddle_x = mouse_x;
+  int const half_width = paddle_ptr->width() / 2;
+  std::pair<int, int> constrains{ playing_field_left + half_width, playing_field_right - half_width };
+
+  if (new_paddle_x < constrains.first) { new_paddle_x = constrains.first; }
+  if (new_paddle_x > constrains.second) { new_paddle_x = constrains.second; }// todo: auslagern
+  paddle_ptr->update_x(new_paddle_x);
+}
+
+void run_game(int const frame_rate,
+  ftxui::ScreenInteractive &screen,
+  ftxui::Loop &loop,
+  int &mouse_x,
+  connection::Connection &connection,
+  std::mutex &element_mutex,
+  std::map<int, std::unique_ptr<arkanoid::Element>> &element_map,
+  std::array<arkanoid::Paddle *, 2> &paddle_ptrs,
+  std::array<b2Fixture *, 2> const &back_plates,
+  std::mutex &game_update_mutex,
+  std::vector<arkanoid::Element *> &updated_elements,
+  b2World &arkanoid_world,
+  ContactListener &listener)
+{
+  using namespace ftxui;
+  using namespace arkanoid;
+  auto const frame_time_budget{ std::chrono::seconds(1) / frame_rate };
+
+  while (!loop.HasQuitted()) {
+    const auto frame_start_time{ std::chrono::steady_clock::now() };
+
+    screen.RequestAnimationFrame();// wichtig, da sonst keine aktualisierung, wenn aus fokus
+    loop.RunOnce();
+
+    {
+      std::lock_guard<std::mutex> lock{ element_mutex };
+
+      if (find_paddle_ptrs(paddle_ptrs, back_plates, element_map, listener)) {
+        auto *paddle_ptr = paddle_ptrs[0];
+        update_paddle_position(paddle_ptr, mouse_x);
+      }
+
+      arkanoid_world.Step(1.0F / (frame_rate), 4, 2);
+
+      std::for_each(element_map.begin(), element_map.end(), [&updated_elements](auto const &pair) {
+        if (pair.second->did_update()) { updated_elements.push_back(pair.second.get()); }
+      });
+    }
+
+    if (!updated_elements.empty()) {
+      create_and_send_new_game_update(updated_elements, connection, game_update_mutex);
+      updated_elements.clear();
+    }
+
+    const auto frame_end_time{ std::chrono::steady_clock::now() };
+    const auto unused_frame_time{ frame_time_budget - (frame_end_time - frame_start_time) };
+    if (unused_frame_time > std::chrono::seconds(0)) { std::this_thread::sleep_for(unused_frame_time); }
+  }
+}
+
 int main()
 {
   using namespace ftxui;
@@ -361,23 +485,27 @@ int main()
 
   show_connection_methods([](bool const as_host, int const &port) {
     auto screen = ScreenInteractive::FitComponent();
-
-    connection::Connection connection;
+    constexpr int frame_rate = 40.0;
 
     std::mutex element_mutex;
     std::mutex game_update_mutex;
     std::map<int, std::unique_ptr<arkanoid::Element>> element_map;
     std::map<b2Fixture *, arkanoid::Element *> b2_element_map;
+    std::vector<arkanoid::Element *> updated_elements;
 
     int const paddle_y{ playing_field_bottom - paddle_height };
     Vector const paddle_position{ (canvas_width / 2) - (paddle_width / 2), paddle_y };
+    std::array<Paddle *, 2> paddle_ptrs{ nullptr, nullptr };// {your, enemy}
 
+    int mouse_x{ paddle_position.x_i() };
 
     b2World arkanoid_world{ { 0, 0 } };
     ContactListener listener{ b2_element_map };
     arkanoid_world.SetContactListener(&listener);
     auto const back_plates = build_b2_world_border(&arkanoid_world);
 
+
+    connection::Connection connection;
     connection.register_receiver(
       [&element_map, &element_mutex, &arkanoid_world, &b2_element_map](GameUpdate const &update) {
         std::lock_guard<std::mutex> lock{ element_mutex };
@@ -408,15 +536,13 @@ int main()
     }
 
     if (connection.has_connected()) {
-      std::array<Paddle *, 2> paddle_ptrs{ nullptr, nullptr };// {your, enemy}
 
-      int mouse_x{ paddle_position.x_i() };
-      std::vector<arkanoid::Element *> updated_elements;
 
       auto renderer = Renderer([&] {
         Canvas can = Canvas(canvas_width, canvas_height);
-        int your_score{ 0 }, enemy_score{ 0 };
 
+        int your_score{ 0 };
+        int enemy_score{ 0 };
 
         {
           std::lock_guard<std::mutex> lock{ element_mutex };
@@ -427,17 +553,7 @@ int main()
           if (paddle_ptrs[1] != nullptr) { enemy_score = paddle_ptrs[1]->score(); }
         }
 
-        can.DrawText(15,
-          playing_field_bottom + 10,
-          fmt::format("Synchronisationen versendet: {}", connection.game_updates_sent()));
-        can.DrawText(15,
-          playing_field_bottom + 15,
-          fmt::format("Synchronisationen empfangen: {}", connection.game_updates_received()));
-
-        can.DrawText(playing_field_right - 40, playing_field_bottom + 10, fmt::format("Deine Punkte: {}", your_score));
-        can.DrawText(
-          playing_field_right - 40, playing_field_bottom + 15, fmt::format("Punkte Gegner: {}", enemy_score));
-
+        draw_information_texts(can, connection, your_score, enemy_score);
 
         can.DrawBlockLine(
           playing_field_left, playing_field_top, playing_field_left, playing_field_bottom, ftxui::Color::GrayLight);
@@ -459,101 +575,19 @@ int main()
 
       Loop loop{ &screen, std::move(renderer) };
 
-      constexpr int frame_rate = 40.0;
-
-      auto game_update_loop = [&element_map,
-                                &element_mutex,
-                                &paddle_ptrs,
-                                as_host,
-                                &updated_elements,
-                                &mouse_x,
-                                &back_plates,
-                                &listener,
-                                frame_rate,
-                                &arkanoid_world]() {// todo - mouse_x als kopie buggt
-        {
-          {
-            std::lock_guard<std::mutex> lock{ element_mutex };
-
-            if (paddle_ptrs[0] == nullptr || paddle_ptrs[1] == nullptr) {
-              auto found_iterator = std::find_if(element_map.begin(), element_map.end(), [](const auto &pair) {
-                return pair.second->get_type() == PADDLE;
-              });
-
-              if (found_iterator != element_map.end()) {
-                std::for_each(found_iterator, element_map.end(), [&paddle_ptrs](auto const &pair) {
-                  auto *element_ptr = pair.second.get();
-
-                  if (element_ptr->get_type() == PADDLE) {
-                    auto *paddle_ptr = dynamic_cast<Paddle *>(element_ptr);
-
-                    if (paddle_ptr->is_controlled_by_this_game_instance()) {
-                      paddle_ptrs[0] = paddle_ptr;
-                    } else {
-                      paddle_ptrs[1] = paddle_ptr;
-                    }
-                  }
-                });
-
-                if (paddle_ptrs[0] != nullptr && paddle_ptrs[1] != nullptr && back_plates[0] != nullptr
-                    && back_plates[1] != nullptr) {
-                  auto const distance_paddle_0_to_plate_0 =
-                    std::abs(arkanoid::convert_to_arkanoid_coords(back_plates[0]->GetBody()->GetPosition()).y
-                             - paddle_ptrs[0]->center_position().y);
-                  auto const distance_paddle_1_to_plate_0 =
-                    std::abs(arkanoid::convert_to_arkanoid_coords(back_plates[0]->GetBody()->GetPosition()).y
-                             - paddle_ptrs[1]->center_position().y);
-                  if (distance_paddle_0_to_plate_0 <= distance_paddle_1_to_plate_0) {
-                    listener.add_back_plate(back_plates[0], paddle_ptrs[0]);
-                    listener.add_back_plate(back_plates[1], paddle_ptrs[1]);
-                  } else {
-                    listener.add_back_plate(back_plates[0], paddle_ptrs[1]);
-                    listener.add_back_plate(back_plates[1], paddle_ptrs[0]);
-                  }
-                }
-              }
-            }
-
-            if (paddle_ptrs[0] != nullptr) {
-              auto *paddle_ptr = paddle_ptrs[0];
-
-              int new_paddle_x = mouse_x;
-              int const half_width = paddle_ptr->width() / 2;
-              std::pair<int, int> constrains{ playing_field_left + half_width, playing_field_right - half_width };
-
-              if (new_paddle_x < constrains.first) { new_paddle_x = constrains.first; }
-              if (new_paddle_x > constrains.second) { new_paddle_x = constrains.second; }// todo: auslagern
-              paddle_ptr->update_x(new_paddle_x);
-            }
-
-            arkanoid_world.Step(1.0F / (frame_rate), 4, 2);
-
-            std::for_each(element_map.begin(), element_map.end(), [&updated_elements](auto const &pair) {
-              if (pair.second->did_update()) { updated_elements.push_back(pair.second.get()); }
-            });
-          }
-        }
-      };
-
-      constexpr auto frame_time_budget{ std::chrono::seconds(1) / frame_rate };
-
-      while (!loop.HasQuitted()) {
-        const auto frame_start_time{ std::chrono::steady_clock::now() };
-
-        screen.RequestAnimationFrame();// wichtig, da sonst keine aktualisierung, wenn aus fokus
-        loop.RunOnce();
-
-        game_update_loop();
-
-        if (!updated_elements.empty()) {
-          create_and_send_new_game_update(updated_elements, connection, game_update_mutex);
-          updated_elements.clear();
-        }
-
-        const auto frame_end_time{ std::chrono::steady_clock::now() };
-        const auto unused_frame_time{ frame_time_budget - (frame_end_time - frame_start_time) };
-        if (unused_frame_time > std::chrono::seconds(0)) { std::this_thread::sleep_for(unused_frame_time); }
-      }
+      run_game(frame_rate,
+        screen,
+        loop,
+        mouse_x,
+        connection,
+        element_mutex,
+        element_map,
+        paddle_ptrs,
+        back_plates,
+        game_update_mutex,
+        updated_elements,
+        arkanoid_world,
+        listener);
 
       std::lock_guard<std::mutex> game_update_lock{ game_update_mutex };
       connection.close();
