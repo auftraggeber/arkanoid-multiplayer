@@ -166,25 +166,6 @@ void generate_bricks(std::map<int, std::unique_ptr<arkanoid::Element>> &elements
   }
 }
 
-template<typename T1>//
-void draw(ftxui::Canvas &canvas, T1 &drawable)
-{
-  if (!drawable.exists()) { return; }
-
-  for (int y = drawable.top(); y <= drawable.bottom(); y += 2) {
-    canvas.DrawBlockLine(drawable.left(), y, drawable.right(), y, drawable.color());
-  }
-}
-
-int find_id_of_controller(std::map<int, std::unique_ptr<arkanoid::Element>> const &element_map, bool const as_host)
-{
-  int const id = (as_host) ? 0 : 1;
-
-  if (element_map.contains(id)) { return id; }
-
-  return -1;
-}
-
 void create_and_send_new_game_update(std::vector<arkanoid::Element *> const &send_elements,
   connection::Connection &connection,
   std::mutex &game_update_mutex)
@@ -214,16 +195,6 @@ void create_and_send_new_game_update(std::vector<arkanoid::Element *> const &sen
 
   })
     .detach();
-}
-
-template<typename T1, typename T2>//
-[[nodiscard]] T1 dynamic_multiple_cast(T2 t2_1, T2 t2_2)// todo: ...
-{
-  auto t1_1 = dynamic_cast<T1>(t2_1);
-  auto t1_2 = dynamic_cast<T1>(t2_2);
-
-  if (t1_1 == nullptr) { return t1_2; }
-  return t1_1;
 }
 
 class ContactListener : public b2ContactListener
