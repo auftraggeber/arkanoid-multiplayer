@@ -1139,19 +1139,25 @@ int main()
             std::lock_guard<std::mutex> lock{ element_mutex };
 
             if (paddle_ptrs.first == nullptr || paddle_ptrs.second == nullptr) {
-              std::for_each(element_map.begin(), element_map.end(), [&paddle_ptrs](auto &pair) {
-                auto *element_ptr = pair.second.get();
-
-                if (element_ptr->get_type() == PADDLE) {
-                  auto *paddle_ptr = dynamic_cast<Paddle *>(element_ptr);
-
-                  if (paddle_ptr->is_controlled_by_this_game_instance()) {
-                    paddle_ptrs.first = paddle_ptr;
-                  } else {
-                    paddle_ptrs.second = paddle_ptr;
-                  }
-                }
+              auto found_iterator = std::find_if(element_map.begin(), element_map.end(), [](const auto &pair) {
+                return pair.second->get_type() == PADDLE;
               });
+
+              if (found_iterator != element_map.end()) {
+                std::for_each(found_iterator, element_map.end(), [&paddle_ptrs](auto const &pair) {
+                  auto *element_ptr = pair.second.get();
+
+                  if (element_ptr->get_type() == PADDLE) {
+                    auto *paddle_ptr = dynamic_cast<Paddle *>(element_ptr);
+
+                    if (paddle_ptr->is_controlled_by_this_game_instance()) {
+                      paddle_ptrs.first = paddle_ptr;
+                    } else {
+                      paddle_ptrs.second = paddle_ptr;
+                    }
+                  }
+                });
+              }
             }
 
             if (paddle_ptrs.first != nullptr) {
