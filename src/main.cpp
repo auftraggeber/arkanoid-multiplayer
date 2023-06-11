@@ -366,6 +366,11 @@ public:
   return { vector.x / b2_coord_convertion_rate, vector.y / b2_coord_convertion_rate };
 }
 
+[[nodiscard]] Vector convert_to_arkanoid_coords(b2Vec2 const &vector)
+{
+  return convert_to_arkanoid_coords(arkanoid::Vector{ vector.x, vector.y });
+}
+
 
 enum ElementType { BALL, BRICK, PADDLE };
 class Element
@@ -479,13 +484,13 @@ public:
   [[nodiscard]] Vector center_position() const override
   {
     auto pos = m_body_ptr->GetPosition();
-    return convert_to_arkanoid_coords({ pos.x, pos.y });
+    return convert_to_arkanoid_coords(arkanoid::Vector{ pos.x, pos.y });
   }
 
   void add_score(int const score)
   {
     m_score += score;
-    m_updated = m_updated || score != 0;
+    m_updated = m_updated || (score != 0 && is_controlled_by_this_game_instance());
   }
 
   [[nodiscard]] int width() const override { return paddle_width; }
@@ -566,7 +571,7 @@ public:
   [[nodiscard]] Vector center_position() const override
   {
     auto pos = m_body_ptr->GetPosition();
-    return convert_to_arkanoid_coords({ pos.x, pos.y });
+    return convert_to_arkanoid_coords(arkanoid::Vector{ pos.x, pos.y });
   }
 
   [[nodiscard]] int width() const override { return ball_radius; }
@@ -633,7 +638,7 @@ public:
   [[nodiscard]] Vector center_position() const override
   {
     auto pos = m_body_ptr->GetPosition();
-    return convert_to_arkanoid_coords({ pos.x, pos.y });
+    return convert_to_arkanoid_coords(arkanoid::Vector{ pos.x, pos.y });
   }
 
   [[nodiscard]] int width() const override { return brick_width; }
@@ -949,7 +954,10 @@ template<typename T1, typename T2>//
 class ContactListener : public b2ContactListener
 {
 private:
+  static void BackPlateHit(arkanoid::Paddle *const paddle) { paddle->add_score(-5); }
+
   std::map<b2Fixture *, arkanoid::Element *> &m_b2_element_map;
+  std::map<b2Fixture *, arkanoid::Paddle *> m_back_plates;
 
   void UpdateElementsAfterContact(std::map<b2Fixture *, arkanoid::Element *>::iterator const &first_iterator,
     std::map<b2Fixture *, arkanoid::Element *>::iterator const &second_iterator)
@@ -978,8 +986,32 @@ private:
     }
   }
 
+
+  void CheckIfBackPlateWasHit(b2Contact *contact)
+  {
+    arkanoid::Paddle *paddle_ptr{ nullptr };
+    arkanoid::Ball *ball_ptr{ nullptr };
+    if (m_back_plates.contains(contact->GetFixtureA()) && m_b2_element_map.contains(contact->GetFixtureB())) {
+      paddle_ptr = m_back_plates.find(contact->GetFixtureA())->second;
+      ball_ptr = dynamic_cast<arkanoid::Ball *>(m_b2_element_map.find(contact->GetFixtureB())->second);
+    } else if (m_back_plates.contains(contact->GetFixtureB()) && m_b2_element_map.contains(contact->GetFixtureA())) {
+      paddle_ptr = m_back_plates.find(contact->GetFixtureB())->second;
+      ball_ptr = dynamic_cast<arkanoid::Ball *>(m_b2_element_map.find(contact->GetFixtureA())->second);
+    }
+
+    if (paddle_ptr != nullptr && ball_ptr != nullptr && ball_ptr->last_paddle() != nullptr
+        && ball_ptr->last_paddle()->is_controlled_by_this_game_instance()) {
+      BackPlateHit(paddle_ptr);
+    }
+  }
+
 public:
-  explicit ContactListener(std::map<b2Fixture *, arkanoid::Element *> &b2_map) : m_b2_element_map{ b2_map } {}
+  explicit ContactListener(std::map<b2Fixture *, arkanoid::Element *> &b2_map) : m_b2_element_map{ b2_map } {};
+
+  void add_back_plate(b2Fixture *const fixture, arkanoid::Paddle *const paddle)
+  {
+    m_back_plates.insert({ fixture, paddle });
+  }
 
 
   void PreSolve(b2Contact *contact, const b2Manifold *oldManifold) override
@@ -996,12 +1028,15 @@ public:
       if (m_b2_element_map.contains(contact->GetFixtureB())) {
         auto pairB = m_b2_element_map.find(contact->GetFixtureB());
         UpdateElementsAfterContact(pairA, pairB);
+        return;
       }
     }
+
+    CheckIfBackPlateWasHit(contact);
   }
 };
 
-void build_world_border(b2World *world)
+std::array<b2Fixture *, 2> build_world_border(b2World *world)
 {
   int const playing_field_width = arkanoid::playing_field_right - arkanoid::playing_field_left;
   int const playing_field_height = arkanoid::playing_field_bottom - arkanoid::playing_field_top;
@@ -1017,7 +1052,7 @@ void build_world_border(b2World *world)
     b2Body *body = world->CreateBody(&def);
     b2PolygonShape box;
     box.SetAsBox(width, height);
-    body->CreateFixture(&box, 1.0f);
+    return body->CreateFixture(&box, 1.0f);
   };
 
   // links
@@ -1025,9 +1060,13 @@ void build_world_border(b2World *world)
   // rechts
   generate(arkanoid::playing_field_right + 1, arkanoid::playing_field_top - 12, 1, playing_field_height + 24);
   // oben
-  generate(arkanoid::playing_field_left - 2, arkanoid::playing_field_top - 11, playing_field_width + 4, 1);
+  auto *const fix_1 =
+    generate(arkanoid::playing_field_left - 2, arkanoid::playing_field_top - 11, playing_field_width + 4, 1);
   // unten
-  generate(arkanoid::playing_field_left - 2, arkanoid::playing_field_bottom + 10, playing_field_width + 4, 1);
+  auto *const fix_2 =
+    generate(arkanoid::playing_field_left - 2, arkanoid::playing_field_bottom + 10, playing_field_width + 4, 1);
+
+  return { fix_1, fix_2 };
 }
 
 int main()
@@ -1049,7 +1088,7 @@ int main()
     arkanoid_world.SetContactListener(&listener);
     arkanoid::Vector const paddle_position = { (canvas_width / 2) - (paddle_width / 2), paddle_y };
 
-    build_world_border(&arkanoid_world);
+    auto const back_plates = build_world_border(&arkanoid_world);
 
     connection.register_receiver(
       [&element_map, &element_mutex, &arkanoid_world, &b2_element_map](GameUpdate const &update) {
@@ -1093,7 +1132,7 @@ int main()
     }
 
     if (connection.has_connected()) {
-      std::pair<Paddle *, Paddle *> paddle_ptrs{ nullptr, nullptr };
+      std::array<Paddle *, 2> paddle_ptrs{ nullptr, nullptr };// {your, enemy}
 
       int mouse_x{ paddle_position.x_i() };
       std::vector<arkanoid::Element *> updated_elements;
@@ -1108,8 +1147,8 @@ int main()
           std::for_each(
             element_map.begin(), element_map.end(), [&can](auto const &pair) { draw(can, *(pair.second)); });
 
-          if (paddle_ptrs.first != nullptr) { your_score = paddle_ptrs.first->score(); }
-          if (paddle_ptrs.second != nullptr) { enemy_score = paddle_ptrs.second->score(); }
+          if (paddle_ptrs[0] != nullptr) { your_score = paddle_ptrs[0]->score(); }
+          if (paddle_ptrs[1] != nullptr) { enemy_score = paddle_ptrs[1]->score(); }
         }
 
         can.DrawText(15,
@@ -1152,13 +1191,15 @@ int main()
                                 as_host,
                                 &updated_elements,
                                 &mouse_x,
+                                &back_plates,
+                                &listener,
                                 frame_rate,
                                 &arkanoid_world]() {// todo - mouse_x als kopie buggt
         {
           {
             std::lock_guard<std::mutex> lock{ element_mutex };
 
-            if (paddle_ptrs.first == nullptr || paddle_ptrs.second == nullptr) {
+            if (paddle_ptrs[0] == nullptr || paddle_ptrs[1] == nullptr) {
               auto found_iterator = std::find_if(element_map.begin(), element_map.end(), [](const auto &pair) {
                 return pair.second->get_type() == PADDLE;
               });
@@ -1171,17 +1212,34 @@ int main()
                     auto *paddle_ptr = dynamic_cast<Paddle *>(element_ptr);
 
                     if (paddle_ptr->is_controlled_by_this_game_instance()) {
-                      paddle_ptrs.first = paddle_ptr;
+                      paddle_ptrs[0] = paddle_ptr;
                     } else {
-                      paddle_ptrs.second = paddle_ptr;
+                      paddle_ptrs[1] = paddle_ptr;
                     }
                   }
                 });
+
+                if (paddle_ptrs[0] != nullptr && paddle_ptrs[1] != nullptr && back_plates[0] != nullptr
+                    && back_plates[1] != nullptr) {
+                  auto const distance_paddle_0_to_plate_0 =
+                    std::abs(arkanoid::convert_to_arkanoid_coords(back_plates[0]->GetBody()->GetPosition()).y
+                             - paddle_ptrs[0]->center_position().y);
+                  auto const distance_paddle_1_to_plate_0 =
+                    std::abs(arkanoid::convert_to_arkanoid_coords(back_plates[0]->GetBody()->GetPosition()).y
+                             - paddle_ptrs[1]->center_position().y);
+                  if (distance_paddle_0_to_plate_0 <= distance_paddle_1_to_plate_0) {
+                    listener.add_back_plate(back_plates[0], paddle_ptrs[0]);
+                    listener.add_back_plate(back_plates[1], paddle_ptrs[1]);
+                  } else {
+                    listener.add_back_plate(back_plates[0], paddle_ptrs[1]);
+                    listener.add_back_plate(back_plates[1], paddle_ptrs[0]);
+                  }
+                }
               }
             }
 
-            if (paddle_ptrs.first != nullptr) {
-              auto *paddle_ptr = paddle_ptrs.first;
+            if (paddle_ptrs[0] != nullptr) {
+              auto *paddle_ptr = paddle_ptrs[0];
 
               int new_paddle_x = mouse_x;
               int const half_width = paddle_ptr->width() / 2;
