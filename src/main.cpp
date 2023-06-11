@@ -307,6 +307,7 @@ int constexpr num_bricks_y{ 8 };
 int constexpr brick_distance_x{ 2 }, brick_distance_y{ 3 };
 float constexpr b2_coord_convertion_rate{ 140.0F };
 int constexpr brick_max_duration{ 3 }, brick_min_duration{ 1 };
+float constexpr ball_velocity_x{ 2.0F }, ball_velocity_y{ 2.5F };
 
 class IdGenerator
 {
@@ -513,7 +514,7 @@ private:
   friend void parse_game_element(Element *, GameElement const &);
 
 public:
-  explicit Ball(Vector const pos, b2World *arkanoid_world, std::map<b2Fixture *, Element *> &map)
+  explicit Ball(Vector const pos, b2World *arkanoid_world, std::map<b2Fixture *, Element *> &map, Vector const velocity)
     : Element{ ftxui::Color::Red }
   {
     auto const position = convert_to_b2_coords(pos);
@@ -534,7 +535,7 @@ public:
     fixtureDef.friction = 0.0F;// todo: andere friction = fehlerhaftes verhalten
 
     auto fixture = m_body_ptr->CreateFixture(&fixtureDef);
-    m_body_ptr->SetLinearVelocity({ 2.0F, 3.0F });
+    m_body_ptr->SetLinearVelocity({ velocity.x, velocity.y });
     m_body_ptr->SetAngularVelocity(0);
     m_body_ptr->SetFixedRotation(true);
 
@@ -761,7 +762,8 @@ void parse_game_update(std::map<int, std::unique_ptr<Element>> &map,
       std::unique_ptr<Element> arkanoid_element_ptr = nullptr;
 
       if (net_element.has_ball()) {
-        arkanoid_element_ptr = std::make_unique<Ball>(position, world, b2_map);
+        arkanoid_element_ptr = std::make_unique<Ball>(
+          position, world, b2_map, Vector{ net_element.ball().velocity_x(), net_element.ball().velocity_y() });
       } else if (net_element.has_brick()) {
         arkanoid_element_ptr = std::make_unique<Brick>(position, world, b2_map, net_element.brick().duration());
       } else if (net_element.has_paddle()) {
@@ -1087,6 +1089,8 @@ int main()
     ContactListener listener{ b2_element_map };
     arkanoid_world.SetContactListener(&listener);
     arkanoid::Vector const paddle_position = { (canvas_width / 2) - (paddle_width / 2), paddle_y };
+    arkanoid::Vector const ball_velocity = { ball_velocity_x, ball_velocity_y };
+    arkanoid::Vector const ball_position_add = { paddle_width / 2, -10 };
 
     auto const back_plates = build_world_border(&arkanoid_world);
 
@@ -1115,12 +1119,18 @@ int main()
         auto *paddle_enemy_ptr = dynamic_cast<Paddle *>(paddle_enemy.get());
         paddle_enemy_ptr->set_is_controlled_by_this_game_instance(false);
 
-        std::unique_ptr<arkanoid::Element> ball =
-          std::make_unique<Ball>(paddle_position.add(paddle_width / 2, -10), &arkanoid_world, b2_element_map);
+        std::unique_ptr<arkanoid::Element> ball = std::make_unique<Ball>(
+          paddle_position.add(ball_position_add), &arkanoid_world, b2_element_map, ball_velocity);
+        std::unique_ptr<arkanoid::Element> ball_enemy = std::make_unique<Ball>(
+          paddle_position.sub(0, paddle_y).add(0, playing_field_top).add({ ball_position_add.x, -ball_position_add.y }),
+          &arkanoid_world,
+          b2_element_map,
+          ball_velocity.invert());
 
         insert_element(element_map, paddle);
         insert_element(element_map, paddle_enemy);
         insert_element(element_map, ball);
+        insert_element(element_map, ball_enemy);
 
         generate_bricks(element_map, &arkanoid_world, b2_element_map);
 
