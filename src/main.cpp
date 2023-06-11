@@ -110,6 +110,34 @@ void show_connecting_state(connection::Connection &connection)
   screen.Exit();
 }
 
+void show_winner(int const winner, std::array<arkanoid::Paddle *, 2> const &paddles)
+{
+  using namespace ftxui;
+
+  auto screen = ScreenInteractive::TerminalOutput();
+  screen.Clear();
+
+  auto renderer = Renderer([&]() {
+    std::string winner_str{ "Unentschieden" };
+
+    if (winner < paddles.size() && winner >= 0) {
+      if (paddles[winner]->is_controlled_by_this_game_instance()) {
+        winner_str = "Du hast gewonnnen!";
+      } else {
+        winner_str = "Dein Gegner hat gewonnen!";
+      }
+    } else if (winner < 0) {
+      winner_str = "Das Spiel wurde abgebrochen!";
+    }
+
+    return vbox({ text(winner_str) }) | border;
+  });
+
+  Loop{ &screen, std::move(renderer) }.Run();
+
+  screen.Exit();
+}
+
 void connect_to_peer(connection::Connection &connection, bool const as_host, int const port)
 {
   using namespace ftxui;
@@ -427,6 +455,30 @@ void update_paddle_position(arkanoid::Paddle *paddle_ptr, int const mouse_x)
   paddle_ptr->update_x(new_paddle_x);
 }
 
+[[nodiscard]] int get_winner(std::map<int, std::unique_ptr<arkanoid::Element>> const &elements,
+  std::array<arkanoid::Paddle *, 2> const &paddles)
+{
+  auto found = std::find_if(elements.begin(), elements.end(), [](auto const &pair) {
+    auto *const element = pair.second.get();
+
+    return element->get_type() == arkanoid::BRICK && element->exists();
+  });
+
+  if (found == elements.end()) {
+    if (paddles[0] != nullptr && paddles[1] != nullptr) {
+      if (paddles[0]->score() > paddles[1]->score()) {
+        return 0;
+      } else if (paddles[0]->score() < paddles[1]->score()) {
+        return 1;
+      }
+
+      return paddles.max_size();
+    }
+  }
+
+  return -1;
+}
+
 void run_game(int const frame_rate,
   ftxui::ScreenInteractive &screen,
   ftxui::Loop &loop,
@@ -444,6 +496,8 @@ void run_game(int const frame_rate,
   using namespace ftxui;
   using namespace arkanoid;
   auto const frame_time_budget{ std::chrono::seconds(1) / frame_rate };
+  long frame{ 0 };
+  int winner{ -1 };
 
   while (!loop.HasQuitted()) {
     const auto frame_start_time{ std::chrono::steady_clock::now() };
@@ -471,10 +525,24 @@ void run_game(int const frame_rate,
       updated_elements.clear();
     }
 
+    {
+      if (frame % frame_rate == 0) {
+        std::lock_guard<std::mutex> lock{ element_mutex };
+        winner = get_winner(element_map, paddle_ptrs);
+
+        if (winner >= 0) {
+          screen.Exit();
+          break;
+        }
+      }
+    }
+
+    ++frame;
     const auto frame_end_time{ std::chrono::steady_clock::now() };
     const auto unused_frame_time{ frame_time_budget - (frame_end_time - frame_start_time) };
     if (unused_frame_time > std::chrono::seconds(0)) { std::this_thread::sleep_for(unused_frame_time); }
   }
+  show_winner(winner, paddle_ptrs);
 }
 
 int main()
@@ -537,7 +605,6 @@ int main()
 
     if (connection.has_connected()) {
 
-
       auto renderer = Renderer([&] {
         Canvas can = Canvas(canvas_width, canvas_height);
 
@@ -595,6 +662,7 @@ int main()
   });
 
   google::protobuf::ShutdownProtobufLibrary();
+
 
   return EXIT_SUCCESS;
 }
