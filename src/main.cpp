@@ -93,6 +93,23 @@ void show_connection_methods(std::function<void(bool const &, int const &)> call
   callback(is_host, port);
 }
 
+
+void show_connecting_state(connection::Connection &connection)
+{
+  using namespace ftxui;
+
+  auto screen = ScreenInteractive::TerminalOutput();
+  screen.Clear();
+
+  auto renderer = Renderer([&connection]() {
+    return vbox({ text((connection.has_connected()) ? "Verbunden" : "Konnte nicht verbinden") }) | border;
+  });
+
+  Loop{ &screen, std::move(renderer) }.RunOnce();
+
+  screen.Exit();
+}
+
 void connect_to_peer(connection::Connection &connection, bool const as_host, int const port)
 {
   using namespace ftxui;
@@ -117,52 +134,6 @@ void connect_to_peer(connection::Connection &connection, bool const as_host, int
     connection.wait_for_connection(port);
   } else {
     connection.connect_to(connection::default_host, port);
-  }
-}
-
-void show_connecting_state(connection::Connection &connection)
-{
-  using namespace ftxui;
-
-  auto screen = ScreenInteractive::TerminalOutput();
-  screen.Clear();
-
-  auto renderer = Renderer([&connection]() {
-    return vbox({ text((connection.has_connected()) ? "Verbunden" : "Konnte nicht verbinden") }) | border;
-  });
-
-  Loop{ &screen, std::move(renderer) }.RunOnce();
-
-  screen.Exit();
-}
-
-void generate_bricks(std::map<int, std::unique_ptr<arkanoid::Element>> &elements,
-  b2World *world,
-  std::map<b2Fixture *, arkanoid::Element *> &map)
-{
-  using namespace arkanoid;
-  std::random_device random_device;
-  std::default_random_engine random_engine{ random_device() };
-  std::uniform_int_distribution<int> uni_dist{ brick_min_duration, brick_max_duration };
-
-  int const num_bricks_x =
-    (playing_field_right - playing_field_left - brick_distance_x) / (brick_width + brick_distance_x);
-
-  int const total_brick_height = (num_bricks_y * (brick_height + brick_distance_y)) + brick_distance_y;
-  int const total_brick_width = (num_bricks_x * (brick_width + brick_distance_x)) - brick_distance_x;
-  int const top = std::round(((playing_field_bottom - playing_field_top) / 2.0F) - (total_brick_height / 2.0F));
-  int const left = std::round(((playing_field_right - playing_field_left) - total_brick_width) / 2.0F);
-
-  for (int i_x{ 0 }; i_x < num_bricks_x; ++i_x) {
-    for (int i_y{ 0 }; i_y < num_bricks_y; ++i_y) {
-
-      int const x{ playing_field_left + left + ((brick_distance_x + brick_width) * i_x) };
-      int const y{ playing_field_top + top + ((brick_distance_y + brick_height) * i_y) };
-
-      std::unique_ptr<arkanoid::Element> brick =
-        std::make_unique<arkanoid::Brick>(arkanoid::Vector{ x, y }, world, map, uni_dist(random_engine));
-      insert_element(elements, brick);
-    }
   }
 }
 
@@ -196,6 +167,73 @@ void create_and_send_new_game_update(std::vector<arkanoid::Element *> const &sen
   })
     .detach();
 }
+
+void generate_bricks(std::map<int, std::unique_ptr<arkanoid::Element>> &elements,
+  b2World *world,
+  std::map<b2Fixture *, arkanoid::Element *> &map)
+{
+  using namespace arkanoid;
+  std::random_device random_device;
+  std::default_random_engine random_engine{ random_device() };
+  std::uniform_int_distribution<int> uni_dist{ brick_min_duration, brick_max_duration };
+
+  int const num_bricks_x =
+    (playing_field_right - playing_field_left - brick_distance_x) / (brick_width + brick_distance_x);
+
+  int const total_brick_height = (num_bricks_y * (brick_height + brick_distance_y)) + brick_distance_y;
+  int const total_brick_width = (num_bricks_x * (brick_width + brick_distance_x)) - brick_distance_x;
+  int const top = std::round(((playing_field_bottom - playing_field_top) / 2.0F) - (total_brick_height / 2.0F));
+  int const left = std::round(((playing_field_right - playing_field_left) - total_brick_width) / 2.0F);
+
+  for (int i_x{ 0 }; i_x < num_bricks_x; ++i_x) {
+    for (int i_y{ 0 }; i_y < num_bricks_y; ++i_y) {
+
+      int const x{ playing_field_left + left + ((brick_distance_x + brick_width) * i_x) };
+      int const y{ playing_field_top + top + ((brick_distance_y + brick_height) * i_y) };
+
+      std::unique_ptr<arkanoid::Element> brick =
+        std::make_unique<arkanoid::Brick>(arkanoid::Vector{ x, y }, world, map, uni_dist(random_engine));
+      insert_element(elements, brick);
+    }
+  }
+}
+
+void generate_arkanoid_elements(arkanoid::Vector const paddle_position,
+  int const paddle_y,
+  arkanoid::Vector const ball_position_add,
+  arkanoid::Vector const ball_velocity,
+  b2World *arkanoid_world,
+  std::map<int, std::unique_ptr<arkanoid::Element>> &element_map,
+  std::map<b2Fixture *, arkanoid::Element *> &b2_element_map)
+{
+  using namespace arkanoid;
+
+  std::unique_ptr<arkanoid::Element> paddle = std::make_unique<Paddle>(paddle_position, arkanoid_world, b2_element_map);
+  std::unique_ptr<arkanoid::Element> paddle_enemy = std::make_unique<Paddle>(
+    paddle_position.sub(0, paddle_y).add(0, playing_field_top), arkanoid_world, b2_element_map);
+
+  auto *paddle_ptr = dynamic_cast<Paddle *>(paddle.get());
+  paddle_ptr->set_is_controlled_by_this_game_instance(true);
+
+  auto *paddle_enemy_ptr = dynamic_cast<Paddle *>(paddle_enemy.get());
+  paddle_enemy_ptr->set_is_controlled_by_this_game_instance(false);
+
+  std::unique_ptr<arkanoid::Element> ball =
+    std::make_unique<Ball>(paddle_position.add(ball_position_add), arkanoid_world, b2_element_map, ball_velocity);
+  std::unique_ptr<arkanoid::Element> ball_enemy = std::make_unique<Ball>(
+    paddle_position.sub(0, paddle_y).add(0, playing_field_top).add({ ball_position_add.x, -ball_position_add.y }),
+    arkanoid_world,
+    b2_element_map,
+    ball_velocity.invert());
+
+  insert_element(element_map, paddle);
+  insert_element(element_map, paddle_enemy);
+  insert_element(element_map, ball);
+  insert_element(element_map, ball_enemy);
+
+  generate_bricks(element_map, arkanoid_world, b2_element_map);
+}
+
 
 class ContactListener : public b2ContactListener
 {
@@ -282,7 +320,7 @@ public:
   }
 };
 
-std::array<b2Fixture *, 2> build_world_border(b2World *world)
+std::array<b2Fixture *, 2> build_b2_world_border(b2World *world)
 {
   int const playing_field_width = arkanoid::playing_field_right - arkanoid::playing_field_left;
   int const playing_field_height = arkanoid::playing_field_bottom - arkanoid::playing_field_top;
@@ -322,21 +360,23 @@ int main()
 
 
   show_connection_methods([](bool const as_host, int const &port) {
+    auto screen = ScreenInteractive::FitComponent();
+
+    connection::Connection connection;
+
     std::mutex element_mutex;
     std::mutex game_update_mutex;
     std::map<int, std::unique_ptr<arkanoid::Element>> element_map;
     std::map<b2Fixture *, arkanoid::Element *> b2_element_map;
-    connection::Connection connection;
-    auto screen = ScreenInteractive::FitComponent();
+
     int const paddle_y{ playing_field_bottom - paddle_height };
+    Vector const paddle_position{ (canvas_width / 2) - (paddle_width / 2), paddle_y };
+
+
     b2World arkanoid_world{ { 0, 0 } };
     ContactListener listener{ b2_element_map };
     arkanoid_world.SetContactListener(&listener);
-    arkanoid::Vector const paddle_position = { (canvas_width / 2) - (paddle_width / 2), paddle_y };
-    arkanoid::Vector const ball_velocity = { ball_velocity_x, ball_velocity_y };
-    arkanoid::Vector const ball_position_add = { paddle_width / 2, -10 };
-
-    auto const back_plates = build_world_border(&arkanoid_world);
+    auto const back_plates = build_b2_world_border(&arkanoid_world);
 
     connection.register_receiver(
       [&element_map, &element_mutex, &arkanoid_world, &b2_element_map](GameUpdate const &update) {
@@ -352,31 +392,13 @@ int main()
       {
         std::lock_guard<std::mutex> lock{ element_mutex };
 
-        std::unique_ptr<arkanoid::Element> paddle =
-          std::make_unique<Paddle>(paddle_position, &arkanoid_world, b2_element_map);
-        std::unique_ptr<arkanoid::Element> paddle_enemy = std::make_unique<Paddle>(
-          paddle_position.sub(0, paddle_y).add(0, playing_field_top), &arkanoid_world, b2_element_map);
-
-        auto *paddle_ptr = dynamic_cast<Paddle *>(paddle.get());
-        paddle_ptr->set_is_controlled_by_this_game_instance(true);
-
-        auto *paddle_enemy_ptr = dynamic_cast<Paddle *>(paddle_enemy.get());
-        paddle_enemy_ptr->set_is_controlled_by_this_game_instance(false);
-
-        std::unique_ptr<arkanoid::Element> ball = std::make_unique<Ball>(
-          paddle_position.add(ball_position_add), &arkanoid_world, b2_element_map, ball_velocity);
-        std::unique_ptr<arkanoid::Element> ball_enemy = std::make_unique<Ball>(
-          paddle_position.sub(0, paddle_y).add(0, playing_field_top).add({ ball_position_add.x, -ball_position_add.y }),
+        generate_arkanoid_elements(paddle_position,
+          { playing_field_bottom - paddle_height },
+          { paddle_width / 2, -10 },
+          { ball_velocity_x, ball_velocity_y },
           &arkanoid_world,
-          b2_element_map,
-          ball_velocity.invert());
-
-        insert_element(element_map, paddle);
-        insert_element(element_map, paddle_enemy);
-        insert_element(element_map, ball);
-        insert_element(element_map, ball_enemy);
-
-        generate_bricks(element_map, &arkanoid_world, b2_element_map);
+          element_map,
+          b2_element_map);
 
         GameUpdate update;
         arkanoid::fill_game_update(&update, map_values(element_map));
