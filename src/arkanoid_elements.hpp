@@ -12,7 +12,7 @@
 #include <ftxui/screen/color.hpp>
 #include <iostream>
 
-#include "utils.cpp"
+#include "utils.hpp"
 
 namespace arkanoid {
 

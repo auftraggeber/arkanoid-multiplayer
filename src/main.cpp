@@ -49,9 +49,9 @@
 
 #include "box2d-incl/box2d/box2d.h"
 
-#include "arkanoid_elements.cpp"
-#include "connection.cpp"
-#include "utils.cpp"
+#include "arkanoid_elements.hpp"
+#include "connection.hpp"
+#include "utils.hpp"
 
 void show_connection_methods(std::function<void(bool const &, int const &)> callback)
 {

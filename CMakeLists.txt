@@ -80,6 +80,7 @@ include_directories(asio/include)
 
 file(GLOB SOURCES
     src/*.cpp
+    src/*.hpp
     src/box2d-incl/*.cpp
     src/box2d-incl/*.h
     src/box2d-incl/box2d/*.h
