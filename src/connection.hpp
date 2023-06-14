@@ -50,7 +50,6 @@ private:
   asio::ip::tcp::socket m_socket{ m_io_service };
   std::vector<std::function<void(GameUpdate const &)>> m_receivers;
   bool m_connected{ false }, m_sending{ false };
-  std::queue<GameUpdate> m_next_game_updates;
   std::mutex m_receivers_mutex, m_conntected_mutex, m_send_mutex, m_send_c_mutex, m_receive_c_mutex;
   int m_gu_send_counter{ 0 }, m_gu_receive_counter{ 0 };
 

@@ -27,7 +27,7 @@ int constexpr brick_distance_x{ 2 }, brick_distance_y{ 3 };
 float constexpr b2_coord_convertion_rate{ 140.0F };
 int constexpr brick_max_duration{ 3 }, brick_min_duration{ 1 };
 float constexpr ball_velocity_x{ 2.0F }, ball_velocity_y{ 2.5F };
-float constexpr ball_force_y{ 0.08F }, ball_force_push_when_zero{ 0.7F };
+float constexpr ball_force_y{ 0.05F }, ball_force_push_when_zero{ 0.7F };
 bool constexpr ball_forces{ true };
 
 class IdGenerator
