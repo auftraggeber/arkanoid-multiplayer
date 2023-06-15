@@ -553,7 +553,7 @@ int main()
 
   show_connection_methods([](bool const as_host, int const &port) {
     auto screen = ScreenInteractive::FitComponent();
-    constexpr int frame_rate = 40.0;
+    constexpr int frame_rate = 30.0;
 
     std::mutex element_mutex;
     std::mutex game_update_mutex;

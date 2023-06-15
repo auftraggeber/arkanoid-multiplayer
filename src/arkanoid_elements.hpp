@@ -22,7 +22,7 @@ int constexpr playing_field_top{ 5 }, playing_field_bottom{ canvas_height - 30 }
 int constexpr ball_radius{ 1 }, ball_speed{ 1 };
 int constexpr paddle_width{ 14 }, paddle_height{ 1 };
 int constexpr brick_width{ 14 }, brick_height{ 5 };
-int constexpr num_bricks_y{ 6 };
+int constexpr num_bricks_y{ 4 };
 int constexpr brick_distance_x{ 2 }, brick_distance_y{ 3 };
 float constexpr b2_coord_convertion_rate{ 140.0F };
 int constexpr brick_max_duration{ 3 }, brick_min_duration{ 1 };
